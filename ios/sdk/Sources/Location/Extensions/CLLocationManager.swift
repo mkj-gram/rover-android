@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import CoreLocation
+
 extension CLLocationManager {
     public func monitor(for regions: Set<Region>) {
         let regionsToMonitor = Set<CLRegion>(regions.map { $0.clRegion })

@@ -6,6 +6,8 @@
 //  Copyright © 2018 Sean Rucker. All rights reserved.
 //
 
+import UIKit
+
 class NotificationStoreService: NotificationStore {
     let client: GraphQLClient
     let eventQueue: EventQueue?

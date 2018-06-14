@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 public enum DeepLinkAction {
     case presentExperience(campaignID: ID)
     case presentNotificationCenter
@@ -14,7 +16,7 @@ public enum DeepLinkAction {
 // MARK: Action
 
 extension DeepLinkAction: Action {
-    public func operation(_ resolver: Resolver) -> RoverFoundation.Operation? {
+    public func operation(_ resolver: Resolver) -> Operation? {
         switch self {
         case .presentExperience(let campaignID):
             return resolver.resolve(Operation.self, name: "presentExperience", arguments: campaignID)

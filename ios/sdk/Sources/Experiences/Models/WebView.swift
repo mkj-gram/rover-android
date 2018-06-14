@@ -6,6 +6,8 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 public struct WebView: Decodable {
     public var isScrollingEnabled: Bool
     public var url: URL

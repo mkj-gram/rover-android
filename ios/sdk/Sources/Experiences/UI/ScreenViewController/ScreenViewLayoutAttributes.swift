@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import UIKit
+
 class ScreenLayoutAttributes: UICollectionViewLayoutAttributes {
     var referenceFrame = CGRect.zero
     var verticalAlignment = UIControlContentVerticalAlignment.top

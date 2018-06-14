@@ -6,10 +6,12 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 public struct BlockObserver: OperationObserver {
-    public typealias StartHandler = (Operation) -> Void
-    public typealias ProduceHandler = (Operation, Foundation.Operation) -> Void
-    public typealias FinishHandler = (Operation, [Error]) -> Void
+    public typealias StartHandler = (AsynchronousOperation) -> Void
+    public typealias ProduceHandler = (AsynchronousOperation, Operation) -> Void
+    public typealias FinishHandler = (AsynchronousOperation, [Error]) -> Void
     
     private let startHandler: StartHandler?
     private let produceHandler: ProduceHandler?
@@ -21,15 +23,15 @@ public struct BlockObserver: OperationObserver {
         self.finishHandler = finishHandler
     }
     
-    public func operationDidStart(_ operation: Operation) {
+    public func operationDidStart(_ operation: AsynchronousOperation) {
         startHandler?(operation)
     }
     
-    public func operation(_ operation: Operation, didProduceOperation newOperation: Foundation.Operation) {
+    public func operation(_ operation: AsynchronousOperation, didProduceOperation newOperation: Operation) {
         produceHandler?(operation, newOperation)
     }
     
-    public func operationDidFinish(_ operation: Operation, errors: [Error]) {
+    public func operationDidFinish(_ operation: AsynchronousOperation, errors: [Error]) {
         finishHandler?(operation, errors)
     }
 }

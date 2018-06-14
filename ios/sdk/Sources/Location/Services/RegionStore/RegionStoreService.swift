@@ -6,6 +6,8 @@
 //  Copyright © 2018 Sean Rucker. All rights reserved.
 //
 
+import UIKit
+
 class RegionStoreService: RegionStore {
     let client: GraphQLClient
     let logger: Logger

@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import CoreBluetooth
+
 class BluetoothManagerService: NSObject, BluetoothManager {
     let central: CBCentralManager
     let eventQueue: EventQueue

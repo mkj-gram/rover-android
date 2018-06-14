@@ -6,6 +6,8 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
+import CoreLocation
+
 public struct LocationAssembler: Assembler {
     let isAutomaticLocationEventTrackingEnabled: Bool
     let isAutomaticRegionManagementEnabled: Bool

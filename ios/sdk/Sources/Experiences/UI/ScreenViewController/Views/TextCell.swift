@@ -6,6 +6,8 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
+import UIKit
+
 open class TextCell: BlockCell {
     open let textView: UITextView = {
         let textView = UITextView()

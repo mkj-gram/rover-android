@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import CoreLocation
+
 struct LocationContextProvider: ContextProvider {
     var locationAuthorization: String {
         let authorizationStatus: String

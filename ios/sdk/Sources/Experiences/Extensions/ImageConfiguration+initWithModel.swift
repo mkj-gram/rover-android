@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import CoreGraphics
+
 extension ImageConfiguration {
     public init?(background: Background, frame: CGRect) {
         guard let image = background.image else {

@@ -6,6 +6,8 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 fileprivate let storageKey = "io.rover.deviceAttributes"
 
 class DeviceAttributesService: DeviceAttributes {

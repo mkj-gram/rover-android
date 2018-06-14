@@ -6,7 +6,9 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
-class GoToScreenOperation: RoverFoundation.Operation {
+import UIKit
+
+class GoToScreenOperation: AsynchronousOperation {
     let screenID: ID
     let viewControllerProvider: (Experience, Screen) -> UIViewController
     

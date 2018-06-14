@@ -6,6 +6,8 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 class TimeZoneContextProvider {
     let timeZone: NSTimeZone
     

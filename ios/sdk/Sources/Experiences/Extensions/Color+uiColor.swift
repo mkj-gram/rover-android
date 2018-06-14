@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import UIKit
+
 extension Color {
     var uiColor: UIColor {
         let red = CGFloat(self.red) / 255.0

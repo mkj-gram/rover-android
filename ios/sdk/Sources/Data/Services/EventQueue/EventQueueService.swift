@@ -6,6 +6,8 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
+import UIKit
+
 class EventQueueService: EventQueue {
     let client: GraphQLClient
     let flushAt: Int

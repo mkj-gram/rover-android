@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import UIKit
+
 public struct DataAssembler: Assembler {
     public var accountToken: String
     public var endpoint: URL

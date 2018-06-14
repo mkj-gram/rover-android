@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import CoreLocation
+
 public enum Region: Equatable {
     case beacon(uuid: UUID, major: UInt16?, minor: UInt16?)
     case geofence(latitude: Double, longitude: Double, radius: Double)

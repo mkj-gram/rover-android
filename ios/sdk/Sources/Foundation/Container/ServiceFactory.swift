@@ -6,4 +6,4 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
-typealias ServiceFactory = Any
+public typealias ServiceFactory = Any

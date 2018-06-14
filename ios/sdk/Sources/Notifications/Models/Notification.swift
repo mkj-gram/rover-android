@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 public struct Notification: Codable, Equatable, Hashable {
     public struct Attachment: Codable, Equatable {
         public enum Format: String, Codable {
@@ -70,7 +72,7 @@ extension Notification {
 // MARK: Notification.Action
 
 extension Notification.Action: Action {
-    public func operation(_ resolver: Resolver) -> RoverFoundation.Operation? {
+    public func operation(_ resolver: Resolver) -> Operation? {
         switch self {
         case .openURL(let url):
             return resolver.resolve(Operation.self, name: "openURL", arguments: url)

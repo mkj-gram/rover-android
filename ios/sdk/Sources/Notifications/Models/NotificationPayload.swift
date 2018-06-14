@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 struct NotificationPayload: Decodable {
     enum Action {
         case addNotification(notification: Notification)
@@ -17,7 +19,7 @@ struct NotificationPayload: Decodable {
 // MARK: NotificationPayload.Action
 
 extension NotificationPayload.Action: Action {
-    public func operation(_ resolver: Resolver) -> RoverFoundation.Operation? {
+    public func operation(_ resolver: Resolver) -> Operation? {
         switch self {
         case .addNotification(let notification):
             return resolver.resolve(Operation.self, name: "addNotification", arguments: notification)

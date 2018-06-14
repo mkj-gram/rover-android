@@ -6,6 +6,8 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
+import UIKit
+
 class DeviceContextProvider: ContextProvider {
     let device: UIDevice
     let logger: Logger

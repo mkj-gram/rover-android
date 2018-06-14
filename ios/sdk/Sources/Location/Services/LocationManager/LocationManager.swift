@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import CoreLocation
+
 public protocol LocationManager {
     var isAutomaticLocationEventTrackingEnabled: Bool { get set }
     var isAutomaticRegionManagementEnabled: Bool { get set }

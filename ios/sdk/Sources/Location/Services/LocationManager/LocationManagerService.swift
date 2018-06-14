@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import CoreLocation
+
 class LocationManagerService: NSObject, LocationManager, CLLocationManagerDelegate {
     let eventQueue: EventQueue
     let locationManager: CLLocationManager

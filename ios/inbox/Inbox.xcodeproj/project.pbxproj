@@ -35,8 +35,6 @@
 		DBD88AE520C1BF2900085AE0 /* RoverBluetooth.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88AE320C1BF2900085AE0 /* RoverBluetooth.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBD88AE720C1BF2900085AE0 /* RoverExperiences.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88AE620C1BF2900085AE0 /* RoverExperiences.framework */; };
 		DBD88AE820C1BF2900085AE0 /* RoverExperiences.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88AE620C1BF2900085AE0 /* RoverExperiences.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DBD88AEA20C1BF2900085AE0 /* RoverApplication.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88AE920C1BF2900085AE0 /* RoverApplication.framework */; };
-		DBD88AEB20C1BF2900085AE0 /* RoverApplication.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88AE920C1BF2900085AE0 /* RoverApplication.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBD88AED20C1BF2900085AE0 /* RoverUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88AEC20C1BF2900085AE0 /* RoverUI.framework */; };
 		DBD88AEE20C1BF2900085AE0 /* RoverUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88AEC20C1BF2900085AE0 /* RoverUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBD88AF020C1BF2900085AE0 /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88AEF20C1BF2900085AE0 /* RoverData.framework */; };
@@ -78,7 +76,6 @@
 				DBD88AF120C1BF2900085AE0 /* RoverData.framework in Embed Frameworks */,
 				DBD88AE520C1BF2900085AE0 /* RoverBluetooth.framework in Embed Frameworks */,
 				DBD88ADC20C1BF2900085AE0 /* RoverFoundation.framework in Embed Frameworks */,
-				DBD88AEB20C1BF2900085AE0 /* RoverApplication.framework in Embed Frameworks */,
 				DBD88ACE20C1BEFC00085AE0 /* RoverAppExtensions.framework in Embed Frameworks */,
 				DBD88ADF20C1BF2900085AE0 /* RoverNotifications.framework in Embed Frameworks */,
 				DBD88AE820C1BF2900085AE0 /* RoverExperiences.framework in Embed Frameworks */,
@@ -113,7 +110,6 @@
 		DBD88AE020C1BF2900085AE0 /* RoverLocation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverLocation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBD88AE320C1BF2900085AE0 /* RoverBluetooth.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverBluetooth.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBD88AE620C1BF2900085AE0 /* RoverExperiences.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverExperiences.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBD88AE920C1BF2900085AE0 /* RoverApplication.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverApplication.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBD88AEC20C1BF2900085AE0 /* RoverUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBD88AEF20C1BF2900085AE0 /* RoverData.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RoverData.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -138,7 +134,6 @@
 				DBD88AF020C1BF2900085AE0 /* RoverData.framework in Frameworks */,
 				DBD88AE420C1BF2900085AE0 /* RoverBluetooth.framework in Frameworks */,
 				DBD88ADB20C1BF2900085AE0 /* RoverFoundation.framework in Frameworks */,
-				DBD88AEA20C1BF2900085AE0 /* RoverApplication.framework in Frameworks */,
 				DBD88ACD20C1BEFC00085AE0 /* RoverAppExtensions.framework in Frameworks */,
 				DBD88ADE20C1BF2900085AE0 /* RoverNotifications.framework in Frameworks */,
 				DBD88AE720C1BF2900085AE0 /* RoverExperiences.framework in Frameworks */,
@@ -171,7 +166,6 @@
 			children = (
 				DBD88AEF20C1BF2900085AE0 /* RoverData.framework */,
 				DBD88AEC20C1BF2900085AE0 /* RoverUI.framework */,
-				DBD88AE920C1BF2900085AE0 /* RoverApplication.framework */,
 				DBD88AE620C1BF2900085AE0 /* RoverExperiences.framework */,
 				DBD88AE320C1BF2900085AE0 /* RoverBluetooth.framework */,
 				DBD88AE020C1BF2900085AE0 /* RoverLocation.framework */,

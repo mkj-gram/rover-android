@@ -6,6 +6,8 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 public struct EventInfo {
     public let name: String
     public let namespace: String?

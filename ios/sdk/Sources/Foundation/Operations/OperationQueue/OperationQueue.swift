@@ -6,14 +6,16 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 /**
  `OperationQueue` is a `Foundation.OperationQueue` subclass that adds the ability to notify a delegate when operations finish.
  */
 public class OperationQueue: Foundation.OperationQueue {
     weak var delegate: OperationQueueDelegate?
     
-    override public func addOperation(_ op: Foundation.Operation) {
-        if let operation = op as? Operation {
+    override public func addOperation(_ op: Operation) {
+        if let operation = op as? AsynchronousOperation {
             
             // Use a `BlockObserver` to add produced operations and invoke the `OperationQueueDelegate` methods.
             
@@ -48,7 +50,7 @@ public class OperationQueue: Foundation.OperationQueue {
         super.addOperation(op)
     }
 
-    override public func addOperations(_ ops: [Foundation.Operation], waitUntilFinished wait: Bool) {
+    override public func addOperations(_ ops: [Operation], waitUntilFinished wait: Bool) {
     
         // The base implementation of this method does not call `addOperation()`, so we'll call it ourselves.
 

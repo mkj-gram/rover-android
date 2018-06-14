@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 class ExperienceStoreService: ExperienceStore {
     let client: GraphQLClient
     let logger: Logger

@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import UserNotifications
+
 extension UNNotificationRequest {
     public var action: Action? {
         guard let data = try? JSONSerialization.data(withJSONObject: content.userInfo, options: []) else {

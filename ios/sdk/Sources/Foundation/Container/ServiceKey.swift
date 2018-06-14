@@ -6,15 +6,20 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
-struct ServiceKey: Hashable, Equatable {
-    var factoryType: ServiceFactory.Type
-    var name: String?
+public struct ServiceKey: Hashable, Equatable {
+    public var factoryType: ServiceFactory.Type
+    public var name: String?
     
-    var hashValue: Int {
+    public init(factoryType: ServiceFactory.Type, name: String?) {
+        self.factoryType = factoryType
+        self.name = name
+    }
+    
+    public var hashValue: Int {
         return ObjectIdentifier(factoryType).hashValue ^ (name?.hashValue ?? 0)
     }
     
-    static func == (lhs: ServiceKey, rhs: ServiceKey) -> Bool {
+    public static func == (lhs: ServiceKey, rhs: ServiceKey) -> Bool {
         return lhs.factoryType == rhs.factoryType && lhs.name == rhs.name
     }
 }

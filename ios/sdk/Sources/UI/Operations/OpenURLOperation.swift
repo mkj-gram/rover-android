@@ -6,7 +6,9 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
-open class OpenURLOperation: RoverFoundation.Operation {
+import UIKit
+
+open class OpenURLOperation: AsynchronousOperation {
     public let url: URL
     
     public init(url: URL) {

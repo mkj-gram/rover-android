@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import UIKit
+
 open class NotificationCell: UITableViewCell {
     public var notification: Notification?
     

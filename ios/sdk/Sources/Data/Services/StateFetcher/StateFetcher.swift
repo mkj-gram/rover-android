@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import UIKit
+
 public protocol StateFetcher {
     var isAutoFetchEnabled: Bool { get set }
     

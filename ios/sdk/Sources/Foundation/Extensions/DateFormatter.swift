@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 extension DateFormatter {
     public static let rfc3339: DateFormatter = {
         let formatter = DateFormatter()

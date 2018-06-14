@@ -7,7 +7,6 @@
 //
 
 import Auth
-import RoverApplication
 import RoverBluetooth
 import RoverExperiences
 import RoverLocation

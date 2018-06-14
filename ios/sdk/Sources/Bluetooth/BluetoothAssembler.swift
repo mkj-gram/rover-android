@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import CoreBluetooth
+
 public struct BluetoothAssembler: Assembler {
     public init() { }
     

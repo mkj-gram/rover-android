@@ -6,7 +6,7 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
-fileprivate typealias Operation = RoverFoundation.Operation
+import UIKit
 
 public struct ExperiencesAssembler: Assembler {
     public init() { }

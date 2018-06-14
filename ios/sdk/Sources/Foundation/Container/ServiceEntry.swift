@@ -6,18 +6,16 @@
 //  Copyright © 2017 Rover Labs Inc. All rights reserved.
 //
 
-struct ServiceEntry<T> {
-    let serviceType: T.Type
-    let factory: ServiceFactory
-    let scope: ServiceScope
+public class ServiceEntry<T> {
+    public let serviceType: T.Type
+    public let factory: ServiceFactory
+    public let scope: ServiceScope
     
-    var instance: T?
+    public var instance: T?
     
-    init(serviceType: T.Type, scope: ServiceScope, factory: ServiceFactory) {
+    public init(serviceType: T.Type, scope: ServiceScope, factory: ServiceFactory) {
         self.serviceType = serviceType
         self.factory = factory
         self.scope = scope
     }
 }
-
-extension ServiceEntry: ServiceEntryProtocol { }

@@ -6,7 +6,8 @@
 //  Copyright © 2018 Sean Rucker. All rights reserved.
 //
 
-fileprivate typealias Operation = RoverFoundation.Operation
+import UIKit
+import UserNotifications
 
 public struct NotificationsAssembler: Assembler {
     public var appGroup: String

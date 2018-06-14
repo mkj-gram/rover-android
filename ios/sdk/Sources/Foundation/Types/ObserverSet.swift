@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 /*
  Inspired by:
  http://blog.scottlogic.com/2015/02/11/swift-kvo-alternatives.html

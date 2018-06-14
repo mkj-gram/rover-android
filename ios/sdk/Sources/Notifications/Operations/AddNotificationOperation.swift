@@ -6,7 +6,9 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
-class AddNotificationOperation: RoverFoundation.Operation {
+import UIKit
+
+class AddNotificationOperation: AsynchronousOperation {
     let dispatcher: Dispatcher
     let eventQueue: EventQueue
     let notification: Notification
@@ -30,7 +32,7 @@ class AddNotificationOperation: RoverFoundation.Operation {
         
         if notification.isNotificationCenterEnabled, let notificationHandler = notificationCenter as? NotificationHandler {
             let presentNotificationCenter = PresentNotificationCenterAction()
-            if let operation = dispatcher.dispatch(presentNotificationCenter) {
+            if let operation = dispatcher.dispatch(presentNotificationCenter) as? AsynchronousOperation {
                 let observer = BlockObserver { (_, _) in
                     notificationHandler.openNotification(self.notification)
                     self.finish()

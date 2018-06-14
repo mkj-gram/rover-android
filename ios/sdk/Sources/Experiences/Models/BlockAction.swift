@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 public enum BlockAction {
     case goToScreen(screenID: ID)
     case openURL(url: URL)
@@ -15,7 +17,7 @@ public enum BlockAction {
 // MARK: Action
 
 extension BlockAction: Action {
-    public func operation(_ resolver: Resolver) -> RoverFoundation.Operation? {
+    public func operation(_ resolver: Resolver) -> Operation? {
         switch self {
         case .goToScreen(let screenID):
             return resolver.resolve(Operation.self, name: "goToScreen", arguments: screenID)

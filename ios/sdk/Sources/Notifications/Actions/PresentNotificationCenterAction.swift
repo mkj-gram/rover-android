@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 public struct PresentNotificationCenterAction {
     public init() { }
 }
@@ -13,7 +15,7 @@ public struct PresentNotificationCenterAction {
 // MARK: Action
 
 extension PresentNotificationCenterAction: Action {
-    public func operation(_ resolver: Resolver) -> RoverFoundation.Operation? {
+    public func operation(_ resolver: Resolver) -> Operation? {
         return resolver.resolve(Operation.self, name: "presentNotificationCenter")
     }
 }

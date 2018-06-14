@@ -6,6 +6,9 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import CoreGraphics
+import Foundation
+
 public struct ImageConfiguration {
     public let url: URL
     public let optimization: ImageOptimization?

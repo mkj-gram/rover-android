@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import UIKit
+
 open class BarcodeCell: BlockCell {
     open let imageView: UIImageView = {
         let imageView = UIImageView()

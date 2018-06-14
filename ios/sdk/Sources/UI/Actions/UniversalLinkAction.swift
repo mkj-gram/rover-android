@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 public struct UniversalLinkAction {
     public let url: URL
     
@@ -17,7 +19,7 @@ public struct UniversalLinkAction {
 // MARK: Action
 
 extension UniversalLinkAction: Action {
-    public func operation(_ resolver: Resolver) -> RoverFoundation.Operation? {
+    public func operation(_ resolver: Resolver) -> Operation? {
         return resolver.resolve(Operation.self, name: "universalLink", arguments: url)
     }
 }

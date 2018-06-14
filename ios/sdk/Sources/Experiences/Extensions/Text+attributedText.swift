@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import UIKit
+
 extension Text {
     var attributedText: NSAttributedString? {
         guard let data = rawValue.data(using: String.Encoding.unicode) else {

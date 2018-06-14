@@ -6,7 +6,9 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
-open class PresentViewOperation: RoverFoundation.Operation {
+import UIKit
+
+open class PresentViewOperation: AsynchronousOperation {
     public let logger: Logger
     
     public var viewControllerToPresent: UIViewController

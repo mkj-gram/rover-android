@@ -6,7 +6,9 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
-open class GroupOperation: Operation {
+import Foundation
+
+open class GroupOperation: AsynchronousOperation {
     private let internalQueue = OperationQueue()
     private let startingOperation = BlockOperation { }
     private let finishingOperation = BlockOperation { }
@@ -49,7 +51,7 @@ open class GroupOperation: Operation {
 // MARK: OperationQueueDelegate
 
 extension GroupOperation: OperationQueueDelegate {
-    func operationQueue(_ operationQueue: OperationQueue, willAddOperation operation: Foundation.Operation) {
+    func operationQueue(_ operationQueue: OperationQueue, willAddOperation operation: Operation) {
         guard !finishingOperation.isFinished && !finishingOperation.isExecuting else {
             return
         }
@@ -63,7 +65,7 @@ extension GroupOperation: OperationQueueDelegate {
         }
     }
     
-    func operationQueue(_ operationQueue: OperationQueue, operationDidFinish operation: Foundation.Operation, withErrors errors: [Error]) {
+    func operationQueue(_ operationQueue: OperationQueue, operationDidFinish operation: Operation, withErrors errors: [Error]) {
         aggregatedErrors.append(contentsOf: errors)
         
         if operation === finishingOperation {

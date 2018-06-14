@@ -6,6 +6,8 @@
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
+import Foundation
+
 public struct Event: Codable, Equatable {
     private enum CodingKeys: String, CodingKey {
         case id

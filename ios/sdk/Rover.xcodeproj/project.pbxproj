@@ -32,7 +32,6 @@
 		DB6ADD7520B33F3A002F226C /* ImageStoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB709C6B207EAEED00F96C2B /* ImageStoreService.swift */; };
 		DB6ADD7820B33F68002F226C /* UIAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD7620B33F5D002F226C /* UIAssembler.swift */; };
 		DB6ADD8020B344BC002F226C /* SessionControllerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD7E20B3449E002F226C /* SessionControllerService.swift */; };
-		DB6ADD8220B34998002F226C /* RoverUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD5A20B33EC0002F226C /* RoverUI.framework */; };
 		DB6ADD8620B34F00002F226C /* SessionControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD8420B34EF8002F226C /* SessionControllerDelegate.swift */; };
 		DB6ADD8920B34F86002F226C /* SessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD8720B34F81002F226C /* SessionController.swift */; };
 		DB6ADD8A20B351B6002F226C /* OpenURLOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2585920A36DF400400EA2 /* OpenURLOperation.swift */; };
@@ -41,19 +40,17 @@
 		DB9DBF7F2055974B00E5C77F /* RoverNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB9DBF762055974B00E5C77F /* RoverNotifications.framework */; };
 		DB9DBF842055974B00E5C77F /* RoverNotificationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBF832055974B00E5C77F /* RoverNotificationsTests.swift */; };
 		DB9DBF862055974B00E5C77F /* RoverNotifications.h in Headers */ = {isa = PBXBuildFile; fileRef = DB9DBF782055974B00E5C77F /* RoverNotifications.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB9DBF8D2055976E00E5C77F /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
 		DB9DBFA2205597C300E5C77F /* NotificationsAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBF8E205597C300E5C77F /* NotificationsAssembler.swift */; };
 		DB9DBFA8205597C300E5C77F /* NotificationAuthorizationContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBF98205597C300E5C77F /* NotificationAuthorizationContextProvider.swift */; };
 		DB9DBFBE2055980800E5C77F /* RoverLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB9DBFB52055980800E5C77F /* RoverLocation.framework */; };
 		DB9DBFC32055980800E5C77F /* RoverLocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBFC22055980800E5C77F /* RoverLocationTests.swift */; };
 		DB9DBFC52055980800E5C77F /* RoverLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = DB9DBFB72055980800E5C77F /* RoverLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DB9DBFCC2055982000E5C77F /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
 		DB9DBFDE2055983700E5C77F /* LocationAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBFCD2055983700E5C77F /* LocationAssembler.swift */; };
 		DB9DBFE02055983700E5C77F /* LocationContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBFD22055983700E5C77F /* LocationContextProvider.swift */; };
 		DB9DBFE12055983700E5C77F /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBFD42055983700E5C77F /* LocationManager.swift */; };
-		DBADA7F920A4F32500225C80 /* Foundation.Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F020A4F32500225C80 /* Foundation.Operation.swift */; };
+		DBADA7F920A4F32500225C80 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F020A4F32500225C80 /* Operation.swift */; };
 		DBADA7FA20A4F32500225C80 /* GroupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F120A4F32500225C80 /* GroupOperation.swift */; };
-		DBADA7FB20A4F32500225C80 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F220A4F32500225C80 /* Operation.swift */; };
+		DBADA7FB20A4F32500225C80 /* AsynchronousOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F220A4F32500225C80 /* AsynchronousOperation.swift */; };
 		DBADA7FC20A4F32500225C80 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F420A4F32500225C80 /* OperationObserver.swift */; };
 		DBADA7FD20A4F32500225C80 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F520A4F32500225C80 /* BlockObserver.swift */; };
 		DBADA7FE20A4F32500225C80 /* OperationQueueDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F720A4F32500225C80 /* OperationQueueDelegate.swift */; };
@@ -68,6 +65,17 @@
 		DBB89B9A20D014C700DD797A /* RouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB00FDF9208D0A0A008D1A57 /* RouterService.swift */; };
 		DBB89B9E20D0167B00DD797A /* ApplicationMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB89B9C20D0160100DD797A /* ApplicationMonitor.swift */; };
 		DBB89BA120D01CD700DD797A /* ApplicationMonitorService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB89B9F20D01CC500DD797A /* ApplicationMonitorService.swift */; };
+		DBB89BC820D03E7900DD797A /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
+		DBB89BC920D03E7900DD797A /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
+		DBB89BCA20D03E8600DD797A /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
+		DBB89BCB20D03E8600DD797A /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
+		DBB89BCC20D03E8600DD797A /* RoverUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD5A20B33EC0002F226C /* RoverUI.framework */; };
+		DBB89BCD20D03E9000DD797A /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
+		DBB89BCE20D03E9000DD797A /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
+		DBB89BCF20D03E9000DD797A /* RoverUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD5A20B33EC0002F226C /* RoverUI.framework */; };
+		DBB89BE820D0415600DD797A /* Rover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DF2203DE18500B54652 /* Rover.swift */; };
+		DBB89C4920D07F6600DD797A /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
+		DBB89C4C20D084D600DD797A /* RoverFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = DBB89C4A20D083AF00DD797A /* RoverFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DBD88A7C20C1B21700085AE0 /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
 		DBD88A8120C1B21700085AE0 /* RoverDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBD88A8020C1B21700085AE0 /* RoverDataTests.swift */; };
 		DBD88A8320C1B21700085AE0 /* RoverData.h in Headers */ = {isa = PBXBuildFile; fileRef = DBD88A7520C1B21700085AE0 /* RoverData.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -111,21 +119,14 @@
 		DBD88ABE20C1BACF00085AE0 /* DataAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBD88ABC20C1BA7C00085AE0 /* DataAssembler.swift */; };
 		DBD88ABF20C1BC4000085AE0 /* DeepLinkAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA82420A777B100225C80 /* DeepLinkAction.swift */; };
 		DBD88AC020C1BC4000085AE0 /* UniversalLinkAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB08F9A120AB8B1A0029D6DF /* UniversalLinkAction.swift */; };
-		DBD88AC220C1BD8E00085AE0 /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
-		DBD88AC320C1BDBB00085AE0 /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
-		DBD88AC420C1BDBB00085AE0 /* RoverUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD5A20B33EC0002F226C /* RoverUI.framework */; };
-		DBD88AC520C1BDF900085AE0 /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
 		DBD88AC620C1BE1C00085AE0 /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
 		DBE03B3B20AF162700F3CE95 /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
 		DBF2584120A107BD00400EA2 /* ObserverSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2584020A107BD00400EA2 /* ObserverSet.swift */; };
 		DBF2584520A32E9400400EA2 /* Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2584420A32E9400400EA2 /* Action.swift */; };
 		DBF49DDD203DE00F00B54652 /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
 		DBF49DE2203DE00F00B54652 /* RoverFoundationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DE1203DE00F00B54652 /* RoverFoundationTests.swift */; };
-		DBF49DE4203DE00F00B54652 /* RoverFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = DBF49DD6203DE00F00B54652 /* RoverFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DBF49DF5203DE18500B54652 /* Rover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DF2203DE18500B54652 /* Rover.swift */; };
 		DBF49DF6203DE18500B54652 /* FoundationAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DF3203DE18500B54652 /* FoundationAssembler.swift */; };
 		DBF49E00203DE1DE00B54652 /* Resolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DF8203DE1DE00B54652 /* Resolver.swift */; };
-		DBF49E01203DE1DE00B54652 /* ServiceEntryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DF9203DE1DE00B54652 /* ServiceEntryProtocol.swift */; };
 		DBF49E02203DE1DE00B54652 /* Assembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DFA203DE1DE00B54652 /* Assembler.swift */; };
 		DBF49E03203DE1DE00B54652 /* ServiceEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DFB203DE1DE00B54652 /* ServiceEntry.swift */; };
 		DBF49E04203DE1DE00B54652 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DFC203DE1DE00B54652 /* Container.swift */; };
@@ -157,7 +158,6 @@
 		DBFDF44B20AC84430031EF47 /* RoverExperiences.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBFDF44220AC84430031EF47 /* RoverExperiences.framework */; };
 		DBFDF45020AC84430031EF47 /* RoverExperiencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFDF44F20AC84430031EF47 /* RoverExperiencesTests.swift */; };
 		DBFDF45220AC84430031EF47 /* RoverExperiences.h in Headers */ = {isa = PBXBuildFile; fileRef = DBFDF44420AC84430031EF47 /* RoverExperiences.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DBFDF45920AC84990031EF47 /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
 		DBFDF45A20AC84B30031EF47 /* ExperiencesAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B62209CD46200E99F9F /* ExperiencesAssembler.swift */; };
 		DBFDF45B20AC853B0031EF47 /* Color+uiColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B66209CD89400E99F9F /* Color+uiColor.swift */; };
 		DBFDF45C20AC853B0031EF47 /* Text+attributedText.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B68209CD8D600E99F9F /* Text+attributedText.swift */; };
@@ -199,7 +199,7 @@
 		DBFDF48020AC85650031EF47 /* ScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBEE02055964E00E5C77F /* ScreenViewController.swift */; };
 		DBFDF48120AC85650031EF47 /* ScreenViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBEE32055964E00E5C77F /* ScreenViewLayout.swift */; };
 		DBFDF48220AC85650031EF47 /* ScreenViewLayoutAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB00FDD92087E09F008D1A57 /* ScreenViewLayoutAttributes.swift */; };
-		DBFDF48520AC85920031EF47 /* ImageConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFDF48320AC858A0031EF47 /* ImageConfiguration.swift */; };
+		DBFDF48520AC85920031EF47 /* ImageConfiguration+initWithModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFDF48320AC858A0031EF47 /* ImageConfiguration+initWithModel.swift */; };
 		DBFDF52420AE2B1C0031EF47 /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFDF52320AE2B1C0031EF47 /* DateFormatter.swift */; };
 /* End PBXBuildFile section */
 
@@ -342,9 +342,9 @@
 		DB9DC0302055992400E5C77F /* DeviceAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceAttributes.swift; sourceTree = "<group>"; };
 		DB9DC0312055992400E5C77F /* DeviceAttributesService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceAttributesService.swift; sourceTree = "<group>"; };
 		DB9DC0AD2055B82B00E5C77F /* NotificationExtensionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationExtensionHelper.swift; sourceTree = "<group>"; };
-		DBADA7F020A4F32500225C80 /* Foundation.Operation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Foundation.Operation.swift; sourceTree = "<group>"; };
+		DBADA7F020A4F32500225C80 /* Operation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operation.swift; sourceTree = "<group>"; };
 		DBADA7F120A4F32500225C80 /* GroupOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupOperation.swift; sourceTree = "<group>"; };
-		DBADA7F220A4F32500225C80 /* Operation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operation.swift; sourceTree = "<group>"; };
+		DBADA7F220A4F32500225C80 /* AsynchronousOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsynchronousOperation.swift; sourceTree = "<group>"; };
 		DBADA7F420A4F32500225C80 /* OperationObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationObserver.swift; sourceTree = "<group>"; };
 		DBADA7F520A4F32500225C80 /* BlockObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockObserver.swift; sourceTree = "<group>"; };
 		DBADA7F720A4F32500225C80 /* OperationQueueDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationQueueDelegate.swift; sourceTree = "<group>"; };
@@ -361,6 +361,7 @@
 		DBADA83420AA2A3100225C80 /* GoToScreenOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoToScreenOperation.swift; sourceTree = "<group>"; };
 		DBB89B9C20D0160100DD797A /* ApplicationMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationMonitor.swift; sourceTree = "<group>"; };
 		DBB89B9F20D01CC500DD797A /* ApplicationMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationMonitorService.swift; sourceTree = "<group>"; };
+		DBB89C4A20D083AF00DD797A /* RoverFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoverFoundation.h; sourceTree = "<group>"; };
 		DBD88A7320C1B21700085AE0 /* RoverData.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RoverData.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBD88A7520C1B21700085AE0 /* RoverData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoverData.h; sourceTree = "<group>"; };
 		DBD88A7620C1B21700085AE0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -379,7 +380,6 @@
 		DBF2585920A36DF400400EA2 /* OpenURLOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenURLOperation.swift; sourceTree = "<group>"; };
 		DBF2585D20A37BF300400EA2 /* PresentViewOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentViewOperation.swift; sourceTree = "<group>"; };
 		DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RoverFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DBF49DD6203DE00F00B54652 /* RoverFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoverFoundation.h; sourceTree = "<group>"; };
 		DBF49DD7203DE00F00B54652 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DBF49DDC203DE00F00B54652 /* RoverFoundationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoverFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBF49DE1203DE00F00B54652 /* RoverFoundationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoverFoundationTests.swift; sourceTree = "<group>"; };
@@ -387,7 +387,6 @@
 		DBF49DF2203DE18500B54652 /* Rover.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Rover.swift; sourceTree = "<group>"; };
 		DBF49DF3203DE18500B54652 /* FoundationAssembler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FoundationAssembler.swift; sourceTree = "<group>"; };
 		DBF49DF8203DE1DE00B54652 /* Resolver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Resolver.swift; sourceTree = "<group>"; };
-		DBF49DF9203DE1DE00B54652 /* ServiceEntryProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceEntryProtocol.swift; sourceTree = "<group>"; };
 		DBF49DFA203DE1DE00B54652 /* Assembler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Assembler.swift; sourceTree = "<group>"; };
 		DBF49DFB203DE1DE00B54652 /* ServiceEntry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceEntry.swift; sourceTree = "<group>"; };
 		DBF49DFC203DE1DE00B54652 /* Container.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
@@ -465,7 +464,7 @@
 		DBFDF44A20AC84430031EF47 /* RoverExperiencesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoverExperiencesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBFDF44F20AC84430031EF47 /* RoverExperiencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoverExperiencesTests.swift; sourceTree = "<group>"; };
 		DBFDF45120AC84430031EF47 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DBFDF48320AC858A0031EF47 /* ImageConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageConfiguration.swift; sourceTree = "<group>"; };
+		DBFDF48320AC858A0031EF47 /* ImageConfiguration+initWithModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImageConfiguration+initWithModel.swift"; sourceTree = "<group>"; };
 		DBFDF51420ACB2340031EF47 /* GraphQLClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GraphQLClient.swift; sourceTree = "<group>"; };
 		DBFDF52320AE2B1C0031EF47 /* DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -508,6 +507,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBB89C4920D07F6600DD797A /* RoverData.framework in Frameworks */,
 				DB6ADD7120B33F12002F226C /* RoverFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -524,9 +524,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBD88AC320C1BDBB00085AE0 /* RoverData.framework in Frameworks */,
-				DBD88AC420C1BDBB00085AE0 /* RoverUI.framework in Frameworks */,
-				DB9DBF8D2055976E00E5C77F /* RoverFoundation.framework in Frameworks */,
+				DBB89BCA20D03E8600DD797A /* RoverData.framework in Frameworks */,
+				DBB89BCB20D03E8600DD797A /* RoverFoundation.framework in Frameworks */,
+				DBB89BCC20D03E8600DD797A /* RoverUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -542,8 +542,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBD88AC520C1BDF900085AE0 /* RoverData.framework in Frameworks */,
-				DB9DBFCC2055982000E5C77F /* RoverFoundation.framework in Frameworks */,
+				DBB89BC820D03E7900DD797A /* RoverData.framework in Frameworks */,
+				DBB89BC920D03E7900DD797A /* RoverFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -590,9 +590,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBD88AC220C1BD8E00085AE0 /* RoverData.framework in Frameworks */,
-				DB6ADD8220B34998002F226C /* RoverUI.framework in Frameworks */,
-				DBFDF45920AC84990031EF47 /* RoverFoundation.framework in Frameworks */,
+				DBB89BCD20D03E9000DD797A /* RoverData.framework in Frameworks */,
+				DBB89BCE20D03E9000DD797A /* RoverFoundation.framework in Frameworks */,
+				DBB89BCF20D03E9000DD797A /* RoverUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -920,9 +920,9 @@
 		DBADA7EF20A4F32500225C80 /* Operations */ = {
 			isa = PBXGroup;
 			children = (
-				DBADA7F020A4F32500225C80 /* Foundation.Operation.swift */,
+				DBADA7F020A4F32500225C80 /* Operation.swift */,
 				DBADA7F120A4F32500225C80 /* GroupOperation.swift */,
-				DBADA7F220A4F32500225C80 /* Operation.swift */,
+				DBADA7F220A4F32500225C80 /* AsynchronousOperation.swift */,
 			);
 			path = Operations;
 			sourceTree = "<group>";
@@ -1060,8 +1060,8 @@
 				DBADA7EE20A4F32500225C80 /* Operations */,
 				DBFB1B23209CB78400E99F9F /* Services */,
 				DBFB1A63209B8CC500E99F9F /* Types */,
+				DBB89C4A20D083AF00DD797A /* RoverFoundation.h */,
 				DBF49DF3203DE18500B54652 /* FoundationAssembler.swift */,
-				DBF49DD6203DE00F00B54652 /* RoverFoundation.h */,
 				DBF49DD7203DE00F00B54652 /* Info.plist */,
 			);
 			path = Foundation;
@@ -1086,11 +1086,10 @@
 				DBF49DFC203DE1DE00B54652 /* Container.swift */,
 				DBF49DF8203DE1DE00B54652 /* Resolver.swift */,
 				DBF49DF2203DE18500B54652 /* Rover.swift */,
-				DBF49DFB203DE1DE00B54652 /* ServiceEntry.swift */,
-				DBF49DF9203DE1DE00B54652 /* ServiceEntryProtocol.swift */,
 				DBF49DFD203DE1DE00B54652 /* ServiceFactory.swift */,
-				DBF49DFE203DE1DE00B54652 /* ServiceKey.swift */,
+				DBF49DFB203DE1DE00B54652 /* ServiceEntry.swift */,
 				DBF49DFF203DE1DE00B54652 /* ServiceScope.swift */,
+				DBF49DFE203DE1DE00B54652 /* ServiceKey.swift */,
 			);
 			path = Container;
 			sourceTree = "<group>";
@@ -1243,7 +1242,7 @@
 			children = (
 				DBFB1B66209CD89400E99F9F /* Color+uiColor.swift */,
 				DBFB1B68209CD8D600E99F9F /* Text+attributedText.swift */,
-				DBFDF48320AC858A0031EF47 /* ImageConfiguration.swift */,
+				DBFDF48320AC858A0031EF47 /* ImageConfiguration+initWithModel.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -1489,7 +1488,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBF49DE4203DE00F00B54652 /* RoverFoundation.h in Headers */,
+				DBB89C4C20D084D600DD797A /* RoverFoundation.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2202,15 +2201,13 @@
 				DBADA7FE20A4F32500225C80 /* OperationQueueDelegate.swift in Sources */,
 				DBFB1B5D209CCE0700E99F9F /* FrameworksRegistry.swift in Sources */,
 				DBF49E02203DE1DE00B54652 /* Assembler.swift in Sources */,
-				DBADA7FB20A4F32500225C80 /* Operation.swift in Sources */,
+				DBADA7FB20A4F32500225C80 /* AsynchronousOperation.swift in Sources */,
 				DBFB1AF3209CA82800E99F9F /* ID.swift in Sources */,
-				DBF49DF5203DE18500B54652 /* Rover.swift in Sources */,
-				DBF49E01203DE1DE00B54652 /* ServiceEntryProtocol.swift in Sources */,
 				DBF49E05203DE1DE00B54652 /* ServiceFactory.swift in Sources */,
 				DBF2584120A107BD00400EA2 /* ObserverSet.swift in Sources */,
+				DBF2584520A32E9400400EA2 /* Action.swift in Sources */,
 				DBF49E06203DE1DE00B54652 /* ServiceKey.swift in Sources */,
 				DBF49E03203DE1DE00B54652 /* ServiceEntry.swift in Sources */,
-				DBF2584520A32E9400400EA2 /* Action.swift in Sources */,
 				DBADA7FF20A4F32500225C80 /* OperationQueue.swift in Sources */,
 				DBADA80320A4F37C00225C80 /* Dispatcher.swift in Sources */,
 				DBFDF52420AE2B1C0031EF47 /* DateFormatter.swift in Sources */,
@@ -2219,13 +2216,14 @@
 				DBF49E04203DE1DE00B54652 /* Container.swift in Sources */,
 				DBFB1AF4209CA82800E99F9F /* Attributes.swift in Sources */,
 				DBF49E0C203DE1F600B54652 /* Logger.swift in Sources */,
+				DBB89BE820D0415600DD797A /* Rover.swift in Sources */,
 				DBF49DF6203DE18500B54652 /* FoundationAssembler.swift in Sources */,
 				DBF49E0B203DE1F600B54652 /* LogLevel.swift in Sources */,
 				DBF49E07203DE1DE00B54652 /* ServiceScope.swift in Sources */,
 				DBADA7FA20A4F32500225C80 /* GroupOperation.swift in Sources */,
 				DB9469392051E58400C8C3AE /* LoggerService.swift in Sources */,
 				DBADA80420A4F37C00225C80 /* DispatcherService.swift in Sources */,
-				DBADA7F920A4F32500225C80 /* Foundation.Operation.swift in Sources */,
+				DBADA7F920A4F32500225C80 /* Operation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2261,7 +2259,7 @@
 				DBFDF47B20AC855E0031EF47 /* ButtonCell.swift in Sources */,
 				DBFDF46C20AC85430031EF47 /* Height.swift in Sources */,
 				DBFDF47720AC85560031EF47 /* ExperienceContainer.swift in Sources */,
-				DBFDF48520AC85920031EF47 /* ImageConfiguration.swift in Sources */,
+				DBFDF48520AC85920031EF47 /* ImageConfiguration+initWithModel.swift in Sources */,
 				DBFDF45E20AC85430031EF47 /* Experience.swift in Sources */,
 				DBFDF47520AC854F0031EF47 /* ExperienceStore.swift in Sources */,
 				DBFDF47A20AC855E0031EF47 /* BlockCell.swift in Sources */,
