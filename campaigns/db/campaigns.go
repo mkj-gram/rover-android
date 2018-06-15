@@ -373,6 +373,7 @@ func (db *campaignsStore) UpdateNotificationSettings(ctx context.Context, req *c
 			SET
 				 updated_at = :updated_at
 
+				,experience_id = :experience_id
 				,ui_state = :ui_state
 
 				,notification_body = :notification_body

@@ -1667,7 +1667,9 @@ func test_UpdateNotificationSettings(t *testing.T) {
 				AuthContext: &auth.AuthContext{AccountId: 1},
 				CampaignId:  2,
 
-				UiState:                                   "this is my state",
+				ExperienceId: "123",
+				UiState:      "this is my state",
+
 				NotificationBody:                          "body",
 				NotificationTitle:                         "title",
 				NotificationAttachmentUrl:                 "https://www.rover.io/logo.png",
@@ -1733,6 +1735,8 @@ func test_UpdateNotificationSettings(t *testing.T) {
 							CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
 							UpdatedAt:        updatedAt,
 							SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+							ExperienceId: "123",
 
 							UiState: "this is my state",
 
