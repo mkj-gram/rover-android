@@ -154,6 +154,14 @@ class EventQueueService: EventQueue {
         flushEvents()
     }
 
+    struct FlushReponse: Decodable {
+        struct Data: Decodable {
+            var trackEvents: String
+        }
+        
+        var data: Data
+    }
+    
     func flushEvents(minBatchSize: Int = 1) {
         serialQueue.addOperation {
             if self.uploadTask != nil {
@@ -188,9 +196,14 @@ class EventQueueService: EventQueue {
                         self.logger.error("Failed to upload events - discarding events")
                         self.removeEvents(events)
                     }
-                case .success:
-                    self.logger.debug("Successfully uploaded \(events.count) event(s)")
-                    self.removeEvents(events)
+                case .success(let data):
+                    do {
+                        _ = try JSONDecoder().decode(FlushReponse.self, from: data)
+                        self.logger.debug("Successfully uploaded \(events.count) event(s)")
+                        self.removeEvents(events)
+                    } catch {
+                        self.logger.error("Failed to upload events - will retry")
+                    }
                 }
                 
                 self.uploadTask = nil

@@ -137,14 +137,14 @@ class GraphQLClientService: GraphQLClient {
         }
         
         guard var data = data else {
-            return .error(error: GraphQLError.emptyResponseData, isRetryable: false)
+            return .error(error: GraphQLError.emptyResponseData, isRetryable: true)
         }
         
         if data.isGzipped {
             do {
                 try data = data.gunzipped()
             } catch {
-                return .error(error: GraphQLError.failedToUnzipResponseData, isRetryable: false)
+                return .error(error: GraphQLError.failedToUnzipResponseData, isRetryable: true)
             }
         }
         
