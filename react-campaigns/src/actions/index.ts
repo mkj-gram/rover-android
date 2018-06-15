@@ -13,6 +13,7 @@ import * as H from 'history'
 
 import { Action, Dispatch, ActionCreator } from 'redux'
 import { ThunkAction } from 'redux-thunk'
+import { getEditableCampaign } from '../reducers'
 
 // Overview Modal
 export const handleSendTestModalDisplay = (on?: boolean) =>
@@ -117,6 +118,55 @@ export const closeCampaignTypeSelector: ActionCreator<
 export const updateEditableCampaign = (val: object) =>
     editableCampaignActions.updateEditableCampaign(val)
 
+export const updateSegmentCondition: ActionCreator<
+    ThunkAction<void, State, void>
+> = (segmentCondition: SegmentCondition) => (
+    dispatch: Dispatch<State>
+): void => {
+    dispatch({ type: 'UPDATE_SEGMENT_CONDITION' })
+    dispatch(updateEditableCampaign({ segmentCondition }))
+    dispatch(fetchAudienceSizes())
+}
+
+export const addEditableSegmentIds: ActionCreator<
+    ThunkAction<void, State, void>
+> = (newSegmentIds: Array<string>) => (
+    dispatch: Dispatch<State>,
+    getState: () => State
+): void => {
+    const state = getState()
+    const { segmentIds } = getEditableCampaign(state)
+    dispatch({ type: 'ADD_EDITABLE_SEGMENT_IDS' })
+
+    dispatch(
+        updateEditableCampaign({
+            segmentIds: [...segmentIds, ...newSegmentIds]
+        })
+    )
+
+    dispatch(fetchAudienceSizes())
+}
+
+export const removeEditableSegmentId: ActionCreator<
+    ThunkAction<void, State, void>
+> = (segmentId: string) => (
+    dispatch: Dispatch<State>,
+    getState: () => State
+): void => {
+    const state = getState()
+    const { segmentIds } = getEditableCampaign(state)
+
+    const newSegmentIds = segmentIds.filter(id => id !== segmentId)
+
+    dispatch(
+        updateEditableCampaign({
+            segmentIds: newSegmentIds
+        })
+    )
+
+    dispatch(fetchAudienceSizes())
+}
+
 export const createEditableCampaign = (campaignId: string) =>
     editableCampaignActions.createEditableCampaign(campaignId)
 
@@ -220,12 +270,7 @@ export const closePopoverModalForm: ActionCreator<
 // Segments
 export const fetchSegments = () => segmentsActions.fetchSegments()
 
-export const fetchNextAudienceSize = (
-    segmentId: string,
-    condition: 'ANY' | 'ALL'
-) => segmentsActions.fetchNextAudienceSize(segmentId, condition)
-
-export const fetchAudienceSize = () => segmentsActions.fetchAudienceSize()
+export const fetchAudienceSizes = () => segmentsActions.fetchAudienceSizes()
 
 // Wizard Modal
 export const openWizardModal: ActionCreator<ThunkAction<void, State, void>> = (

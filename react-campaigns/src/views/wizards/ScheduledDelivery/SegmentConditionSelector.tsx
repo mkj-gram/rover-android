@@ -6,14 +6,15 @@ import { parse } from 'qs'
 
 import {
     closePopoverModalForm,
-    fetchAudienceSize,
     updateActivePopover,
     updateEditableCampaign,
-    updateEditableUIState
+    updateEditableUIState,
+    updateSegmentCondition
 } from '../../../actions'
 
 import {
     getActivePopover,
+    getAudience,
     getCampaign,
     getEditableCampaign,
     getEditableUIState,
@@ -54,13 +55,13 @@ export interface SegmentConditionSelectorStateProps {
 
 export interface SegmentConditionSelectorDispatchProps {
     closePopoverModalForm: () => void
-    fetchAudienceSize: () => void
     updateActivePopover: (field: string) => void
     updateEditableCampaign: (x: object) => void
     updateEditableUIState: (
         newUIStateGroup: keyof editableUIState,
         newUIStateValue: AudienceUIState
     ) => void
+    updateSegmentCondition: (condition: SegmentCondition) => void
 }
 
 const { Fragment } = React
@@ -76,16 +77,15 @@ const SegmentConditionSelector: React.SFC<
     device,
     editableCampaign,
     editableUIState,
-    fetchAudienceSize,
     isPopoverModalFormOpen,
     totalAudienceSize,
     updateActivePopover,
     updateEditableCampaign,
-    updateEditableUIState
+    updateEditableUIState,
+    updateSegmentCondition
 }) => {
     const { segmentCondition, segmentIds } = editableCampaign
     const { conditionSelected } = editableUIState.audience
-    fetchAudienceSize()
     const updatePopoverVisibility = () => {
         if (activePopover === 'segment-selector') {
             closePopoverModalForm()
@@ -147,15 +147,12 @@ const SegmentConditionSelector: React.SFC<
         )
     }
 
-    const renderSegmentCondition = (condition: 'ANY' | 'ALL') => (
+    const renderSegmentCondition = (condition: SegmentCondition) => (
         <div
             key={condition}
             onClick={e => {
                 e.stopPropagation()
-                updateEditableCampaign({
-                    segmentCondition: condition,
-                    segmentIds: []
-                })
+                updateSegmentCondition(condition)
                 updateEditableUIState('audience', {
                     ...editableUIState.audience,
                     conditionSelected: condition
@@ -202,8 +199,8 @@ const SegmentConditionSelector: React.SFC<
                     key="all-devices"
                     onClick={e => {
                         e.stopPropagation()
+                        updateSegmentCondition('ANY')
                         updateEditableCampaign({
-                            segmentCondition: 'ANY',
                             segmentIds: []
                         })
                         updateEditableUIState('audience', {
@@ -250,9 +247,9 @@ const SegmentConditionSelector: React.SFC<
                         navBarProperties: {
                             buttonLeft: 'Cancel',
                             buttonLeftCallback: () => {
-                                updateEditableCampaign({
-                                    segmentCondition: campaign.segmentCondition
-                                })
+                                updateSegmentCondition(
+                                    campaign.segmentCondition
+                                )
                                 updateEditableUIState('audience', {
                                     ...editableUIState.audience,
                                     conditionSelected:
@@ -348,7 +345,6 @@ const mapDispatchToProps = (
 ): SegmentConditionSelectorDispatchProps => {
     return {
         closePopoverModalForm: () => dispatch(closePopoverModalForm()),
-        fetchAudienceSize: () => dispatch(fetchAudienceSize()),
         updateActivePopover: (activePopover: string) =>
             dispatch(updateActivePopover(activePopover)),
         updateEditableCampaign: (x: object) =>
@@ -356,10 +352,13 @@ const mapDispatchToProps = (
         updateEditableUIState: (
             newUIStateGroup: keyof editableUIState,
             newUIStateValue: AudienceUIState
-        ) => dispatch(updateEditableUIState(newUIStateGroup, newUIStateValue))
+        ) => dispatch(updateEditableUIState(newUIStateGroup, newUIStateValue)),
+        updateSegmentCondition: (condition: SegmentCondition) =>
+            dispatch(updateSegmentCondition(condition))
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-    SegmentConditionSelector
-)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(SegmentConditionSelector)

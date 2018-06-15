@@ -11,12 +11,7 @@ export default (
     return state
 }
 
-export const getAggregateAudienceSize = (
-    state: AudienceState,
-    segmentId: string
-): number | false => state[segmentId] || false
-
 export const getAudience = (state: AudienceState) => state
 
-export const getTotalAudienceSize = (state: AudienceState): number | false =>
-    state.totalSize || false
+export const getTotalAudienceSize = (state: AudienceState) =>
+    state.totalSize || 0

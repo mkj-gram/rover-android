@@ -24,8 +24,8 @@ export default combineReducers({
     wizardModal
 })
 // Audience
-export const getAggregateAudienceSize = (state: AppState, segmentId: string) =>
-    audienceSelector.getAggregateAudienceSize(state.audience, segmentId)
+export const getAudience = (state: AppState) =>
+    audienceSelector.getAudience(state.audience)
 
 export const getTotalAudienceSize = (state: AppState) =>
     audienceSelector.getTotalAudienceSize(state.audience)
@@ -95,6 +95,9 @@ export const getCurrentFormPage = (state: AppState) =>
 
 export const getShouldShowPhonePreview = (state: AppState) =>
     formSelector.getShouldShowPhonePreview(state.form)
+
+export const getIsAudienceSizeUpdating = (state: AppState) =>
+    formSelector.getIsAudienceSizeUpdating(state.form)
 
 // Wizard
 export const getCurrentWizard = (state: AppState) =>

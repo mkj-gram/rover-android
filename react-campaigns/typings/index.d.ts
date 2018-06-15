@@ -224,6 +224,7 @@ type formPage =
 
 type FormState = {
     readonly currentPage: formPage
+    readonly isAudienceSizeUpdating: boolean
 }
 
 type OverviewModalState = {

@@ -41,8 +41,7 @@ export const getIsCampaignTypeSelectorClosing = (state: State) =>
     appSelector.getIsCampaignTypeSelectorClosing(state.app)
 
 // Audience
-export const getAggregateAudienceSize = (state: State, segmentId: string) =>
-    appSelector.getAggregateAudienceSize(state.app, segmentId)
+export const getAudience = (state: State) => appSelector.getAudience(state.app)
 
 export const getTotalAudienceSize = (state: State) =>
     appSelector.getTotalAudienceSize(state.app)
@@ -68,6 +67,9 @@ export const getCurrentFormPage = (state: State) =>
 
 export const getShouldShowPhonePreview = (state: State) =>
     appSelector.getShouldShowPhonePreview(state.app)
+
+export const getIsAudienceSizeUpdating = (state: State) =>
+    appSelector.getIsAudienceSizeUpdating(state.app)
 
 // Notification Delivery
 export const getIsNotificationDeliveryModalOpen = (state: State) =>

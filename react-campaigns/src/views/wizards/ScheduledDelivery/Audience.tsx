@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom'
 import { parse } from 'qs'
 import { connect, Dispatch } from 'react-redux'
 
-import { fetchNextAudienceSize, updateEditableCampaign } from '../../../actions'
+import { updateEditableCampaign } from '../../../actions'
 import { getEditableCampaign, getCampaign } from '../../../reducers'
 
 import {
@@ -68,4 +68,7 @@ const mapStateToProps = (state: State): AudienceStateProps => ({
     editableCampaign: getEditableCampaign(state)
 })
 
-export default connect(mapStateToProps)(Audience)
+export default connect(
+    mapStateToProps,
+    {}
+)(Audience)

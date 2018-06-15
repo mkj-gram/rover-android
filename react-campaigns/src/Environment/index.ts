@@ -22,6 +22,7 @@ const link = new HttpLink({
     headers: {
         accept: 'application/json',
         Authorization: `Bearer ${getToken()}`
+        // 'x-rover-account-token': 'bf704e5aeb9ac3aefaa5e289154a4832aa87a7a3'
     },
     uri
 })

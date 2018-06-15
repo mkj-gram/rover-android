@@ -53,48 +53,47 @@ export const fetchSegments: ActionCreator<
 
 export const fetchNextAudienceSize: ActionCreator<
     ThunkAction<Promise<Action | void>, State, void>
-> = (segmentId: string, condition: 'ANY' | 'ALL') => (
+> = (segmentIds: Array<string>) => (
     dispatch: Dispatch<State>,
     getState: () => State
 ): Promise<Action | void> => {
-    dispatch({ type: 'FETCH_AUDIENCE_SIZE_REQUEST' })
-
+    dispatch({ type: 'FETCH_NEXT_AUDIENCE_SIZE_REQUEST' })
     const query: DocumentNode = gql`
         query SegmentSize($segmentIds: [ID!]!, $condition: String!) {
             segmentSize(segmentIds: $segmentIds, condition: $condition)
         }
     `
     const state = getState()
-    const { editableCampaign } = state
-    const { segmentIds } = editableCampaign
+    const { app, editableCampaign } = state
+    const { segmentCondition } = editableCampaign
 
     const request = {
         query,
         variables: {
-            segmentIds: [...segmentIds, segmentId],
-            condition
+            segmentIds: segmentIds,
+            condition: segmentCondition
         }
     }
     return Environment(request).then(
         ({ data, errors }) => {
             if (errors) {
                 return handleError(
-                    'FETCH_SEGMENTS_FAILURE',
+                    'FETCH_NEXT_AUDIENCE_FAILURE',
                     dispatch,
                     errors[0].message
                 )
             }
             return dispatch({
-                type: 'FETCH_AUDIENCE_SIZE_SUCCESS',
+                type: 'FETCH_NEXT_AUDIENCE_SIZE_SUCCESS',
                 audience: {
-                    ...state.app.audience,
-                    [segmentId]: { ...data.segmentSize }
+                    ...getState().app.audience,
+                    [segmentIds[0]]: data.segmentSize
                 }
             })
         },
         ({ result }) =>
             handleError(
-                'FETCH_SEGMENTS_FAILURE',
+                'FETCH_NEXT_AUDIENCE_FAILURE',
                 dispatch,
                 result.errors[0].message
             )
@@ -125,7 +124,7 @@ export const fetchAudienceSize: ActionCreator<
         ({ data, errors }) => {
             if (errors) {
                 return handleError(
-                    'FETCH_SEGMENTS_FAILURE',
+                    'FETCH_AUDIENCE_SIZE_FAILURE',
                     dispatch,
                     errors[0].message
                 )
@@ -139,7 +138,72 @@ export const fetchAudienceSize: ActionCreator<
         },
         ({ result }) =>
             handleError(
-                'FETCH_SEGMENTS_FAILURE',
+                'FETCH_AUDIENCE_SIZE_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
+    )
+}
+
+export const fetchAudienceSizes: ActionCreator<
+    ThunkAction<Promise<Action | void>, State, void>
+> = () => (dispatch: Dispatch<State>, getState: () => State) => {
+    dispatch({ type: 'FETCH_AUDIENCE_SIZE_REQUEST' })
+
+    const state = getState()
+    const { editableCampaign } = state
+    const { segmentCondition, segmentIds } = editableCampaign
+
+    const queriesById = segmentIds
+        .map((id, index, array) => {
+            const ids = array.slice(0, index + 1).reverse()
+            return `x${id}: segmentSize(segmentIds: ${JSON.stringify(
+                ids
+            )}, condition: $condition)`
+        })
+        .concat([
+            `totalSize: segmentSize(segmentIds: [], condition: $condition)`
+        ])
+        .join('\n')
+
+    const query: DocumentNode = gql`
+        query SegmentSize($condition: String!) {
+            ${queriesById}
+        }
+    `
+
+    const request = {
+        query,
+        variables: {
+            condition: segmentCondition
+        }
+    }
+
+    return Environment(request).then(
+        ({ data, errors }) => {
+            if (errors) {
+                return handleError(
+                    'FETCH_AUDIENCE_SIZE_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
+            }
+            return dispatch({
+                type: 'FETCH_AUDIENCE_SIZE_SUCCESS',
+                audience: Object.keys(data).reduce(
+                    (prev, curr) => ({
+                        ...prev,
+                        [curr === 'totalSize'
+                            ? 'totalSize'
+                            : curr.slice(1)]: data[curr]
+                    }),
+                    {}
+                )
+            })
+        },
+        ({ result }) =>
+            handleError(
+                'FETCH_AUDIENCE_SIZE_FAILURE',
                 dispatch,
                 result.errors[0].message
             )
