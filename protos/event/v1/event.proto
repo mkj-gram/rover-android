@@ -15,7 +15,6 @@ import "auth/v1/auth.proto";
 import "audience/v1/audience.proto";
 
 message DeviceContext {
-
 	string device_identifier    = 1;
 	string profile_identifier   = 2;
 
@@ -32,8 +31,8 @@ message DeviceContext {
 	string device_manufacturer  = 9;
 	string device_model         = 10;
 
-	rover.protobuf.BoolValue 				is_location_services_enabled  = 11;
-	audience.v1.LocationAuthorization.Value location_authorization    	  = 12;
+	rover.protobuf.BoolValue          is_location_services_enabled = 11;
+	audience.v1.LocationAuthorization.Value location_authorization = 12;
 
 	string locale_language  = 13;
 	string locale_region    = 14;
@@ -44,8 +43,8 @@ message DeviceContext {
 
 	audience.v1.NotificationAuthorization.Value notification_authorization = 18;
 
-	audience.v1.PushEnvironment.Value push_environment  = 19;
-	string push_token                                   = 20;
+	audience.v1.PushEnvironment.Value push_environment = 19;
+	string push_token                                  = 20;
 
 
 	string radio        = 21;
@@ -53,8 +52,8 @@ message DeviceContext {
 	string time_zone    = 23;
 	string ip           = 24;
 
-	rover.protobuf.BoolValue is_cellular_enabled    = 25;
-	rover.protobuf.BoolValue is_wifi_enabled        = 26;
+	rover.protobuf.BoolValue is_cellular_enabled = 25;
+	rover.protobuf.BoolValue is_wifi_enabled     = 26;
 
 	int32 screen_width  = 27;
 	int32 screen_height = 28;
@@ -98,7 +97,7 @@ message Event {
 	}
 
 	SchemaIdentifier schema_identifier = 9;
-	
+
 	// represents when the pipeline received the event as input
 	google.protobuf.Timestamp processed_at  = 10;
 }

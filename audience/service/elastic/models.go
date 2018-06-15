@@ -65,10 +65,12 @@ func DeviceV2Doc(d *mongodb.Device, p *mongodb.Profile) M {
 		"push_token_updated_at":      TimeDoc(d.PushTokenUpdatedAt),
 		"push_token_unregistered_at": TimeDoc(d.PushTokenUnregisteredAt),
 
-		"app_name":            d.AppName,
-		"app_version":         d.AppVersion,
-		"app_build":           d.AppBuild,
-		"app_namespace":       d.AppNamespace,
+		"app_name":         d.AppName,
+		"app_version":      d.AppVersion,
+		"app_build":        d.AppBuild,
+		"app_namespace":    d.AppNamespace,
+		"app_badge_number": d.AppBadgeNumber.Value(),
+
 		"device_manufacturer": d.DeviceManufacturer,
 		"device_model":        d.DeviceModel,
 		"os_name":             d.OsName,
@@ -88,6 +90,10 @@ func DeviceV2Doc(d *mongodb.Device, p *mongodb.Profile) M {
 
 		"is_background_enabled":          d.IsBackgroundEnabled,
 		"is_location_monitoring_enabled": d.IsLocationMonitoringEnabled,
+
+		"is_wifi_enabled":      d.IsWifiEnabled.Value(),
+		"is_cellular_enabled":  d.IsCellularEnabled.Value(),
+		"is_bluetooth_enabled": d.IsBluetoothEnabled.Value(),
 
 		"advertising_id": d.AdvertisingId,
 
@@ -110,24 +116,6 @@ func DeviceV2Doc(d *mongodb.Device, p *mongodb.Profile) M {
 	if d.LocationLongitude != float64(0) && d.LocationLatitude != float64(0) {
 		// https://www.elastic.co/guide/en/elasticsearch/reference/5.5/geo-point.html
 		m["location"] = M{"lat": d.LocationLatitude, "lon": d.LocationLongitude}
-	}
-
-	if d.IsWifiEnabled.Present() {
-		m["is_wifi_enabled"] = d.IsWifiEnabled.Value()
-	} else {
-		m["is_wifi_enabled"] = nil
-	}
-
-	if d.IsCellularEnabled.Present() {
-		m["is_cellular_enabled"] = d.IsCellularEnabled.Value()
-	} else {
-		m["is_cellular_enabled"] = nil
-	}
-
-	if d.IsBluetoothEnabled.Present() {
-		m["is_bluetooth_enabled"] = d.IsBluetoothEnabled.Value()
-	} else {
-		m["is_bluetooth_enabled"] = nil
 	}
 
 	// NOTE: key is encoded as dots aren't allowed in mongo map keys

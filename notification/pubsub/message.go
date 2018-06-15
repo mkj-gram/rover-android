@@ -12,7 +12,7 @@ type Device struct {
 	PushToken            string `json:"push_token"`
 	PushTokenEnvironment string `json:"push_token_environment"`
 	AppNamespace         string `json:"app_namespace"`
-	BadgeCount           int    `json:"badge_count"`
+	AppBadgeNumber       *int32 `json:"app_badge_number,omitempty"`
 
 	OsName     string  `json:"os_name"`
 	SdkVersion Version `json:"sdk_version"`

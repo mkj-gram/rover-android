@@ -8762,6 +8762,7 @@ proto.rover.audience.v1.UpdateDeviceRequest.toObject = function(includeInstance,
     appVersion: jspb.Message.getFieldWithDefault(msg, 13, ""),
     appBuild: jspb.Message.getFieldWithDefault(msg, 14, ""),
     appNamespace: jspb.Message.getFieldWithDefault(msg, 15, ""),
+    appBadgeNumber: (f = msg.getAppBadgeNumber()) && protobuf_wrappers_pb.Int32Value.toObject(includeInstance, f),
     deviceManufacturer: jspb.Message.getFieldWithDefault(msg, 16, ""),
     osName: jspb.Message.getFieldWithDefault(msg, 17, ""),
     osVersion: (f = msg.getOsVersion()) && proto.rover.audience.v1.Version.toObject(includeInstance, f),
@@ -8860,6 +8861,11 @@ proto.rover.audience.v1.UpdateDeviceRequest.deserializeBinaryFromReader = functi
     case 15:
       var value = /** @type {string} */ (reader.readString());
       msg.setAppNamespace(value);
+      break;
+    case 40:
+      var value = new protobuf_wrappers_pb.Int32Value;
+      reader.readMessage(value,protobuf_wrappers_pb.Int32Value.deserializeBinaryFromReader);
+      msg.setAppBadgeNumber(value);
       break;
     case 16:
       var value = /** @type {string} */ (reader.readString());
@@ -9050,6 +9056,14 @@ proto.rover.audience.v1.UpdateDeviceRequest.serializeBinaryToWriter = function(m
     writer.writeString(
       15,
       f
+    );
+  }
+  f = message.getAppBadgeNumber();
+  if (f != null) {
+    writer.writeMessage(
+      40,
+      f,
+      protobuf_wrappers_pb.Int32Value.serializeBinaryToWriter
     );
   }
   f = message.getDeviceManufacturer();
@@ -9374,6 +9388,36 @@ proto.rover.audience.v1.UpdateDeviceRequest.prototype.getAppNamespace = function
 /** @param {string} value */
 proto.rover.audience.v1.UpdateDeviceRequest.prototype.setAppNamespace = function(value) {
   jspb.Message.setField(this, 15, value);
+};
+
+
+/**
+ * optional rover.protobuf.Int32Value app_badge_number = 40;
+ * @return {?proto.rover.protobuf.Int32Value}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.getAppBadgeNumber = function() {
+  return /** @type{?proto.rover.protobuf.Int32Value} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.Int32Value, 40));
+};
+
+
+/** @param {?proto.rover.protobuf.Int32Value|undefined} value */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.setAppBadgeNumber = function(value) {
+  jspb.Message.setWrapperField(this, 40, value);
+};
+
+
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.clearAppBadgeNumber = function() {
+  this.setAppBadgeNumber(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.UpdateDeviceRequest.prototype.hasAppBadgeNumber = function() {
+  return jspb.Message.getField(this, 40) != null;
 };
 
 
@@ -10360,6 +10404,7 @@ proto.rover.audience.v1.Device.toObject = function(includeInstance, msg) {
     appVersion: jspb.Message.getFieldWithDefault(msg, 17, ""),
     appBuild: jspb.Message.getFieldWithDefault(msg, 18, ""),
     appNamespace: jspb.Message.getFieldWithDefault(msg, 19, ""),
+    appBadgeNumber: (f = msg.getAppBadgeNumber()) && protobuf_wrappers_pb.Int32Value.toObject(includeInstance, f),
     deviceManufacturer: jspb.Message.getFieldWithDefault(msg, 20, ""),
     deviceModel: jspb.Message.getFieldWithDefault(msg, 23, ""),
     osName: jspb.Message.getFieldWithDefault(msg, 21, ""),
@@ -10515,6 +10560,11 @@ proto.rover.audience.v1.Device.deserializeBinaryFromReader = function(msg, reade
     case 19:
       var value = /** @type {string} */ (reader.readString());
       msg.setAppNamespace(value);
+      break;
+    case 61:
+      var value = new protobuf_wrappers_pb.Int32Value;
+      reader.readMessage(value,protobuf_wrappers_pb.Int32Value.deserializeBinaryFromReader);
+      msg.setAppBadgeNumber(value);
       break;
     case 20:
       var value = /** @type {string} */ (reader.readString());
@@ -10828,6 +10878,14 @@ proto.rover.audience.v1.Device.serializeBinaryToWriter = function(message, write
     writer.writeString(
       19,
       f
+    );
+  }
+  f = message.getAppBadgeNumber();
+  if (f != null) {
+    writer.writeMessage(
+      61,
+      f,
+      protobuf_wrappers_pb.Int32Value.serializeBinaryToWriter
     );
   }
   f = message.getDeviceManufacturer();
@@ -11457,6 +11515,36 @@ proto.rover.audience.v1.Device.prototype.getAppNamespace = function() {
 /** @param {string} value */
 proto.rover.audience.v1.Device.prototype.setAppNamespace = function(value) {
   jspb.Message.setField(this, 19, value);
+};
+
+
+/**
+ * optional rover.protobuf.Int32Value app_badge_number = 61;
+ * @return {?proto.rover.protobuf.Int32Value}
+ */
+proto.rover.audience.v1.Device.prototype.getAppBadgeNumber = function() {
+  return /** @type{?proto.rover.protobuf.Int32Value} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.Int32Value, 61));
+};
+
+
+/** @param {?proto.rover.protobuf.Int32Value|undefined} value */
+proto.rover.audience.v1.Device.prototype.setAppBadgeNumber = function(value) {
+  jspb.Message.setWrapperField(this, 61, value);
+};
+
+
+proto.rover.audience.v1.Device.prototype.clearAppBadgeNumber = function() {
+  this.setAppBadgeNumber(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.audience.v1.Device.prototype.hasAppBadgeNumber = function() {
+  return jspb.Message.getField(this, 61) != null;
 };
 
 

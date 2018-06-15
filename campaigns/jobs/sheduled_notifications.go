@@ -410,17 +410,16 @@ func buildNotificationRequest(b *Result, c *campaigns.Campaign) (*notificationpb
 			NotificationBody:  c.NotificationBody,
 			NotificationTitle: c.NotificationTitle,
 
-			DeviceAppNamespace: d.AppNamespace,
-			// TODO:
-			// DeviceBadgeCount:				campaign.DeviceBadgeCount
 			DeviceId:                   d.DeviceId,
+			DeviceAppNamespace:         d.AppNamespace,
+			DeviceAppBadgeNumber:       d.AppBadgeNumber,
 			DevicePushToken:            d.PushTokenKey,
 			DevicePushTokenEnvironment: toPushEnvironment(d.PushEnvironment.String()),
 
-			IsTest: b.IsTest,
-
 			OsName:     d.OsName,
 			SdkVersion: getSdkVersion(d.GetFrameworks()),
+
+			IsTest: b.IsTest,
 		}
 	}
 

@@ -11,6 +11,7 @@ import (
 	"github.com/roverplatform/rover/apis/go/auth/v1"
 	"github.com/roverplatform/rover/apis/go/notification/v1"
 	"github.com/roverplatform/rover/apis/go/protobuf"
+	"github.com/roverplatform/rover/apis/go/protobuf/wrappers"
 	"github.com/roverplatform/rover/go/protobuf/ptypes/timestamp"
 	"github.com/roverplatform/rover/notification/grpc"
 	"github.com/roverplatform/rover/notification/grpc/mocks"
@@ -19,6 +20,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
+
+func intPtr(v int32) *int32 {
+	return &v
+}
 
 type DB struct {
 	settingsStore *mocks.MockNotificationSettingsStore
@@ -257,7 +262,7 @@ func Test_SendCampaignNotification(t *testing.T) {
 						DevicePushToken:            "token",
 						DevicePushTokenEnvironment: notification.PushEnvironment_PRODUCTION,
 						DeviceAppNamespace:         "io.rover.Bagel",
-						DeviceBadgeCount:           2,
+						DeviceAppBadgeNumber:       &wrappers.Int32Value{Value: 1},
 						OsName:                     "iOS",
 						SdkVersion:                 &rover_protobuf.Version{1, 2, 3},
 					},
@@ -304,7 +309,7 @@ func Test_SendCampaignNotification(t *testing.T) {
 							PushToken:            "token",
 							PushTokenEnvironment: "PRODUCTION",
 							AppNamespace:         "io.rover.Bagel",
-							BadgeCount:           2,
+							AppBadgeNumber:       intPtr(1),
 							OsName:               "iOS",
 							SdkVersion:           pubsub.Version{1, 2, 3},
 						},

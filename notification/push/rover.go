@@ -94,6 +94,7 @@ func ToRoverNotification(settings *scylla.NotificationSettings, note *scylla.Not
 		Title: note.Title,
 		Body:  note.Body,
 
+		// see below
 		Attachment: nil,
 
 		Action: &actionInfo{

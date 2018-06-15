@@ -68,7 +68,6 @@ func ToAPNSRequest(m notification_pubsub.Message, settings *scylla.NotificationS
 					Alert: alert,
 					Badge: nil, // see below
 					// URLArgs
-					// only for silent push
 					ContentAvailable: boolToInt(settings.IosContentAvailable),
 					MutableContent:   1,
 					Sound:            settings.IosSound,
@@ -77,8 +76,10 @@ func ToAPNSRequest(m notification_pubsub.Message, settings *scylla.NotificationS
 				}
 			)
 
-			if settings.AlertOptionBadgeNumber {
-				apsPayload.Badge = msg.Device.BadgeCount
+			// should never be set for sdk.v1
+			// as sdk.v1 reports nil AppBadgeNumber
+			if settings.AlertOptionBadgeNumber && msg.Device.AppBadgeNumber != nil {
+				apsPayload.Badge = *msg.Device.AppBadgeNumber + 1
 			}
 
 			return apsPayload

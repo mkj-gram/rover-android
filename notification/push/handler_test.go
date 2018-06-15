@@ -36,6 +36,10 @@ func uuid(t *testing.T, str string) scylla.UUID {
 	return id
 }
 
+func intPtr(v int32) *int32 {
+	return &v
+}
+
 func toBase64(t *testing.T, data []byte) string {
 	t.Helper()
 
@@ -178,7 +182,7 @@ func TestHandler(t *testing.T) {
 				Device: notification_pubsub.Device{
 					AccountID:            1,
 					AppNamespace:         "hello",
-					BadgeCount:           2,
+					AppBadgeNumber:       nil,
 					ID:                   "device_id",
 					OsName:               "Android",
 					PushToken:            "pushtoken",
@@ -302,7 +306,7 @@ func TestHandler(t *testing.T) {
 				Device: notification_pubsub.Device{
 					AccountID:            1,
 					AppNamespace:         "hello",
-					BadgeCount:           2,
+					AppBadgeNumber:       intPtr(2),
 					ID:                   "device_id",
 					OsName:               "Android",
 					PushToken:            "pushtoken",
@@ -418,7 +422,7 @@ func TestHandler(t *testing.T) {
 				Device: notification_pubsub.Device{
 					AccountID:            1,
 					AppNamespace:         "io.rover.Bagel",
-					BadgeCount:           2,
+					AppBadgeNumber:       nil,
 					ID:                   "device_id",
 					OsName:               "iOS",
 					PushToken:            "pushtoken",
@@ -431,7 +435,7 @@ func TestHandler(t *testing.T) {
 
 				Headers: http.Header{
 					"User-Agent":       []string{"Go-http-client/1.1"},
-					"Content-Length":   []string{"608"},
+					"Content-Length":   []string{"598"},
 					"Apns-Collapse-Id": []string{"thread"},
 					"Apns-Id":          []string{"09702289-4329-11e8-a214-784f43835469"},
 					"Apns-Topic":       []string{"io.rover.Bagel"},
@@ -444,7 +448,8 @@ func TestHandler(t *testing.T) {
 							"body":  "a body",
 							"title": "a title",
 						},
-						"badge":             float64(2),
+						// sdk.v1 doesn't support badge
+						// "badge":             float64(2),
 						"category":          "category",
 						"content-available": float64(1),
 						"mutable-content":   float64(1),
@@ -548,7 +553,7 @@ func TestHandler(t *testing.T) {
 				Device: notification_pubsub.Device{
 					AccountID:            1,
 					AppNamespace:         "io.rover.Bagel",
-					BadgeCount:           2,
+					AppBadgeNumber:       intPtr(2),
 					ID:                   "device_id",
 					OsName:               "iOS",
 					PushToken:            "pushtoken",
@@ -574,7 +579,7 @@ func TestHandler(t *testing.T) {
 							"body":  "a body",
 							"title": "a title",
 						},
-						"badge":             float64(2),
+						"badge":             float64(3),
 						"category":          "category",
 						"content-available": float64(1),
 						"mutable-content":   float64(1),

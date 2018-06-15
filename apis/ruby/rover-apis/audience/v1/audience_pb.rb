@@ -197,6 +197,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :app_version, :string, 13
     optional :app_build, :string, 14
     optional :app_namespace, :string, 15
+    optional :app_badge_number, :message, 40, "rover.protobuf.Int32Value"
     optional :device_manufacturer, :string, 16
     optional :os_name, :string, 17
     optional :os_version, :message, 18, "rover.audience.v1.Version"
@@ -252,6 +253,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :app_version, :string, 17
     optional :app_build, :string, 18
     optional :app_namespace, :string, 19
+    optional :app_badge_number, :message, 61, "rover.protobuf.Int32Value"
     optional :device_manufacturer, :string, 20
     optional :device_model, :string, 23
     optional :os_name, :string, 21

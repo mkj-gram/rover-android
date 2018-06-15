@@ -174,6 +174,12 @@ func (s *NotificationServer) SendCampaignNotification(ctx context.Context, req *
 }
 
 func pubsubMessageFromProto(accountID int32, campaignID int32, m *notificationpb.SendCampaignNotificationRequest_Message) *pubsub.PushMessage {
+
+	var badgeNumber *int32 = nil
+	if m.DeviceAppBadgeNumber != nil {
+		badgeNumber = &m.DeviceAppBadgeNumber.Value
+	}
+
 	return &pubsub.PushMessage{
 		CampaignID:        int(campaignID),
 		NotificationBody:  m.GetNotificationBody(),
@@ -187,7 +193,7 @@ func pubsubMessageFromProto(accountID int32, campaignID int32, m *notificationpb
 			PushToken:            m.GetDevicePushToken(),
 			PushTokenEnvironment: m.GetDevicePushTokenEnvironment().String(),
 			AppNamespace:         m.GetDeviceAppNamespace(),
-			BadgeCount:           int(m.GetDeviceBadgeCount()),
+			AppBadgeNumber:       badgeNumber,
 			OsName:               m.GetOsName(),
 			SdkVersion: pubsub.Version{
 				Major:    m.GetSdkVersion().GetMajor(),

@@ -371,6 +371,8 @@ message UpdateDeviceRequest {
   string app_version                            = 13;
   string app_build                              = 14;
   string app_namespace                          = 15;
+  rover.protobuf.Int32Value app_badge_number    = 40;
+
   string device_manufacturer                    = 16;
   string os_name                                = 17;
   Version os_version                            = 18;
@@ -467,6 +469,9 @@ message Device {
 
   // The app developer's unique namespace. E.g. "com.airmiles".
   string app_namespace            = 19;
+
+  // badge number
+	rover.protobuf.Int32Value app_badge_number  = 61;
 
   // For iOS this will also be Apple and on Android could be
   // Samsung, LG etc.

@@ -26,9 +26,9 @@ func ToFCMRequest(m notification_pubsub.Message, settings *scylla.NotificationSe
 
 	switch msg := m.(type) {
 	case *notification_pubsub.PushMessage:
-		// TODO:
-		// if settings.AlertOptionBadgeNumber {
-		// 	notification.Badge = fmt.Sprintf("%d", msg.Device.BadgeCount)
+
+		// NOTE: Badge is not supported for Android
+		// if settings.AlertOptionBadgeNumber && msg.Device.AppBadgeNumber != nil {
 		// }
 
 		req.To = msg.Device.PushToken

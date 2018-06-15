@@ -5,6 +5,7 @@ var grpc = require('grpc');
 var notification_v1_notification_pb = require('../../notification/v1/notification_pb.js');
 var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
 var protobuf_version_pb = require('../../protobuf/version_pb.js');
+var protobuf_wrappers_pb = require('../../protobuf/wrappers_pb.js');
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 
 function serialize_rover_notification_v1_CreateAndroidPlatformRequest(arg) {

@@ -15,6 +15,7 @@
     "ts":             {"$date":"2017-10-14T15:44:18.497Z"},
     "null":           null
   },
+  "app_badge_number": {"$numberLong": "1"},
   "is_wifi_enabled": true,
   "is_cellular_enabled": false,
   "is_bluetooth_enabled": true,
@@ -32,7 +33,8 @@
   "updated_at":{"$date":"2017-10-14T15:44:18.497Z"},
   "attributes": {
     "bool": true
-  }
+  },
+  "app_badge_number": null
 }
 
 {

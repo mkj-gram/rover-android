@@ -6,6 +6,7 @@ option go_package = "notification/v1;notification";
 
 import "auth/v1/auth.proto";
 import "protobuf/version.proto";
+import "protobuf/wrappers.proto";
 import "google/protobuf/timestamp.proto";
 
 service Notification {
@@ -37,9 +38,9 @@ service Notification {
 
 /*
 
-  Notifications
+	Notifications
 
-*/
+ */
 
 message PushEnvironment {
 	enum Enum {
@@ -109,22 +110,23 @@ message SendCampaignNotificationRequest {
 	bool                notification_alert_option_notification_center                = 26;
 	bool                notification_alert_option_badge_number                       = 27;
 
-  message Message {
-    string              notification_body              = 1;
-    string              notification_title             = 2;
+	message Message {
+		string              notification_body              = 1;
+		string              notification_title             = 2;
 
-    bool                is_test                        = 9;
+		bool                is_test                        = 9;
 
-    string               device_id                     = 10;
-    string               device_push_token             = 11;
-    PushEnvironment.Enum device_push_token_environment = 12;
-    string               device_app_namespace          = 13;
-    int32                device_badge_count            = 14;
-    // Either "iOS" or "Android"
-    string               os_name                       = 15;
+		string                    device_id                     = 10;
+		string                    device_push_token             = 11;
+		PushEnvironment.Enum      device_push_token_environment = 12;
+		string                    device_app_namespace          = 13;
+		rover.protobuf.Int32Value device_app_badge_number       = 14;
 
-    rover.protobuf.Version sdk_version                 = 16;
-  }
+		// Either "iOS" or "Android"
+		string               os_name                       = 15;
+
+		rover.protobuf.Version sdk_version                 = 16;
+	}
 
 	repeated Message messages                                                        = 30;
 }
@@ -217,7 +219,7 @@ message DeleteNotificationResponse {
 
 /*
 	Platform
-*/ 
+ */ 
 
 message Platform {
 	oneof paltform {

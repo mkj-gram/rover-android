@@ -215,6 +215,7 @@ func UpdateDeviceWithContext(client audience.AudienceClient, deviceModelNameMapp
 			AppVersion:         dctx.GetAppVersion(),
 			AppBuild:           dctx.GetAppBuild(),
 			AppNamespace:       dctx.GetAppNamespace(),
+			AppBadgeNumber:     dctx.AppBadgeNumber,
 			DeviceManufacturer: dctx.GetDeviceManufacturer(),
 			OsName:             dctx.GetOperatingSystemName(),
 			OsVersion:          versionForAudience(dctx.GetOperatingSystemVersion()),

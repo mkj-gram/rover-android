@@ -11,6 +11,7 @@ var global = Function('return this')();
 
 var auth_v1_auth_pb = require('../../auth/v1/auth_pb.js');
 var protobuf_version_pb = require('../../protobuf/version_pb.js');
+var protobuf_wrappers_pb = require('../../protobuf/wrappers_pb.js');
 var google_protobuf_timestamp_pb = require('google-protobuf/google/protobuf/timestamp_pb.js');
 goog.exportSymbol('proto.rover.notification.v1.AndroidPlatform', null, global);
 goog.exportSymbol('proto.rover.notification.v1.CreateAndroidPlatformRequest', null, global);
@@ -983,7 +984,7 @@ proto.rover.notification.v1.SendCampaignNotificationRequest.Message.toObject = f
     devicePushToken: jspb.Message.getFieldWithDefault(msg, 11, ""),
     devicePushTokenEnvironment: jspb.Message.getFieldWithDefault(msg, 12, 0),
     deviceAppNamespace: jspb.Message.getFieldWithDefault(msg, 13, ""),
-    deviceBadgeCount: jspb.Message.getFieldWithDefault(msg, 14, 0),
+    deviceAppBadgeNumber: (f = msg.getDeviceAppBadgeNumber()) && protobuf_wrappers_pb.Int32Value.toObject(includeInstance, f),
     osName: jspb.Message.getFieldWithDefault(msg, 15, ""),
     sdkVersion: (f = msg.getSdkVersion()) && protobuf_version_pb.Version.toObject(includeInstance, f)
   };
@@ -1051,8 +1052,9 @@ proto.rover.notification.v1.SendCampaignNotificationRequest.Message.deserializeB
       msg.setDeviceAppNamespace(value);
       break;
     case 14:
-      var value = /** @type {number} */ (reader.readInt32());
-      msg.setDeviceBadgeCount(value);
+      var value = new protobuf_wrappers_pb.Int32Value;
+      reader.readMessage(value,protobuf_wrappers_pb.Int32Value.deserializeBinaryFromReader);
+      msg.setDeviceAppBadgeNumber(value);
       break;
     case 15:
       var value = /** @type {string} */ (reader.readString());
@@ -1140,11 +1142,12 @@ proto.rover.notification.v1.SendCampaignNotificationRequest.Message.serializeBin
       f
     );
   }
-  f = message.getDeviceBadgeCount();
-  if (f !== 0) {
-    writer.writeInt32(
+  f = message.getDeviceAppBadgeNumber();
+  if (f != null) {
+    writer.writeMessage(
       14,
-      f
+      f,
+      protobuf_wrappers_pb.Int32Value.serializeBinaryToWriter
     );
   }
   f = message.getOsName();
@@ -1273,17 +1276,32 @@ proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.se
 
 
 /**
- * optional int32 device_badge_count = 14;
- * @return {number}
+ * optional rover.protobuf.Int32Value device_app_badge_number = 14;
+ * @return {?proto.rover.protobuf.Int32Value}
  */
-proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.getDeviceBadgeCount = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 14, 0));
+proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.getDeviceAppBadgeNumber = function() {
+  return /** @type{?proto.rover.protobuf.Int32Value} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.Int32Value, 14));
 };
 
 
-/** @param {number} value */
-proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.setDeviceBadgeCount = function(value) {
-  jspb.Message.setField(this, 14, value);
+/** @param {?proto.rover.protobuf.Int32Value|undefined} value */
+proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.setDeviceAppBadgeNumber = function(value) {
+  jspb.Message.setWrapperField(this, 14, value);
+};
+
+
+proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.clearDeviceAppBadgeNumber = function() {
+  this.setDeviceAppBadgeNumber(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.notification.v1.SendCampaignNotificationRequest.Message.prototype.hasDeviceAppBadgeNumber = function() {
+  return jspb.Message.getField(this, 14) != null;
 };
 
 

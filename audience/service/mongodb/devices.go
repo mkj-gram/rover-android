@@ -74,6 +74,7 @@ type Device struct {
 	AppVersion                  string              `bson:"app_version,omitempty"`
 	AppBuild                    string              `bson:"app_build,omitempty"`
 	AppNamespace                string              `bson:"app_namespace,omitempty"`
+	AppBadgeNumber              intValue            `bson:"app_badge_number"`
 	DeviceManufacturer          string              `bson:"device_manufacturer,omitempty"`
 	DeviceModel                 string              `bson:"device_model,omitempty"`
 	DeviceModelRaw              string              `bson:"device_model_raw,omitempty"`
@@ -157,6 +158,9 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.AppVersion = proto.AppVersion
 	d.AppBuild = proto.AppBuild
 	d.AppNamespace = proto.AppNamespace
+	if proto.AppBadgeNumber != nil {
+		d.AppBadgeNumber.int32 = &proto.AppBadgeNumber.Value
+	}
 	d.DeviceManufacturer = proto.DeviceManufacturer
 	d.OsName = proto.OsName
 	d.OsVersion = (*Version)(proto.OsVersion)
@@ -170,18 +174,6 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.LocaleLanguage = proto.LocaleLanguage
 	d.LocaleRegion = proto.LocaleRegion
 	d.LocaleScript = proto.LocaleScript
-
-	if proto.IsWifiEnabled != nil {
-		d.IsWifiEnabled = newBoolValue(proto.IsWifiEnabled.GetValue())
-	} else {
-		d.IsWifiEnabled.Unset()
-	}
-
-	if proto.IsCellularEnabled != nil {
-		d.IsCellularEnabled = newBoolValue(proto.IsCellularEnabled.GetValue())
-	} else {
-		d.IsCellularEnabled.Unset()
-	}
 
 	d.ScreenWidth = proto.ScreenWidth
 	d.ScreenHeight = proto.ScreenHeight
@@ -201,10 +193,14 @@ func (d *Device) fromProto(proto *audience.Device) error {
 	d.IsBackgroundEnabled = proto.IsBackgroundEnabled
 	d.IsLocationMonitoringEnabled = proto.IsLocationMonitoringEnabled
 
+	if proto.IsWifiEnabled != nil {
+		d.IsWifiEnabled.bool = &proto.IsWifiEnabled.Value
+	}
+	if proto.IsCellularEnabled != nil {
+		d.IsCellularEnabled.bool = &proto.IsCellularEnabled.Value
+	}
 	if proto.IsBluetoothEnabled != nil {
-		d.IsBluetoothEnabled = newBoolValue(proto.IsBluetoothEnabled.GetValue())
-	} else {
-		d.IsBluetoothEnabled.Unset()
+		d.IsBluetoothEnabled.bool = &proto.IsBluetoothEnabled.Value
 	}
 
 	d.AdvertisingId = proto.AdvertisingId
@@ -275,6 +271,11 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.AppVersion = d.AppVersion
 	proto.AppBuild = d.AppBuild
 	proto.AppNamespace = d.AppNamespace
+	if d.AppBadgeNumber.int32 != nil {
+		proto.AppBadgeNumber = &wrappers.Int32Value{
+			Value: *d.AppBadgeNumber.int32,
+		}
+	}
 	proto.DeviceManufacturer = d.DeviceManufacturer
 	proto.OsName = d.OsName
 	proto.OsVersion = (*audience.Version)(d.OsVersion)
@@ -292,18 +293,6 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.LocaleLanguage = d.LocaleLanguage
 	proto.LocaleRegion = d.LocaleRegion
 	proto.LocaleScript = d.LocaleScript
-
-	if d.IsWifiEnabled.Present() {
-		proto.IsWifiEnabled = wrappers.Bool(d.IsWifiEnabled.Value())
-	} else {
-		proto.IsWifiEnabled = nil
-	}
-
-	if d.IsCellularEnabled.Present() {
-		proto.IsCellularEnabled = wrappers.Bool(d.IsCellularEnabled.Value())
-	} else {
-		proto.IsCellularEnabled = nil
-	}
 
 	proto.ScreenWidth = d.ScreenWidth
 	proto.ScreenHeight = d.ScreenHeight
@@ -323,10 +312,14 @@ func (d *Device) toProto(proto *audience.Device) error {
 	proto.IsBackgroundEnabled = d.IsBackgroundEnabled
 	proto.IsLocationMonitoringEnabled = d.IsLocationMonitoringEnabled
 
-	if d.IsBluetoothEnabled.Present() {
-		proto.IsBluetoothEnabled = wrappers.Bool(d.IsBluetoothEnabled.Value())
-	} else {
-		proto.IsBluetoothEnabled = nil
+	if d.IsWifiEnabled.bool != nil {
+		proto.IsWifiEnabled = wrappers.Bool(*d.IsWifiEnabled.bool)
+	}
+	if d.IsCellularEnabled.bool != nil {
+		proto.IsCellularEnabled = wrappers.Bool(*d.IsCellularEnabled.bool)
+	}
+	if d.IsBluetoothEnabled.bool != nil {
+		proto.IsBluetoothEnabled = wrappers.Bool(*d.IsBluetoothEnabled.bool)
 	}
 
 	proto.AdvertisingId = d.AdvertisingId
@@ -580,6 +573,11 @@ func (s *devicesStore) UpdateDevice(ctx context.Context, r *audience.UpdateDevic
 	update["app_version"] = r.AppVersion
 	update["app_build"] = r.AppBuild
 	update["app_namespace"] = r.AppNamespace
+	if r.AppBadgeNumber != nil {
+		update["app_badge_number"] = r.AppBadgeNumber.Value
+	} else {
+		update["app_badge_number"] = nil
+	}
 	update["device_manufacturer"] = r.DeviceManufacturer
 	update["device_model"] = r.DeviceModel
 	update["device_model_raw"] = r.DeviceModelRaw

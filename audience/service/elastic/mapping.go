@@ -44,6 +44,7 @@ func DeviceV2Mapping(customDeviceAttributesMapping, customProfileAttributesMappi
 				"app_version":         M{"type": "keyword"},
 				"app_build":           M{"type": "keyword"},
 				"app_namespace":       M{"type": "keyword"},
+				"app_badge_number":    M{"type": "integer"},
 				"device_manufacturer": M{"type": "keyword"},
 				"device_model":        M{"type": "keyword"},
 				"os_name":             M{"type": "keyword"},
