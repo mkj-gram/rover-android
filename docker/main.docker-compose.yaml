@@ -282,6 +282,18 @@ services:
       AUTH_CLIENT_ID: "1025209954364-pgmntrdfq5526cq2slgsa4ao82a3qtls.apps.googleusercontent.com"
       AUTH_CLIENT_SECRET: "DPD50JrQqU5Xbsgdk2PkxSJh"
       NODE_ENV: development
+ 
+  admin-dashboard:
+    image: node:7.10.1
+    depends_on:
+      - graphql-admin
+    volumes:
+      - ../:/rover:delegated
+    working_dir: /rover/admin-dashboard
+    command: bash -c "npm install && npm start"
+    environment:
+      NODE_ENV: development
+      AUTH_CLIENT_ID: "1025209954364-pgmntrdfq5526cq2slgsa4ao82a3qtls.apps.googleusercontent.com"
 
   geocoder-service:
     image: golang:1.10-alpine

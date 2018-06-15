@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "rover-admin-staging",
+    "staging": "rover-admin-staging",
+    "production": "rover-admin-production"
+  }
+}

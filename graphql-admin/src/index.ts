@@ -18,8 +18,8 @@ app.use(
 )
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })
-app.use('/graphql', json(), graphqlExpress({ schema: schema }))
-app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' })) // GraphiQL enabled
+app.use('/admin', json(), graphqlExpress({ schema: schema }))
+app.get('/graphiql', graphiqlExpress({ endpointURL: '/admin' })) // GraphiQL enabled
 
 app.listen(PORT)
 console.log('Running GraphQL on port ' + PORT)
