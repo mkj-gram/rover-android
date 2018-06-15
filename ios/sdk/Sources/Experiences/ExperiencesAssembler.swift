@@ -87,9 +87,4 @@ public struct ExperiencesAssembler: Assembler {
             return ScreenViewController(collectionViewLayout: collectionViewLayout, experience: experience, screen: screen, dispatcher: dispatcher, eventQueue: eventQueue, imageStore: imageStore, sessionController: sessionController)
         }
     }
-    
-    public func containerDidAssemble(resolver: Resolver) {
-        let frameworksRegistry = resolver.resolve(FrameworksRegistry.self)!
-        frameworksRegistry.register("io.rover.RoverExperiences")
-    }
 }

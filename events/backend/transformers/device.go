@@ -222,7 +222,7 @@ func UpdateDeviceWithContext(client audience.AudienceClient, deviceModelNameMapp
 
 			DeviceModel:                 deviceModelNameMapper(dctx.GetDeviceModel()),
 			DeviceModelRaw:              dctx.GetDeviceModel(),
-			Frameworks:                  toAudienceFrameworks(dctx.GetFrameworks()),
+			Frameworks:                  toAudienceFrameworks(map[string]*rover_protobuf.Version{"io.rover.Rover": dctx.GetSdkVersion()}),
 			LocaleLanguage:              dctx.GetLocaleLanguage(),
 			LocaleRegion:                dctx.GetLocaleRegion(),
 			LocaleScript:                dctx.GetLocaleScript(),

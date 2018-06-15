@@ -9,7 +9,7 @@ import {
 
 import GraphQLJSON from 'graphql-type-json'
 
-import GraphQLFrameworkMap from './FrameworkMap'
+import Version from './Version'
 
 const DeviceContext = new GraphQLInputObjectType({
     name: 'DeviceContext',
@@ -43,9 +43,6 @@ const DeviceContext = new GraphQLInputObjectType({
         },
         deviceName: {
             type: GraphQLString
-        },
-        frameworks: {
-            type: GraphQLFrameworkMap
         },
         isBluetoothEnabled: {
             type: GraphQLBoolean
@@ -97,6 +94,9 @@ const DeviceContext = new GraphQLInputObjectType({
         },
         screenHeight: {
             type: GraphQLInt
+        },
+        sdkVersion: {
+            type: Version
         },
         timeZone: {
             type: GraphQLString

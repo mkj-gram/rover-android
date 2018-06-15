@@ -40,10 +40,6 @@ public struct LocationAssembler: Assembler {
     }
     
     public func containerDidAssemble(resolver: Resolver) {
-        if let frameworksRegistry = resolver.resolve(FrameworksRegistry.self) {
-            frameworksRegistry.register("io.rover.RoverLocation")
-        }
-        
         var locationManager = resolver.resolve(LocationManager.self)!
         locationManager.isAutomaticLocationEventTrackingEnabled = isAutomaticLocationEventTrackingEnabled
         locationManager.isAutomaticRegionManagementEnabled = isAutomaticRegionManagementEnabled

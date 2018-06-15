@@ -58,7 +58,7 @@ message DeviceContext {
 	int32 screen_width  = 27;
 	int32 screen_height = 28;
 
-	map<string,rover.protobuf.Version> frameworks = 29;
+	rover.protobuf.Version sdk_version = 29;
 
 	string device_name = 30;
 	string advertising_id = 31;

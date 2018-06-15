@@ -82,7 +82,6 @@
 		DBD88A8A20C1B26100085AE0 /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
 		DBD88A8B20C1B55C00085AE0 /* AppContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B49209CC80B00E99F9F /* AppContextProvider.swift */; };
 		DBD88A8C20C1B55C00085AE0 /* DeviceContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B44209CC80A00E99F9F /* DeviceContextProvider.swift */; };
-		DBD88A8D20C1B55C00085AE0 /* FrameworksContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B5E209CCEC300E99F9F /* FrameworksContextProvider.swift */; };
 		DBD88A8E20C1B55C00085AE0 /* LocaleContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B46209CC80B00E99F9F /* LocaleContextProvider.swift */; };
 		DBD88A8F20C1B55C00085AE0 /* PushEnvironmentContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE03B9A20B4AD2D00F3CE95 /* PushEnvironmentContextProvider.swift */; };
 		DBD88A9020C1B55C00085AE0 /* ReachabilityContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B48209CC80B00E99F9F /* ReachabilityContextProvider.swift */; };
@@ -121,6 +120,7 @@
 		DBD88AC020C1BC4000085AE0 /* UniversalLinkAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB08F9A120AB8B1A0029D6DF /* UniversalLinkAction.swift */; };
 		DBD88AC620C1BE1C00085AE0 /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
 		DBE03B3B20AF162700F3CE95 /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
+		DBE660A720D40FCE001D4E65 /* SDKContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE660A520D40FBA001D4E65 /* SDKContextProvider.swift */; };
 		DBF2584120A107BD00400EA2 /* ObserverSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2584020A107BD00400EA2 /* ObserverSet.swift */; };
 		DBF2584520A32E9400400EA2 /* Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2584420A32E9400400EA2 /* Action.swift */; };
 		DBF49DDD203DE00F00B54652 /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
@@ -139,8 +139,6 @@
 		DBFB1AD6209C9ABF00E99F9F /* CLLocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1AD4209C9AA600E99F9F /* CLLocationManager.swift */; };
 		DBFB1AF3209CA82800E99F9F /* ID.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A79209B8CC500E99F9F /* ID.swift */; };
 		DBFB1AF4209CA82800E99F9F /* Attributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A7A209B8CC500E99F9F /* Attributes.swift */; };
-		DBFB1B5B209CCDF100E99F9F /* FrameworksRegistryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B5A209CCDF100E99F9F /* FrameworksRegistryService.swift */; };
-		DBFB1B5D209CCE0700E99F9F /* FrameworksRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B5C209CCE0700E99F9F /* FrameworksRegistry.swift */; };
 		DBFB1B86209CE57500E99F9F /* ExperienceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB00FDC82083A010008D1A57 /* ExperienceTests.swift */; };
 		DBFB1B87209CE5C400E99F9F /* experience.json in Resources */ = {isa = PBXBuildFile; fileRef = DB00FDCA2083A14E008D1A57 /* experience.json */; };
 		DBFB1B8B209CE60E00E99F9F /* ScreenViewLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB00FDCE2084EF06008D1A57 /* ScreenViewLayoutTests.swift */; };
@@ -371,6 +369,7 @@
 		DBD88ABC20C1BA7C00085AE0 /* DataAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataAssembler.swift; sourceTree = "<group>"; };
 		DBE03B9A20B4AD2D00F3CE95 /* PushEnvironmentContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushEnvironmentContextProvider.swift; sourceTree = "<group>"; };
 		DBE03BA220B4B3CC00F3CE95 /* PushTokenContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushTokenContextProvider.swift; sourceTree = "<group>"; };
+		DBE660A520D40FBA001D4E65 /* SDKContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKContextProvider.swift; sourceTree = "<group>"; };
 		DBF2583A20A103F600400EA2 /* FetchRegionsResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchRegionsResult.swift; sourceTree = "<group>"; };
 		DBF2583C20A1046100400EA2 /* RegionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegionStore.swift; sourceTree = "<group>"; };
 		DBF2583E20A1054000400EA2 /* FetchNotificationsResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchNotificationsResult.swift; sourceTree = "<group>"; };
@@ -452,9 +451,6 @@
 		DBFB1B47209CC80B00E99F9F /* ScreenContextProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenContextProvider.swift; sourceTree = "<group>"; };
 		DBFB1B48209CC80B00E99F9F /* ReachabilityContextProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReachabilityContextProvider.swift; sourceTree = "<group>"; };
 		DBFB1B49209CC80B00E99F9F /* AppContextProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppContextProvider.swift; sourceTree = "<group>"; };
-		DBFB1B5A209CCDF100E99F9F /* FrameworksRegistryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameworksRegistryService.swift; sourceTree = "<group>"; };
-		DBFB1B5C209CCE0700E99F9F /* FrameworksRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameworksRegistry.swift; sourceTree = "<group>"; };
-		DBFB1B5E209CCEC300E99F9F /* FrameworksContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameworksContextProvider.swift; sourceTree = "<group>"; };
 		DBFB1B62209CD46200E99F9F /* ExperiencesAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperiencesAssembler.swift; sourceTree = "<group>"; };
 		DBFB1B66209CD89400E99F9F /* Color+uiColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+uiColor.swift"; sourceTree = "<group>"; };
 		DBFB1B68209CD8D600E99F9F /* Text+attributedText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Text+attributedText.swift"; sourceTree = "<group>"; };
@@ -1207,12 +1203,12 @@
 				DBFB1B49209CC80B00E99F9F /* AppContextProvider.swift */,
 				DB9DC02E2055992400E5C77F /* AttributesContextProvider.swift */,
 				DBFB1B44209CC80A00E99F9F /* DeviceContextProvider.swift */,
-				DBFB1B5E209CCEC300E99F9F /* FrameworksContextProvider.swift */,
 				DBFB1B46209CC80B00E99F9F /* LocaleContextProvider.swift */,
 				DBE03B9A20B4AD2D00F3CE95 /* PushEnvironmentContextProvider.swift */,
 				DBE03BA220B4B3CC00F3CE95 /* PushTokenContextProvider.swift */,
 				DBFB1B48209CC80B00E99F9F /* ReachabilityContextProvider.swift */,
 				DBFB1B47209CC80B00E99F9F /* ScreenContextProvider.swift */,
+				DBE660A520D40FBA001D4E65 /* SDKContextProvider.swift */,
 				DBFB1B43209CC80A00E99F9F /* TimeZoneContextProvider.swift */,
 			);
 			path = ContextProviders;
@@ -1222,19 +1218,9 @@
 			isa = PBXGroup;
 			children = (
 				DBADA80020A4F37C00225C80 /* Dispatcher */,
-				DBFB1B59209CCDCB00E99F9F /* FrameworksRegistry */,
 				DBF49E08203DE1E800B54652 /* Logger */,
 			);
 			path = Services;
-			sourceTree = "<group>";
-		};
-		DBFB1B59209CCDCB00E99F9F /* FrameworksRegistry */ = {
-			isa = PBXGroup;
-			children = (
-				DBFB1B5C209CCE0700E99F9F /* FrameworksRegistry.swift */,
-				DBFB1B5A209CCDF100E99F9F /* FrameworksRegistryService.swift */,
-			);
-			path = FrameworksRegistry;
 			sourceTree = "<group>";
 		};
 		DBFB1B64209CD7E400E99F9F /* Extensions */ = {
@@ -2151,12 +2137,12 @@
 				DBD88AB720C1B99C00085AE0 /* TokenManagerService.swift in Sources */,
 				DBD88AA920C1B61800085AE0 /* Data+Gzip.swift in Sources */,
 				DBD88AA420C1B5C200085AE0 /* URLSession+URLSessionProtocol.swift in Sources */,
+				DBE660A720D40FCE001D4E65 /* SDKContextProvider.swift in Sources */,
 				DBD88AB620C1B99C00085AE0 /* TokenManager.swift in Sources */,
 				DBD88AB820C1B9A700085AE0 /* PushTokenContextProvider.swift in Sources */,
 				DBD88A8C20C1B55C00085AE0 /* DeviceContextProvider.swift in Sources */,
 				DBD88A9420C1B58E00085AE0 /* Event.swift in Sources */,
 				DBD88ABE20C1BACF00085AE0 /* DataAssembler.swift in Sources */,
-				DBD88A8D20C1B55C00085AE0 /* FrameworksContextProvider.swift in Sources */,
 				DBD88AA820C1B61200085AE0 /* Reachability.swift in Sources */,
 				DBD88A9520C1B58E00085AE0 /* Context.swift in Sources */,
 				DBD88A8E20C1B55C00085AE0 /* LocaleContextProvider.swift in Sources */,
@@ -2197,9 +2183,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DBADA7FC20A4F32500225C80 /* OperationObserver.swift in Sources */,
-				DBFB1B5B209CCDF100E99F9F /* FrameworksRegistryService.swift in Sources */,
 				DBADA7FE20A4F32500225C80 /* OperationQueueDelegate.swift in Sources */,
-				DBFB1B5D209CCE0700E99F9F /* FrameworksRegistry.swift in Sources */,
 				DBF49E02203DE1DE00B54652 /* Assembler.swift in Sources */,
 				DBADA7FB20A4F32500225C80 /* AsynchronousOperation.swift in Sources */,
 				DBFB1AF3209CA82800E99F9F /* ID.swift in Sources */,

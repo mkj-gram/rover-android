@@ -40,7 +40,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :is_wifi_enabled, :message, 26, "rover.protobuf.BoolValue"
     optional :screen_width, :int32, 27
     optional :screen_height, :int32, 28
-    map :frameworks, :string, :message, 29, "rover.protobuf.Version"
+    optional :sdk_version, :message, 29, "rover.protobuf.Version"
     optional :device_name, :string, 30
     optional :advertising_id, :string, 31
     optional :is_bluetooth_enabled, :message, 32, "rover.protobuf.BoolValue"

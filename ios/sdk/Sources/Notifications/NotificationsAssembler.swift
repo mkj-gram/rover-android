@@ -82,10 +82,6 @@ public struct NotificationsAssembler: Assembler {
     }
     
     public func containerDidAssemble(resolver: Resolver) {
-        if let frameworksRegistry = resolver.resolve(FrameworksRegistry.self) {
-            frameworksRegistry.register("io.rover.RoverNotifications")
-        }
-        
         if isInfluenceTrackingEnabled {
             let influenceTracker = resolver.resolve(InfluenceTracker.self)!
             influenceTracker.startMonitoring()

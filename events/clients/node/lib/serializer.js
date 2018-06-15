@@ -100,12 +100,8 @@ function deviceContextToProto(context) {
 	dc.setScreenWidth(context.screenWidth)
 	dc.setScreenHeight(context.screenHeight)
 
-	if (context.frameworks) {
-		// map of string to version
-		let frameworks = dc.getFrameworksMap()
-		Object.keys(context.frameworks).forEach(function(key) {
-			frameworks.set(key, Version.fromJavaScript(context.frameworks[key]))
-		})
+	if (context.sdkVersion) {
+		dc.setSdkVersion(Version.fromJavaScript(context.sdkVersion))
 	}
 
 	dc.setAdvertisingId(context.advertisingId)

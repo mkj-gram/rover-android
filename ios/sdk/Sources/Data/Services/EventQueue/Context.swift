@@ -17,7 +17,6 @@ public struct Context: Codable, Equatable {
     public var deviceManufacturer: String?
     public var deviceModel: String?
     public var deviceName: String?
-    public var frameworks: [String: String]?
     public var isBluetoothEnabled: Bool?
     public var isCellularEnabled: Bool?
     public var isLocationServicesEnabled: Bool?
@@ -34,9 +33,10 @@ public struct Context: Codable, Equatable {
     public var radio: String?
     public var screenWidth: Int?
     public var screenHeight: Int?
+    public var sdkVersion: String?
     public var timeZone: String?
     
-    public init(appBadgeNumber: Int? = nil, appBuild: String? = nil, appIdentifier: String? = nil, appVersion: String? = nil, attributes: Attributes? = nil, carrierName: String? = nil, deviceIdentifier: String? = nil, deviceManufacturer: String? = nil, deviceModel: String? = nil, frameworks: [String: String]? = nil, isBluetoothEnabled: Bool? = nil, isCellularEnabled: Bool? = nil, isLocationServicesEnabled: Bool? = nil, isWifiEnabled: Bool? = nil, locationAuthorization: String? = nil, localeLanguage: String? = nil, localeRegion: String? = nil, localeScript: String? = nil, notificationAuthorization: String? = nil, operatingSystemName: String? = nil, operatingSystemVersion: String? = nil, pushEnvironment: String? = nil, pushToken: String? = nil, radio: String? = nil, screenWidth: Int? = nil, screenHeight: Int? = nil, timeZone: String? = nil) {
+    public init(appBadgeNumber: Int? = nil, appBuild: String? = nil, appIdentifier: String? = nil, appVersion: String? = nil, attributes: Attributes? = nil, carrierName: String? = nil, deviceIdentifier: String? = nil, deviceManufacturer: String? = nil, deviceModel: String? = nil, isBluetoothEnabled: Bool? = nil, isCellularEnabled: Bool? = nil, isLocationServicesEnabled: Bool? = nil, isWifiEnabled: Bool? = nil, locationAuthorization: String? = nil, localeLanguage: String? = nil, localeRegion: String? = nil, localeScript: String? = nil, notificationAuthorization: String? = nil, operatingSystemName: String? = nil, operatingSystemVersion: String? = nil, pushEnvironment: String? = nil, pushToken: String? = nil, radio: String? = nil, screenWidth: Int? = nil, screenHeight: Int? = nil, sdkVersion: String? = nil, timeZone: String? = nil) {
         self.appBadgeNumber = appBadgeNumber
         self.appBuild = appBuild
         self.appIdentifier = appIdentifier
@@ -46,7 +46,6 @@ public struct Context: Codable, Equatable {
         self.deviceIdentifier = deviceIdentifier
         self.deviceManufacturer = deviceManufacturer
         self.deviceModel = deviceModel
-        self.frameworks = frameworks
         self.isBluetoothEnabled = isBluetoothEnabled
         self.isCellularEnabled = isCellularEnabled
         self.isLocationServicesEnabled = isLocationServicesEnabled
@@ -63,6 +62,7 @@ public struct Context: Codable, Equatable {
         self.radio = radio
         self.screenWidth = screenWidth
         self.screenHeight = screenHeight
+        self.sdkVersion = sdkVersion
         self.timeZone = timeZone
     }
 }

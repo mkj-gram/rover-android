@@ -125,10 +125,7 @@ describe('Client', function() {
 					radio: "LTE",
 					screenWidth: 480,
 					screenHeight: 720,
-					frameworks: {
-						"io.rover.Rover": "1.11.1",
-						"io.rover.RoverFoundation": "2.0.0"
-					},
+					sdkVersion: "2.0.0",
 					timeZone: "America/Toronto"
 				}
 			}
@@ -185,20 +182,10 @@ describe('Client', function() {
 							radio: 'LTE',
 							screenWidth: 480,
 							screenHeight: 720,
-							frameworks: {
-								"io.rover.Rover": "1.11.1",
-								"io.rover.RoverFoundation": "2.0.0"
-							},
+							sdkVersion: "2.0.0",
 							timeZone: 'America/Toronto' 
 						} 
 					}
-
-					let gotFrameworks = {}
-					let map = dctx.getFrameworksMap()
-
-					map.forEach((value, key) => {
-						gotFrameworks[key] = value.toStringValue()
-					})
 
 					const got = {
 						id: event.getId(),
@@ -230,7 +217,7 @@ describe('Client', function() {
 							carrierName: dctx.getCarrierName(),
 							screenWidth: dctx.getScreenWidth(),
 							screenHeight: dctx.getScreenHeight(),
-							frameworks: gotFrameworks,
+							sdkVersion: dctx.getSdkVersion().toStringValue(),
 							timeZone: dctx.getTimeZone(),
 						}
 					}

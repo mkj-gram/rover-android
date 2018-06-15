@@ -93,7 +93,7 @@ proto.rover.event.v1.DeviceContext.toObject = function(includeInstance, msg) {
     isWifiEnabled: (f = msg.getIsWifiEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f),
     screenWidth: jspb.Message.getFieldWithDefault(msg, 27, 0),
     screenHeight: jspb.Message.getFieldWithDefault(msg, 28, 0),
-    frameworksMap: (f = msg.getFrameworksMap()) ? f.toObject(includeInstance, proto.rover.protobuf.Version.toObject) : [],
+    sdkVersion: (f = msg.getSdkVersion()) && protobuf_version_pb.Version.toObject(includeInstance, f),
     deviceName: jspb.Message.getFieldWithDefault(msg, 30, ""),
     advertisingId: jspb.Message.getFieldWithDefault(msg, 31, ""),
     isBluetoothEnabled: (f = msg.getIsBluetoothEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f)
@@ -252,10 +252,9 @@ proto.rover.event.v1.DeviceContext.deserializeBinaryFromReader = function(msg, r
       msg.setScreenHeight(value);
       break;
     case 29:
-      var value = msg.getFrameworksMap();
-      reader.readMessage(value, function(message, reader) {
-        jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.rover.protobuf.Version.deserializeBinaryFromReader);
-         });
+      var value = new protobuf_version_pb.Version;
+      reader.readMessage(value,protobuf_version_pb.Version.deserializeBinaryFromReader);
+      msg.setSdkVersion(value);
       break;
     case 30:
       var value = /** @type {string} */ (reader.readString());
@@ -500,9 +499,13 @@ proto.rover.event.v1.DeviceContext.serializeBinaryToWriter = function(message, w
       f
     );
   }
-  f = message.getFrameworksMap(true);
-  if (f && f.getLength() > 0) {
-    f.serializeBinary(29, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.rover.protobuf.Version.serializeBinaryToWriter);
+  f = message.getSdkVersion();
+  if (f != null) {
+    writer.writeMessage(
+      29,
+      f,
+      protobuf_version_pb.Version.serializeBinaryToWriter
+    );
   }
   f = message.getDeviceName();
   if (f.length > 0) {
@@ -1040,20 +1043,32 @@ proto.rover.event.v1.DeviceContext.prototype.setScreenHeight = function(value) {
 
 
 /**
- * map<string, rover.protobuf.Version> frameworks = 29;
- * @param {boolean=} opt_noLazyCreate Do not create the map if
- * empty, instead returning `undefined`
- * @return {!jspb.Map<string,!proto.rover.protobuf.Version>}
+ * optional rover.protobuf.Version sdk_version = 29;
+ * @return {?proto.rover.protobuf.Version}
  */
-proto.rover.event.v1.DeviceContext.prototype.getFrameworksMap = function(opt_noLazyCreate) {
-  return /** @type {!jspb.Map<string,!proto.rover.protobuf.Version>} */ (
-      jspb.Message.getMapField(this, 29, opt_noLazyCreate,
-      proto.rover.protobuf.Version));
+proto.rover.event.v1.DeviceContext.prototype.getSdkVersion = function() {
+  return /** @type{?proto.rover.protobuf.Version} */ (
+    jspb.Message.getWrapperField(this, protobuf_version_pb.Version, 29));
 };
 
 
-proto.rover.event.v1.DeviceContext.prototype.clearFrameworksMap = function() {
-  this.getFrameworksMap().clear();
+/** @param {?proto.rover.protobuf.Version|undefined} value */
+proto.rover.event.v1.DeviceContext.prototype.setSdkVersion = function(value) {
+  jspb.Message.setWrapperField(this, 29, value);
+};
+
+
+proto.rover.event.v1.DeviceContext.prototype.clearSdkVersion = function() {
+  this.setSdkVersion(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.event.v1.DeviceContext.prototype.hasSdkVersion = function() {
+  return jspb.Message.getField(this, 29) != null;
 };
 
 

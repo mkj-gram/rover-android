@@ -61,13 +61,6 @@ public struct DataAssembler: Assembler {
             return DeviceContextProvider(device: UIDevice.current, logger: logger)
         }
         
-        // MARK: ContextProvider (frameworks)
-        
-        container.register(ContextProvider.self, name: "frameworks") { resolver in
-            let registry = resolver.resolve(FrameworksRegistry.self)!
-            return FrameworksContextProvider(registry: registry)
-        }
-        
         // MARK: ContextProvider (locale)
         
         container.register(ContextProvider.self, name: "locale") { resolver in
@@ -100,6 +93,13 @@ public struct DataAssembler: Assembler {
         
         container.register(ContextProvider.self, name: "screen") { resolver in
             return ScreenContextProvider(screen: UIScreen.main)
+        }
+        
+        // MARK: ContextProvider (sdk)
+        
+        container.register(ContextProvider.self, name: "sdk") { resolver in
+            let logger = resolver.resolve(Logger.self)!
+            return SDKContextProvider(logger: logger)
         }
         
         // MARK: ContextProvider (timeZone)
@@ -152,7 +152,6 @@ public struct DataAssembler: Assembler {
             resolver.resolve(ContextProvider.self, name: "attributes"),
             resolver.resolve(ContextProvider.self, name: "bluetooth"),
             resolver.resolve(ContextProvider.self, name: "device"),
-            resolver.resolve(ContextProvider.self, name: "frameworks"),
             resolver.resolve(ContextProvider.self, name: "locale"),
             resolver.resolve(ContextProvider.self, name: "location"),
             resolver.resolve(ContextProvider.self, name: "notificationAuthorization"),
@@ -160,15 +159,13 @@ public struct DataAssembler: Assembler {
             resolver.resolve(ContextProvider.self, name: "pushToken"),
             resolver.resolve(ContextProvider.self, name: "reachability"),
             resolver.resolve(ContextProvider.self, name: "screen"),
+            resolver.resolve(ContextProvider.self, name: "sdk"),
             resolver.resolve(ContextProvider.self, name: "telephony"),
             resolver.resolve(ContextProvider.self, name: "timeZone")
             ].compactMap { $0 }
         
         eventQueue.addContextProviders(contextProviders)
         eventQueue.restore()
-        
-        let frameworksRegistry = resolver.resolve(FrameworksRegistry.self)!
-        frameworksRegistry.register("io.rover.RoverData")
         
         var stateFetcher = resolver.resolve(StateFetcher.self)!
         stateFetcher.isAutoFetchEnabled = isAutoFetchEnabled

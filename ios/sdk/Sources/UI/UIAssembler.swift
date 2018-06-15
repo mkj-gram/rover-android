@@ -83,10 +83,6 @@ extension UIAssembler: Assembler {
     }
     
     public func containerDidAssemble(resolver: Resolver) {
-        if let frameworksRegistry = resolver.resolve(FrameworksRegistry.self) {
-            frameworksRegistry.register("io.rover.RoverUI")
-        }
-        
         var applicationMonitor = resolver.resolve(ApplicationMonitor.self)!
         applicationMonitor.isSessionTrackingEnabled = isApplicationSessionTrackingEnabled
         applicationMonitor.isVersionTrackingEnabled = isApplicationVersionTrackingEnabled

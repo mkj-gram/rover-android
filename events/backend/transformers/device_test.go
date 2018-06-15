@@ -478,15 +478,9 @@ func TestUpdateDeviceWithContextTransformer(t *testing.T) {
 					IsWifiEnabled:             wrappers.Bool(false),
 					ScreenWidth:               720,
 					ScreenHeight:              480,
-					Frameworks: map[string]*rover_protobuf.Version{
-						"io.rover.Rover": {
-							Major:    5,
-							Minor:    2,
-							Revision: 0,
-						},
-					},
-					DeviceName:    "McCafe Phone",
-					AdvertisingId: "LNCNIGXXWQ",
+					SdkVersion:                &rover_protobuf.Version{Major: 5, Minor: 2, Revision: 0},
+					DeviceName:                "McCafe Phone",
+					AdvertisingId:             "LNCNIGXXWQ",
 				},
 			},
 
