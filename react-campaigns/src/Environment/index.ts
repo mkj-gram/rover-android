@@ -11,7 +11,7 @@ const environments: StringMap<string> = {
 const uri =
     environments[process.env.NODE_ENV] || 'https://api.staging.rover.io/graphql'
 
-const getToken = (): string | null => {
+export const getToken = (): string | null => {
     const session = JSON.parse(
         localStorage.getItem('ember_simple_auth:session')
     )

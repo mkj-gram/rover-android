@@ -6,6 +6,7 @@ import app, * as appSelector from './app'
 import campaigns, * as campaignsSelector from './campaigns'
 import editableCampaign, * as editableCampaignSelector from './editableCampaign'
 import editableUIState, * as editableUIStateSelector from './editableUIState'
+import experiences, * as experiencesSelector from './experiences'
 import segments, * as segmentsSelector from './segments'
 import testDevices, * as testDevicesSelector from './testDevices'
 
@@ -14,6 +15,7 @@ export default combineReducers({
     campaigns,
     editableCampaign,
     editableUIState,
+    experiences,
     segments,
     testDevices
 })
@@ -166,3 +168,10 @@ export const getSegment = (state: State, segmentId: string) =>
 // Test Devices
 export const getTestDevices = (state: State) =>
     testDevicesSelector.getTestDevices(state.testDevices)
+
+// Experiences
+export const getExperiences = (state: State) =>
+    experiencesSelector.getExperiences(state.experiences)
+
+export const getExperience = (state: State, id: string) =>
+    experiencesSelector.getExperience(state.experiences, id)

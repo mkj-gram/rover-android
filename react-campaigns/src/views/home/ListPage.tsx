@@ -15,6 +15,7 @@ import {
     createCampaign,
     fetchCampaign,
     fetchCampaigns,
+    fetchExperiences,
     fetchSegments,
     fetchTestDevices,
     handleOpenOverviewModalDisplay
@@ -38,6 +39,7 @@ export interface DispatchProps {
     createCampaign: (name: string, campaignType: CampaignType) => void
     fetchCampaign: (campaignId: number) => void
     fetchCampaigns: () => void
+    fetchExperiences: () => void
     fetchSegments: () => void
     fetchTestDevices: () => void
     handleOpenOverviewModalDisplay: () => void
@@ -63,8 +65,14 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
     }
 
     componentWillMount() {
-        const { fetchCampaigns, fetchSegments, fetchTestDevices } = this.props
+        const {
+            fetchCampaigns,
+            fetchExperiences,
+            fetchSegments,
+            fetchTestDevices
+        } = this.props
         fetchCampaigns()
+        fetchExperiences()
         fetchSegments()
         fetchTestDevices()
     }
@@ -347,6 +355,7 @@ const mapDispatchToProps = (
                 }
             )
         },
+        fetchExperiences: () => dispatch(fetchExperiences()),
         fetchSegments: () => dispatch(fetchSegments()),
         fetchTestDevices: () => dispatch(fetchTestDevices()),
         handleOpenOverviewModalDisplay: () =>
@@ -359,7 +368,8 @@ const mapStateToProps = (state: State): StateProps => ({
 })
 
 export default withRouter(
-    connect(mapStateToProps, mapDispatchToProps)((props: ListPageProps) =>
-        ResponsiveContainer(props)(ListPage)
-    )
+    connect(
+        mapStateToProps,
+        mapDispatchToProps
+    )((props: ListPageProps) => ResponsiveContainer(props)(ListPage))
 )

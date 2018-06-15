@@ -146,11 +146,12 @@ interface AutomatedNotificationCampaign extends Campaign {
 type State = {
     readonly app: AppState
     readonly campaigns: StringMap<Campaign>
-    readonly testDevices: TestDeviceState
-    readonly modal: StringMap<string | boolean>
     readonly editableCampaign: AutomatedNotificationCampaign | ScheduledCampaign
     readonly editableUIState: editableUIState
+    readonly experiences: Array<Experience>
+    readonly modal: StringMap<string | boolean>
     readonly segments: SegmentsState
+    readonly testDevices: TestDeviceState
 }
 
 type TestDeviceState = {
@@ -266,3 +267,9 @@ type alertType =
     | 'notificationAlertOptionBadgeNumber'
     | 'notificationAlertOptionPushNotification'
     | 'notificationAlertOptionNotificationCenter'
+
+type Experience = {
+    id: string
+    name: string
+    simulatorURL: string
+}

@@ -1,12 +1,13 @@
 /// <reference path="../../typings/index.d.ts"/>
 
+import * as campaignsActions from './campaigns'
 import * as editableCampaignActions from './editableCampaign'
 import * as editableUIStateActions from './editableUIState'
-import * as campaignsActions from './campaigns'
-import * as testDevicesActions from './testDevices'
+import * as experienceActions from './experiences'
 import * as notificationActions from './notification'
 import * as segmentsActions from './segments'
 import * as sendTestActions from './sendTest'
+import * as testDevicesActions from './testDevices'
 
 import * as overviewActions from './overview'
 import * as H from 'history'
@@ -178,6 +179,9 @@ export const updateEditableUIState = (
         newUIStateGroup,
         newUIStateValue
     )
+
+// Experiences
+export const fetchExperiences = () => experienceActions.fetchExperiences()
 
 // Form
 export const setCurrentFormPage: ActionCreator<
