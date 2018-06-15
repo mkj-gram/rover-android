@@ -106,7 +106,6 @@ func (c *notificationsStore) Create(ctx context.Context, note *Notification) err
 		va.Value("account_id", note.AccountId, va.Require),
 		va.Value("campaign_id", note.CampaignId, va.Require),
 		va.Value("device_id", note.DeviceId, va.Require),
-		va.Value("title", note.Title, va.Require),
 		va.Value("body", note.Body, va.Require),
 	); err != nil {
 		return errors.Wrap(err, "validations")

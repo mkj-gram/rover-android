@@ -122,7 +122,7 @@ func test_NotificationsStore_Create(t *testing.T) {
 
 			given: &scylla.Notification{},
 
-			expErr: errors.Errorf(`validations: id: uuid: invalid. account_id: is required. campaign_id: is required. device_id: is required. title: is required. body: is required.`),
+			expErr: errors.Errorf(`validations: id: uuid: invalid. account_id: is required. campaign_id: is required. device_id: is required. body: is required.`),
 		},
 
 		{
