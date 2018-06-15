@@ -1,13 +1,18 @@
 /// <reference path="../../../../typings/index.d.ts"/>
 import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
+import { withRouter, RouteComponentProps } from 'react-router'
+import * as H from 'history'
 
 import {
     getEditableCampaign,
     getEditableCampaignDisplayTime,
     getEditableCampaignFormatDate
 } from '../../../reducers'
-import { publishCampaign } from '../../../actions'
+import {
+    handleCloseOverviewModalDisplay,
+    publishCampaign
+} from '../../../actions'
 
 import { Dialog } from '@rover/ts-bootstrap/dist/src'
 import {
@@ -26,19 +31,33 @@ export interface PublishDialogStateProps {
     getFormatDate: (dateField: string) => Date
 }
 export interface DispatchProps {
+    handleCloseOverviewModalDisplay: (history: H.History, path: string) => void
     publishCampaign: (campaignId: number) => void
 }
 
+export interface PublishRouterProps {
+    history: H.History
+    location: H.Location
+}
+
 const PublishCampaignConfirmationDialog: React.SFC<
-    PublishDialogProps & PublishDialogStateProps & DispatchProps
+    PublishDialogProps &
+        PublishDialogStateProps &
+        DispatchProps &
+        PublishRouterProps &
+        // tslint:disable-next-line:no-any
+        RouteComponentProps<any>
 > = ({
     campaignId,
     device,
-    handlePublishCampaignPrompt,
     editableCampaign,
-    publishCampaign,
+    getDisplayTime,
     getFormatDate,
-    getDisplayTime
+    handleCloseOverviewModalDisplay,
+    handlePublishCampaignPrompt,
+    history,
+    location,
+    publishCampaign
 }) => {
     const getDialogText = () => {
         let dialogText
@@ -62,7 +81,7 @@ const PublishCampaignConfirmationDialog: React.SFC<
                 const displayTime = getDisplayTime('scheduledTime')
 
                 const displayScheduledTimezone = scheduledUseLocalDeviceTime
-                    ? "using the devices' local time zone"
+                    ? `using the devices' local time zone`
                     : scheduledTimeZone
 
                 // tslint:disable-next-line:max-line-length
@@ -77,15 +96,21 @@ const PublishCampaignConfirmationDialog: React.SFC<
         return dialogText
     }
 
+    const publish = (): void => {
+        const campaignIdRegEx = new RegExp(`[\\&-]?campaignId=${campaignId}`)
+        const search = location.search.replace(campaignIdRegEx, '')
+        const pathname = location.pathname.replace('wizard/', '')
+        publishCampaign(campaignId)
+        handlePublishCampaignPrompt()
+        handleCloseOverviewModalDisplay(history, `${pathname}${search}`)
+    }
+
     return (
         <Dialog
             buttonPrimaryText="Cancel"
             buttonSecondaryText="Publish"
             primaryOnClick={handlePublishCampaignPrompt}
-            secondaryOnClick={() => {
-                publishCampaign(campaignId)
-                handlePublishCampaignPrompt()
-            }}
+            secondaryOnClick={publish}
             isOpen={true}
             targetParent={
                 device === 'Desktop' ? 'mainModalView' : 'mainModalLeft'
@@ -106,13 +131,17 @@ const mapStateToProps = (state: State): PublishDialogStateProps => ({
 // tslint:disable-next-line:no-any
 const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     return {
+        handleCloseOverviewModalDisplay: (history: H.History, path: string) =>
+            dispatch(handleCloseOverviewModalDisplay(history, path)),
         publishCampaign: campaignId => {
             dispatch(publishCampaign(campaignId))
         }
     }
 }
 
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(PublishCampaignConfirmationDialog)
+export default withRouter(
+    connect(
+        mapStateToProps,
+        mapDispatchToProps
+    )(PublishCampaignConfirmationDialog)
+)
