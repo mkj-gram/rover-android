@@ -62,9 +62,10 @@ class NewCampaignPopover extends React.PureComponent<
         super(props)
 
         this.state = {
-            contentState: 'campaign-types',
+            contentState: 'name-campaign', // 'campaign-types'
             isEditingCampaignName: false,
-            newCampaignName: ''
+            newCampaignName: '',
+            newCampaignType: 'SCHEDULED_NOTIFICATION'
         }
         this.handleOpenClose = this.handleOpenClose.bind(this)
         this.getRightButtonCallback = this.getRightButtonCallback.bind(this)
@@ -77,9 +78,10 @@ class NewCampaignPopover extends React.PureComponent<
 
         if (isNewCampaignPopoverOpen && !nextProps.isNewCampaignPopoverOpen) {
             this.setState({
-                contentState: 'campaign-types',
+                contentState: 'name-campaign', // 'campaign-types'
                 newCampaignName: '',
-                isEditingCampaignName: false
+                isEditingCampaignName: false,
+                newCampaignType: 'SCHEDULED_NOTIFICATION'
             })
         }
     }
@@ -480,10 +482,10 @@ class NewCampaignPopover extends React.PureComponent<
             navBarProperties: {
                 title: this.getTitle(),
                 buttonRight: this.getRightButton(),
-                buttonLeft: this.getLeftButton(),
+                // buttonLeft: this.getLeftButton(),
                 buttonLeftCallback: this.getLeftButtonCallback(),
                 buttonRightCallback: this.getRightButtonCallback(),
-                customLeftElem: this.getNavbarLeftElem(),
+                // customLeftElem: this.getNavbarLeftElem(),
                 id: 'navBarId',
                 style: {
                     containerStyle: {
@@ -575,9 +577,11 @@ class NewCampaignPopover extends React.PureComponent<
                             >
                                 <NavBar
                                     buttonRight={this.getRightButton()}
-                                    buttonLeft={this.getLeftButton()}
+                                    buttonLeft={'Cancel'} // {this.getLeftButton()}
                                     buttonRightCallback={this.getRightButtonCallback()}
-                                    buttonLeftCallback={this.getLeftButtonCallback()}
+                                    buttonLeftCallback={() =>
+                                        this.handleOpenClose()
+                                    } // {this.getLeftButtonCallback()}
                                     style={{
                                         buttonLeftStyle: {
                                             outerStyle: {
@@ -591,7 +595,7 @@ class NewCampaignPopover extends React.PureComponent<
                                         }
                                     }}
                                     title={this.getTitle()}
-                                    customLeftElem={this.getNavbarLeftElem()}
+                                    // customLeftElem={this.getNavbarLeftElem()}
                                 />
                                 <div
                                     style={{
@@ -634,4 +638,7 @@ const mapStateToProps = (state: State): StateProps => ({
     isNewCampaignPopoverOpen: getIsNewCampaignPopoverOpen(state)
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(NewCampaignPopover)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(NewCampaignPopover)

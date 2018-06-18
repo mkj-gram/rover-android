@@ -207,7 +207,7 @@ const CampaignTypeSelector: React.SFC<
                 </div>
                 <div
                     style={{
-                        height: 280,
+                        height: 111, //280
                         width: 384,
                         flexDirection: 'column',
                         paddingLeft: 16,
@@ -216,9 +216,9 @@ const CampaignTypeSelector: React.SFC<
                 >
                     {renderCampaignTypeRow('all')}
                     {renderCampaignTypeRow('scheduled')}
-                    {renderCampaignTypeRow('automated')}
+                    {/* {renderCampaignTypeRow('automated')}
                     {renderCampaignTypeRow('interstitial')}
-                    {renderCampaignTypeRow('web')}
+                    {renderCampaignTypeRow('web')} */}
                 </div>
             </PopoverContainer>
             {isCampaignTypeSelectorOpen &&
@@ -284,9 +284,9 @@ const CampaignTypeSelector: React.SFC<
                                 >
                                     {renderCampaignTypeRow('all')}
                                     {renderCampaignTypeRow('scheduled')}
-                                    {renderCampaignTypeRow('automated')}
+                                    {/* {renderCampaignTypeRow('automated')}
                                     {renderCampaignTypeRow('interstitial')}
-                                    {renderCampaignTypeRow('web')}
+                                    {renderCampaignTypeRow('web')} */}
                                 </div>
                             </div>
                         </div>
@@ -311,6 +311,7 @@ const mapStateToProps = (state: State): StateProps => ({
     isCampaignTypeSelectorOpen: getIsCampaignTypeSelectorOpen(state)
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-    CampaignTypeSelector
-)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(CampaignTypeSelector)
