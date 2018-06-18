@@ -36,18 +36,18 @@ const OverviewModalBodyContainer: React.SFC<
 }) => {
     const arr = [
         {
-            name: 'Notification',
-            text:
-                // tslint:disable-next-line:max-line-length
-                'Compose the title and body of notification, add rich media and determine what happens when the user taps or swipes the notification.',
-            val: notificationProgress
-        },
-        {
             name: 'Scheduled Delivery',
             text:
                 // tslint:disable-next-line:max-line-length
                 'Determine how and when the notification is delivered as well as which devices/users will receive it.',
             val: scheduledDeliveryProgress
+        },
+        {
+            name: 'Notification',
+            text:
+                // tslint:disable-next-line:max-line-length
+                'Compose the title and body of notification, add rich media and determine what happens when the user taps or swipes the notification.',
+            val: notificationProgress
         }
     ]
 
