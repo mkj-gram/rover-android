@@ -123,7 +123,11 @@ class OverviewModalRow extends React.Component<OverviewModalRowProps, {}> {
                 }
             >
                 <div style={outerStyle}>
-                    <Text text={name} size="h2" textStyle={textStyle} />
+                    <Text
+                        text={name === 'Scheduled Delivery' ? 'Delivery' : name}
+                        size="h2"
+                        textStyle={textStyle}
+                    />
                     <div
                         style={{
                             display: 'flex',

@@ -18,7 +18,7 @@ import {
 } from '@rover/ts-bootstrap/dist/src'
 import PopoverTextRadioButtonComponent from '../../utils/PopoverTextRadioButtonComponent'
 import TapBehaviorBody from './TapBehaviorBody'
-import TapBehaviorRow from './TapBehaviorRow'
+import Row from '../components/Row'
 import MobilePopover from '../components/MobilePopover'
 import FormSection from '../../utils/FormSection'
 import {
@@ -277,11 +277,9 @@ class TapBehaviorContainer extends React.Component<
                     size="h1"
                     textStyle={{ margin: '24px 0' }}
                 />
-                <TapBehaviorRow
-                    handleClick={this.getTapNotificationRowClickable}
-                >
+                <Row onClick={this.getTapNotificationRowClickable}>
                     {this.tapNotificationRow()}
-                </TapBehaviorRow>
+                </Row>
                 <TapBehaviorBody
                     device={device}
                     selectedTapOption={notificationTapBehaviorType}
@@ -310,6 +308,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
         }
     }
 }
-export default connect(mapStateToProps, mapDispatchToProps)(
-    TapBehaviorContainer
-)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(TapBehaviorContainer)

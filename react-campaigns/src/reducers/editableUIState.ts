@@ -32,6 +32,7 @@ export const getIsStageValid = (
             )
         case 'tapBehavior':
             const {
+                experienceId,
                 notificationTapBehaviorType,
                 notificationTapBehaviorUrl
             } = editableCampaign
@@ -43,7 +44,7 @@ export const getIsStageValid = (
             switch (notificationTapBehaviorType) {
                 case 'OPEN_APP':
                 case 'OPEN_EXPERIENCE':
-                    return true
+                    return experienceId !== ''
                 case 'OPEN_DEEP_LINK':
                 case 'OPEN_WEBSITE':
                     return notificationTapBehaviorUrl !== ''
@@ -97,7 +98,7 @@ export const getTypeProgress = (state: State, type: UIStateType): number => {
     )
 
     return (
-        fields
+        (fields
             .filter(
                 (field: keyof editableUIState) =>
                     (editableUIState[field] as UIStateField).seen
@@ -105,7 +106,7 @@ export const getTypeProgress = (state: State, type: UIStateType): number => {
             .filter((field: keyof editableUIState) =>
                 getIsStageValid(state, field)
             ).length *
-        100 /
+            100) /
         fields.length
     )
 }
@@ -122,5 +123,5 @@ export const getTotalProgress = (state: State): number => {
         (field: UIStateType) => getTypeProgress(state, field) === 100
     )
 
-    return 100 * validTypes.length / UIStateTypes.size
+    return (100 * validTypes.length) / UIStateTypes.size
 }

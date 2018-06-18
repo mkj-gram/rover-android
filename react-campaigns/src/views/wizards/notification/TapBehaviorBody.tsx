@@ -14,9 +14,10 @@ import {
     PopoverContainer,
     Alert
 } from '@rover/ts-bootstrap/dist/src'
-import TapBehaviorRow from './TapBehaviorRow'
+import Row from '../components/Row'
 import PopoverTextRadioButtonComponent from '../../utils/PopoverTextRadioButtonComponent'
 import MobilePopover from '../components/MobilePopover'
+import ExperienceSelector from './ExperienceSelector'
 
 import {
     updateEditableCampaign,
@@ -26,7 +27,7 @@ import {
 import { getIsTapBehaviorWebsitePresentationOpen } from '../../../reducers'
 
 export interface TapBehaviorBodyProps {
-    device?: string
+    device?: Media
     selectedTapOption?: NotificationTapBehaviorType
     campaign?: ScheduledCampaign | AutomatedNotificationCampaign
 }
@@ -308,8 +309,8 @@ class TapBehaviorBody extends React.Component<
 
         return (
             <Fragment>
-                <TapBehaviorRow
-                    handleClick={
+                <Row
+                    onClick={
                         device === 'Tablet'
                             ? () =>
                                   this.setState({
@@ -320,15 +321,14 @@ class TapBehaviorBody extends React.Component<
                     }
                 >
                     {websiteURLRow}
-                </TapBehaviorRow>
-                <TapBehaviorRow
-                    handleClick={this.getWebsitePresentRowClickable}
-                >
+                </Row>
+                <Row onClick={this.getWebsitePresentRowClickable}>
                     {this.websitePresentRow()}
-                </TapBehaviorRow>
+                </Row>
 
                 <Alert
                     message="Android will always present in the browser"
+                    style={{ marginTop: 24 }}
                     type="warn"
                 />
             </Fragment>
@@ -381,8 +381,8 @@ class TapBehaviorBody extends React.Component<
 
         return (
             <Fragment>
-                <TapBehaviorRow
-                    handleClick={
+                <Row
+                    onClick={
                         device === 'Tablet'
                             ? () =>
                                   this.setState({
@@ -393,7 +393,7 @@ class TapBehaviorBody extends React.Component<
                     }
                 >
                     {deeplinkRow}
-                </TapBehaviorRow>
+                </Row>
             </Fragment>
         )
     }
@@ -403,7 +403,7 @@ class TapBehaviorBody extends React.Component<
 
         switch (selectedTapOption) {
             case 'OPEN_EXPERIENCE':
-                return this.experienceAlert()
+                return <ExperienceSelector device={device} />
             case 'OPEN_WEBSITE':
                 return this.websiteForm()
             case 'OPEN_DEEP_LINK':
@@ -436,4 +436,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TapBehaviorBody)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(TapBehaviorBody)

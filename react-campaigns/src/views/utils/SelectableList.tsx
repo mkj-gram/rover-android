@@ -26,7 +26,7 @@ class SelectableList extends React.Component<
 
     handleHover(onHoverName: React.ReactText) {
         this.setState({
-            onHoverName
+            onHoverName: onHoverName
         })
     }
 
@@ -41,6 +41,7 @@ class SelectableList extends React.Component<
                     flexDirection: 'column',
                     justifyContent: 'space-evenly'
                 }}
+                onMouseOut={() => this.handleHover('')}
             >
                 {children.map((child, index) => (
                     <div
@@ -59,15 +60,12 @@ class SelectableList extends React.Component<
                         }
                     >
                         {child}
-                        {(index !== children.length - 1 ||
-                            device === 'Mobile') && (
-                            <div
-                                style={{
-                                    height: 1,
-                                    background: titanium
-                                }}
-                            />
-                        )}
+                        <div
+                            style={{
+                                height: 1,
+                                background: titanium
+                            }}
+                        />
                     </div>
                 ))}
             </div>

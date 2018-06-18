@@ -24,7 +24,7 @@ export default combineReducers({
 export const getCurrentPage = (state: FormState) => state.currentPage
 
 export const getShouldShowPhonePreview = (state: FormState) => {
-    const formsWithPreview = ['messageAndMedia', 'alertOptions']
+    const formsWithPreview = ['messageAndMedia', 'alertOptions', 'tapBehavior']
 
     return formsWithPreview.includes(getCurrentPage(state))
 }

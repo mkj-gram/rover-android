@@ -82,6 +82,7 @@ export const updateScheduledDeliverySettings: ActionCreator<
                 campaignStatus
                 UIState
                 ... on NotificationCampaign {
+                    experienceId
                     notificationTitle
                     notificationBody
                     notificationAttachment {
@@ -241,6 +242,7 @@ export const updateNotificationSettings: ActionCreator<
                 campaignStatus
                 UIState
                 ... on NotificationCampaign {
+                    experienceId
                     notificationTitle
                     notificationBody
                     notificationAttachment {
@@ -355,6 +357,7 @@ export const fetchCampaign: ActionCreator<
                 campaignStatus
                 UIState
                 ... on NotificationCampaign {
+                    experienceId
                     notificationTitle
                     notificationBody
                     notificationAttachment {
@@ -463,6 +466,7 @@ export const duplicateCampaign: ActionCreator<
                 campaignStatus
                 UIState
                 ... on NotificationCampaign {
+                    experienceId
                     notificationTitle
                     notificationBody
                     notificationAttachment {
@@ -773,6 +777,7 @@ export const fetchCampaigns: ActionCreator<
                 campaignStatus
                 UIState
                 ... on NotificationCampaign {
+                    experienceId
                     notificationTitle
                     notificationBody
                     notificationAttachment {
@@ -890,6 +895,7 @@ export const createCampaign: ActionCreator<
                 campaignStatus
                 UIState
                 ... on NotificationCampaign {
+                    experienceId
                     notificationTitle
                     notificationBody
                     notificationAttachment {

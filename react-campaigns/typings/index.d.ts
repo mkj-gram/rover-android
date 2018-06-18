@@ -77,7 +77,7 @@ interface ScheduledCampaign extends Campaign {
     notificationTitle: string
     notificationAttachment: NotificationAttachment
     notificationTapBehaviorType: NotificationTapBehaviorType
-    notificationTapBehaviorExperienceId: string
+    experienceId: string
     notificationTapBehaviorUrl: string
     notificationTapPresentationType: NotificationTapPresentationType
     notificationIosContentAvailable: boolean
@@ -108,7 +108,7 @@ interface AutomatedNotificationCampaign extends Campaign {
     notificationTitle: string
     notificationAttachment: NotificationAttachment
     notificationTapBehaviorType: NotificationTapBehaviorType
-    notificationTapBehaviorExperienceId: string
+    experienceId: string
     notificationTapBehaviorUrl: string
     notificationTapPresentationType: NotificationTapPresentationType
     notificationIosContentAvailable: boolean

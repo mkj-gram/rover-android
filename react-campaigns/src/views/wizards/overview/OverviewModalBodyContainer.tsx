@@ -48,13 +48,6 @@ const OverviewModalBodyContainer: React.SFC<
                 // tslint:disable-next-line:max-line-length
                 'Determine how and when the notification is delivered as well as which devices/users will receive it.',
             val: scheduledDeliveryProgress
-        },
-        {
-            name: 'Experience',
-            text:
-                // tslint:disable-next-line:max-line-length
-                'Customize and personalize the content of the experience that will be delivered when the user swipes or taps the notification.',
-            val: 10
         }
     ]
 
@@ -103,6 +96,7 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-    OverviewModalBodyContainer
-)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(OverviewModalBodyContainer)

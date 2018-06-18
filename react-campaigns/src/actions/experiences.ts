@@ -44,7 +44,7 @@ export const fetchExperiences: ActionCreator<
             return res
         })
         .then(res => res.json())
-        .then(data => {
+        .then(({ data }) => {
             const experiences: Array<Experience> = data.map(
                 (experience: ExperienceResponse) => ({
                     id: experience.id,
