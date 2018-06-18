@@ -267,6 +267,24 @@
 			"revisionTime": "2016-01-25T11:53:50Z"
 		},
 		{
+			"checksumSHA1": "t06GpE7X4olsyp2d26RuKCDzC7w=",
+			"path": "github.com/influxdata/influxdb/client/v2",
+			"revision": "3eb5349c70e2acd3a93155a811ecd55d5eb331bd",
+			"revisionTime": "2018-06-06T20:50:43Z"
+		},
+		{
+			"checksumSHA1": "CY8B/OcEr0wPuocuJ6lek0XmMys=",
+			"path": "github.com/influxdata/influxdb/models",
+			"revision": "3eb5349c70e2acd3a93155a811ecd55d5eb331bd",
+			"revisionTime": "2018-06-06T20:50:43Z"
+		},
+		{
+			"checksumSHA1": "Z0Bb5PWa5WL/j5Dm2KJCLGn1l7U=",
+			"path": "github.com/influxdata/influxdb/pkg/escape",
+			"revision": "3eb5349c70e2acd3a93155a811ecd55d5eb331bd",
+			"revisionTime": "2018-06-06T20:50:43Z"
+		},
+		{
 			"checksumSHA1": "ecmoC8r7DjVnhBv31uX9UxnN79Y=",
 			"path": "github.com/jackc/pgx",
 			"revision": "606697ffdfe6603013560dbc171656de57b4f542",
