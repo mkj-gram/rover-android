@@ -12,11 +12,15 @@ var (
 	}
 )
 
+var Now = func() time.Time {
+	return time.Now()
+}
+
 // Takes in a utc offset in seconds and returns all iana timezones which currently have the same offset
 func GetZones(offset int) []string {
 	var zones = []string{}
 
-	now := time.Now()
+	now := Now()
 
 	for _, zone := range tzZones {
 		loc, err := time.LoadLocation(zone)
