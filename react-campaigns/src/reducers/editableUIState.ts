@@ -43,6 +43,7 @@ export const getIsStageValid = (
 
             switch (notificationTapBehaviorType) {
                 case 'OPEN_APP':
+                    return true
                 case 'OPEN_EXPERIENCE':
                     return experienceId !== ''
                 case 'OPEN_DEEP_LINK':
