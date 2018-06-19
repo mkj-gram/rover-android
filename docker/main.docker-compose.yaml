@@ -245,7 +245,7 @@ services:
       GRAPHQL_HOST: "http://graphql-gateway/graphql"
 
   graphql-gateway:
-    image: node:7.5.0
+    image: node:7.10.1
     depends_on:
       - auth-service
       - audience-service
