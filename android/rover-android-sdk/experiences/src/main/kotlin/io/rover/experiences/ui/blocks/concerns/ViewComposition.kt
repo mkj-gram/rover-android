@@ -4,11 +4,9 @@ import android.graphics.Canvas
 import android.view.View
 
 /**
- * This allows the mixins to receive notification of certain important events and state changes that
- * are only exposed by Android with a template pattern and not a callback registration pattern.
- *
- * TODO add notes about: why this isn't done with class delegation, and thus why it has to be passed
- * alongside the view to any other View* mixins
+ * This allows the View* mixins to receive notification of certain important events and state
+ * changes that are only exposed by Android with a template pattern and not a callback registration
+ * pattern.
  */
 class ViewComposition : ViewCompositionInterface {
     private val beforeDraws: MutableList<(Canvas) -> Unit> = mutableListOf()
@@ -68,12 +66,24 @@ interface ViewCompositionInterface {
     @Deprecated("Use MeasuredSize passed in with View Model binding instead.")
     fun registerOnSizeChangedCallback(callback: (width: Int, height: Int, oldWidth: Int, oldHeight: Int) -> Unit)
 
-    // The following methods must be wired up!
-    // TODO: this invariant is unenforceable.  How to firm it up somehow?!
+    // The following methods MUST be wired up!  If they are not, functionality in certain mixins
+    // will fail to work properly.
 
+    /**
+     * In the view containing this mixin, implement the [View.onDraw] template method, and call this
+     * method before calling super.
+     */
     fun beforeOnDraw(canvas: Canvas)
 
+    /**
+     * In the view containing this mixin, implement the [View.onDraw] template method, and call this
+     * method after calling super.
+     */
     fun afterOnDraw(canvas: Canvas)
 
+    /**
+     * In the view containing this mixin, implement the [View.onSizeChanged] template method, and
+     * call this method after calling super.
+     */
     fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int)
 }

@@ -45,8 +45,7 @@ class AccountAssembler(
                     LocalStorage::class.java,
                     "account"
                 ),
-                Schedulers.io(),
-                application
+                Schedulers.io()
             )
         }
     }

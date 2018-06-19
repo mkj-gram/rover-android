@@ -73,10 +73,6 @@ interface ExperienceNavigationViewModelInterface : BindableViewModel {
 
     /**
      * Obtain a state object for this Experience Navigation View Model.
-     *
-     * TODO: determine if in fact it is worth exposing my own State interface type here (but not the
-     * full type to avoid exposing internals).  A bit more boilerplate but it allows consuming view
-     * models (that contain this one) to have stronger type guarantees in their own state bundles.
      */
     val state: Parcelable
 }

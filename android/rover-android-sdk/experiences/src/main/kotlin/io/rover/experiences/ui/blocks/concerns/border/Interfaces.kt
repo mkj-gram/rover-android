@@ -17,12 +17,19 @@ interface ViewBorderInterface: BindableView<BorderViewModelInterface>
  * possibly rounded with a radius).  Equivalent to the [Border] domain model interface.
  */
 interface BorderViewModelInterface : LayoutPaddingDeflection, BindableViewModel {
+    /**
+     * An Android color ARGB int of the border color.
+     */
     val borderColor: Int
 
-    // TODO: this should start returning Px instead of Dp
+    /**
+     * The rounded corner radius of the border in Dp.
+     */
     val borderRadius: Int
 
-    // TODO: this should start returning Px instead of Dp
+    /**
+     * The border width in Dp.
+     */
     val borderWidth: Int
 
     companion object

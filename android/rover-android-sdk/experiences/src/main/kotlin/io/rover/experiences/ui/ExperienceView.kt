@@ -58,9 +58,9 @@ class ExperienceView : CoordinatorLayout, BindableView<ExperienceViewModelInterf
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     override var viewModel: BindableView.Binding<ExperienceViewModelInterface>? by ViewModelBinding(false) { binding, subscriptionCallback ->
-        val viewModel = binding?.viewModel
         // sadly have to set rebindingAllowed to be false because of complexity dealing with the
-        // toolbar. May fix it later as required. TODO: put a note here about note why this is?
+        // toolbar; the toolbar may not be configured twice.
+        val viewModel = binding?.viewModel
 
         val toolbarHost = toolbarHost
             ?: throw RuntimeException("You must set the ToolbarHost up on ExperienceView before binding the view to a view model.")
@@ -177,12 +177,10 @@ class ExperienceView : CoordinatorLayout, BindableView<ExperienceViewModelInterf
     }
 
     protected fun turnOnProgressIndicator() {
-        // TODO come down from top animation
         progressIndicatorView?.visibility = View.VISIBLE
     }
 
     protected fun turnOffProgressIndicator() {
-        // TODO shrink and disappear animation
         progressIndicatorView?.visibility = View.GONE
     }
 
@@ -231,8 +229,6 @@ class ExperienceView : CoordinatorLayout, BindableView<ExperienceViewModelInterf
     var toolbarHost: ToolbarHost? = null
         set(host) {
             field = host
-            // TODO: I need an event for when menu arrives, not just pull it.
-
             originalStatusBarColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 host?.provideWindow()?.statusBarColor ?: 0
             } else 0

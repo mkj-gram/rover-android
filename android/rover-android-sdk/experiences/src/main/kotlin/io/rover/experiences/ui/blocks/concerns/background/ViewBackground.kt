@@ -12,9 +12,6 @@ import io.rover.rover.core.streams.androidLifecycleDispose
 import io.rover.rover.core.streams.subscribe
 import io.rover.rover.platform.DrawableWrapper
 import io.rover.rover.core.ui.concerns.ViewModelBinding
-import io.rover.experiences.ui.blocks.image.DimensionCallback
-import io.rover.rover.core.ui.PixelSize
-import io.rover.experiences.ui.blocks.concerns.ViewCompositionInterface
 import io.rover.rover.core.ui.concerns.BindableView
 
 class ViewBackground(

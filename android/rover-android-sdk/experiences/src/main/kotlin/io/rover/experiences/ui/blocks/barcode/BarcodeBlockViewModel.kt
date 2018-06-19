@@ -5,6 +5,7 @@ import io.rover.experiences.ui.layout.ViewType
 import io.rover.experiences.ui.blocks.concerns.background.BackgroundViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.BlockViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.border.BorderViewModelInterface
+import io.rover.experiences.ui.blocks.concerns.layout.Padding
 
 class BarcodeBlockViewModel(
     private val blockViewModel: BlockViewModelInterface,
@@ -18,10 +19,10 @@ class BarcodeBlockViewModel(
     BarcodeViewModelInterface by barcodeViewModel {
     override val viewType: ViewType = ViewType.Barcode
 
-    override val paddingDeflection: Rect
+    override val paddingDeflection: Padding
         // Both the border and the barcode itself are contributing insets/padding, so add them
         // together.
-        get() = Rect(
+        get() = Padding(
             borderViewModel.paddingDeflection.left + barcodeViewModel.paddingDeflection.left,
             borderViewModel.paddingDeflection.top + barcodeViewModel.paddingDeflection.top,
             borderViewModel.paddingDeflection.right + barcodeViewModel.paddingDeflection.right,

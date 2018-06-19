@@ -21,9 +21,7 @@ interface ViewBlockInterface: BindableView<BlockViewModelInterface>
  * gather up all contributed padding and ultimately apply it to the view.
  */
 interface PaddingContributor {
-    // TODO: consider changing to not use Rect to better indicate that it is not a rectangle but an
-    // inset for each edge
-    val contributedPadding: Rect
+    val contributedPadding: Padding
 }
 
 /**
@@ -36,10 +34,18 @@ interface PaddingContributor {
  * details and the rationale.
  */
 interface LayoutPaddingDeflection {
-    // TODO: consider changing to not use Rect to better indicate that it is not a rectangle but an
-    // inset for each edge
-    val paddingDeflection: io.rover.rover.core.ui.Rect
+    val paddingDeflection: Padding
 }
+
+/**
+ * Padding values surrounding a rectilinear UI item, in dp.
+ */
+data class Padding(
+    val left: Int,
+    val top: Int,
+    val right: Int,
+    val bottom: Int
+)
 
 /**
  * Can vertically measure its content for stacked/autoheight purposes.
@@ -58,14 +64,13 @@ interface Measurable {
  *
  * This exists to discriminate between BlockViewModelInterface, which is specifically only block
  * level concerns shared by all blocks, but has its own mixin implementation -- BlockViewModel --
- * that would cause an ambiguity with the
- *
- * TODO rename to RowBlockViewModel, TopLevelBlockViewModel, or something
- */
+ * that would cause an ambiguity a category for the fully block objects themselves.
+  */
 interface CompositeBlockViewModelInterface : BlockViewModelInterface
 
 /**
- * A view model for Blocks (particularly, the dynamic layout concerns thereof).  Note
+ * A view model for Blocks (particularly, the dynamic layout concerns thereof) that can
+ * be laid out in a Rover experience.
  */
 interface BlockViewModelInterface : LayoutableViewModel {
 

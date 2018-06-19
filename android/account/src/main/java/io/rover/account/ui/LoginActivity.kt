@@ -106,8 +106,6 @@ class LoginActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .to(AutoDispose.with(AndroidLifecycleScopeProvider.from(this)).forSingle())
                 .subscribe({ result ->
-                    // TODO replace activity with main view
-
                     // side effect: in case of either success or failure, allow the UI to submit
                     // new attempts again.
                     attemptInProgress = false
@@ -136,9 +134,6 @@ class LoginActivity : AppCompatActivity() {
                     // new attempts again.
                     attemptInProgress = false
                     showProgress(false)
-
-                    // TODO: do snackbar with message
-                    // password.error = getString(R.string.error_incorrect_password)
                     password.error = error.message
                     password.requestFocus()
                 })

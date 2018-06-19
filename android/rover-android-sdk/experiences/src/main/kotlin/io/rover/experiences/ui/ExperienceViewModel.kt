@@ -235,7 +235,7 @@ class ExperienceViewModel(
     @SuppressLint("ParcelCreator")
     @Parcelize
     data class State(
-        val navigationState: Parcelable? // TODO: see comment on ExperienceNavigationViewModelInterface.state
+        val navigationState: Parcelable?
     ) : Parcelable
 
     data class ExperienceSessionKey(

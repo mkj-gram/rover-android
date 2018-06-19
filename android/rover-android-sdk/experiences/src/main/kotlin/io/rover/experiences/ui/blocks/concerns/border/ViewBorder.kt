@@ -14,6 +14,7 @@ import io.rover.rover.platform.whenNotNull
 import io.rover.rover.core.ui.dpAsPx
 import io.rover.experiences.ui.blocks.concerns.layout.PaddingContributor
 import io.rover.experiences.ui.blocks.concerns.ViewCompositionInterface
+import io.rover.experiences.ui.blocks.concerns.layout.Padding
 import io.rover.rover.core.ui.concerns.BindableView
 import io.rover.rover.core.ui.concerns.ViewModelBinding
 
@@ -177,10 +178,10 @@ class ViewBorder(
 
 
 
-    override val contributedPadding: Rect
+    override val contributedPadding: Padding
         get() {
             return viewModel?.viewModel.whenNotNull {
-                Rect(
+                Padding(
                     it.borderWidth,
                     it.borderWidth,
                     it.borderWidth,

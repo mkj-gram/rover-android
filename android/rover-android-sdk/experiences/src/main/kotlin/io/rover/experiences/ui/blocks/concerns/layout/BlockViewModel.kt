@@ -29,8 +29,9 @@ class BlockViewModel(
 ) : BlockViewModelInterface {
 
     override val viewType: ViewType
-        // TODO: remove this entirely
-        get() = TODO("You must implement this in your block ViewModel type.")
+        get() = throw RuntimeException(
+            "When delegating BlockViewModelInterface to an instance of BlockViewModel, you must still implement viewType yourself."
+        )
 
     override fun stackedHeight(bounds: RectF): Float {
         val alignment = block.position.verticalAlignment
@@ -94,8 +95,11 @@ class BlockViewModel(
                             bounds.bottom
                         )
 
+                        bounds.width()
+
                         // TODO: boundsConsideringInsets could go negative if the insets are bigger than the
                         // bounds, causing illegal/undefined behaviour further down the chain.
+                        // https://github.com/RoverPlatform/rover/issues/1460
 
                         if (measurable == null) {
                             log.w("Block is set to auto-height but no measurable is given.")

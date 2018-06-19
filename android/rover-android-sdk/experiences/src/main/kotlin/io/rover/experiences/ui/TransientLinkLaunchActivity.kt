@@ -12,9 +12,6 @@ import java.net.URI
  * point to this activity.
  */
 open class TransientLinkLaunchActivity : AppCompatActivity() {
-    // TODO: this needs to be some sort of LinkOpenInterface.  It would still need to use
-    // notification action routing behaviour, but
-
     private val linkOpen by lazy {
         Rover.sharedInstance.linkOpen
     }

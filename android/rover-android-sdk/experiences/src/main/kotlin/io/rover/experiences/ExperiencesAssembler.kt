@@ -16,6 +16,7 @@ import io.rover.rover.core.events.EventQueueServiceInterface
 import io.rover.experiences.ui.ExperienceViewModel
 import io.rover.experiences.ui.ExperienceViewModelInterface
 import io.rover.experiences.ui.blocks.barcode.BarcodeBlockViewModel
+import io.rover.experiences.ui.blocks.barcode.BarcodeBlockViewModelInterface
 import io.rover.experiences.ui.blocks.barcode.BarcodeViewModel
 import io.rover.experiences.ui.blocks.barcode.BarcodeViewModelInterface
 import io.rover.experiences.ui.blocks.button.*
@@ -28,12 +29,13 @@ import io.rover.experiences.ui.blocks.concerns.text.AndroidRichTextToSpannedTran
 import io.rover.experiences.ui.blocks.concerns.text.RichTextToSpannedTransformer
 import io.rover.experiences.ui.blocks.concerns.text.TextViewModel
 import io.rover.experiences.ui.blocks.concerns.text.TextViewModelInterface
-import io.rover.experiences.ui.blocks.image.ImageBlockViewModel
-import io.rover.experiences.ui.blocks.image.ImageViewModel
-import io.rover.experiences.ui.blocks.image.ImageViewModelInterface
+import io.rover.experiences.ui.blocks.image.*
 import io.rover.experiences.ui.blocks.rectangle.RectangleBlockViewModel
+import io.rover.experiences.ui.blocks.rectangle.RectangleBlockViewModelInterface
 import io.rover.experiences.ui.blocks.text.TextBlockViewModel
+import io.rover.experiences.ui.blocks.text.TextBlockViewModelInterface
 import io.rover.experiences.ui.blocks.web.WebViewBlockViewModel
+import io.rover.experiences.ui.blocks.web.WebViewBlockViewModelInterface
 import io.rover.experiences.ui.blocks.web.WebViewModel
 import io.rover.experiences.ui.blocks.web.WebViewModelInterface
 import io.rover.experiences.ui.layout.BlockAndRowLayoutManager
@@ -278,74 +280,114 @@ class ExperiencesAssembler: Assembler {
             )
         }
 
+        container.register(
+            Scope.Transient,
+            RectangleBlockViewModelInterface::class.java
+        ) { resolver: Resolver, block: RectangleBlock ->
+            RectangleBlockViewModel(
+                resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf<LayoutPaddingDeflection>(),null)!!,
+                resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
+                resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!
+            )
+        }
+
+        container.register(
+            Scope.Transient,
+            TextBlockViewModelInterface::class.java
+        ) { resolver, block: TextBlock ->
+            val borderViewModel = resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!
+            val textViewModel = resolver.resolve(TextViewModelInterface::class.java, null, block.text)!!
+            TextBlockViewModel(
+                resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf(borderViewModel), textViewModel)!!,
+                textViewModel,
+                resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
+                borderViewModel
+            )
+        }
+
+        container.register(
+            Scope.Transient,
+            ImageBlockViewModelInterface::class.java
+        ) { resolver, block: ImageBlock ->
+            val imageViewModel = resolver.resolve(ImageViewModelInterface::class.java, null, block.image, block)!!
+            val borderViewModel = resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!
+            ImageBlockViewModel(
+                resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf(borderViewModel), imageViewModel)!!,
+                resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
+                imageViewModel,
+                borderViewModel
+            )
+        }
+
+        container.register(
+            Scope.Transient,
+            ButtonBlockViewModelInterface::class.java
+        ) { resolver, block: ButtonBlock ->
+            // buttons have no measurable content and also cannot contribute padding, so we
+            // pass empty values for both the layout deflections set and
+
+            val borderViewModel = resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!
+
+            val blockViewModel = resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf<LayoutPaddingDeflection>(borderViewModel),null)!!
+
+            ButtonBlockViewModel(
+                blockViewModel,
+                borderViewModel,
+                resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
+                resolver.resolve(TextViewModelInterface::class.java, "button", block.text)!!
+            )
+        }
+
+        container.register(
+            Scope.Transient,
+            WebViewBlockViewModelInterface::class.java
+        ) { resolver, block: WebViewBlock ->
+            WebViewBlockViewModel(
+                resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf<LayoutPaddingDeflection>(),null)!!,
+                resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
+                resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!,
+                resolver.resolve(WebViewModelInterface::class.java, null, block)!!
+            )
+        }
+
+        container.register(
+            Scope.Transient,
+            BarcodeBlockViewModelInterface::class.java
+        ) { resolver, block: BarcodeBlock ->
+            val barcodeViewModel = resolver.resolve(BarcodeViewModelInterface::class.java, null, block.barcode)!!
+            val borderViewModel = resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!
+
+            BarcodeBlockViewModel(
+                resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf(borderViewModel), barcodeViewModel)!!,
+                barcodeViewModel,
+                resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
+                borderViewModel
+            )
+        }
+
         // row blocks:
         container.register(
             Scope.Transient,
             CompositeBlockViewModelInterface::class.java
         ) { resolver: Resolver, block: Block ->
-            // TODO: perhaps I should register each block as its own factory in the container, to
-            // make overriding individual ones easier.
             when(block) {
                 is RectangleBlock -> {
-                    RectangleBlockViewModel(
-                        resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf<LayoutPaddingDeflection>(),null)!!,
-                        resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
-                        resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!
-                    )
+                    resolver.resolve(RectangleBlockViewModelInterface::class.java, null, block) as CompositeBlockViewModelInterface
                 }
                 is TextBlock -> {
-                    val borderViewModel = resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!
-                    val textViewModel = resolver.resolve(TextViewModelInterface::class.java, null, block.text)!!
-                    TextBlockViewModel(
-                        resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf(borderViewModel), textViewModel)!!,
-                        textViewModel,
-                        resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
-                        borderViewModel
-                    )
+                    resolver.resolve(TextBlockViewModelInterface::class.java, null, block) as CompositeBlockViewModelInterface
                 }
                 is ImageBlock -> {
-                    val imageViewModel = resolver.resolve(ImageViewModelInterface::class.java, null, block.image, block)!!
-                    val borderViewModel = resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!
-                    ImageBlockViewModel(
-                        resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf(borderViewModel), imageViewModel)!!,
-                        resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
-                        imageViewModel,
-                        borderViewModel
-                    )
+                    resolver.resolve(ImageBlockViewModelInterface::class.java, null, block) as CompositeBlockViewModelInterface
                 }
                 is ButtonBlock -> {
-                    // buttons have no measurable content and also cannot contribute padding, so we
-                    // pass empty values for both the layout deflections set and
-
-                    val borderViewModel = resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!
-
-                    val blockViewModel = resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf<LayoutPaddingDeflection>(borderViewModel),null)!!
-
-                    ButtonBlockViewModel(
-                        blockViewModel,
-                        borderViewModel,
-                        resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
-                        resolver.resolve(TextViewModelInterface::class.java, "button", block.text)!!
-                    )
+                    resolver.resolve(ButtonBlockViewModelInterface::class.java, null, block) as CompositeBlockViewModelInterface
                 }
                 is WebViewBlock -> {
-                    WebViewBlockViewModel(
-                        resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf<LayoutPaddingDeflection>(),null)!!,
-                        resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
-                        resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!,
-                        resolver.resolve(WebViewModelInterface::class.java, null, block)!!
-                    )
+                    resolver.resolve(WebViewBlockViewModelInterface::class.java, null, block) as CompositeBlockViewModelInterface
                 }
                 is BarcodeBlock -> {
-                    val barcodeViewModel = resolver.resolve(BarcodeViewModelInterface::class.java, null, block.barcode)!!
-                    val borderViewModel = resolver.resolve(BorderViewModelInterface::class.java, null, block.border)!!
-
-                    BarcodeBlockViewModel(
-                        resolver.resolve(BlockViewModelInterface::class.java, null, block, setOf(borderViewModel), barcodeViewModel)!!,
-                        barcodeViewModel,
-                        resolver.resolve(BackgroundViewModelInterface::class.java, null, block.background)!!,
-                        borderViewModel
-                    )
+                    resolver.resolve(BarcodeBlockViewModelInterface::class.java, null, block) as CompositeBlockViewModelInterface
                 }
                 else -> throw Exception(
                     "This Rover UI block type is not supported by this version of the SDK: ${block.javaClass.simpleName}."
@@ -368,7 +410,6 @@ class ExperiencesAssembler: Assembler {
                 layout, displayMetrics
             )
         }
-        // action types (TODO perhaps delegate to a "sub-assembler"):
         container.register(
             Scope.Transient,
             ActionBehaviour::class.java,

@@ -34,14 +34,11 @@ import java.util.UUID
  */
 class AuthService(
     localStorage: LocalStorage,
-    private val scheduler: Scheduler,
-    private val application: Application
+    private val scheduler: Scheduler
 ): AuthenticationContext {
     private val baseUrl = "https://api.rover.io/"
 
     private val storage = localStorage.getKeyValueStorageFor("auth_service")
-
-    // TODO: this should be injected and behind a NetworkClientService-like thing.
 
     override var bearerToken: String?
         get() = storage.get("token")
@@ -87,7 +84,7 @@ class AuthService(
                     username, password
                 )
             )
-            // TODO: now fetch the account data and retrieve the SDK token from it.
+            // now fetch the account data and retrieve the SDK token from it.
         )).flatMap { authResponse ->
             authClient.getAccount(authResponse.data.relationships.account.data.id, "Bearer ${authResponse.data.attributes.token}").map { accountResponse ->
                 Pair(authResponse, accountResponse)
@@ -102,9 +99,9 @@ class AuthService(
             sdkToken = null
         }.map { _ ->
             AuthResult.Successful() as AuthResult
-        }.onErrorReturn {
-            // TODO: match soft network errors here and map them
-            AuthResult.Failed(it.message ?: "Unknown reason")
+        }.onErrorReturn { error ->
+            // match soft network errors here and map them
+            AuthResult.Failed(error.message ?: "Unknown reason")
         }.subscribeOn(scheduler)
     }
 
@@ -150,7 +147,6 @@ interface RoverAuthenticationClient {
         }
     }
 
-    // TODO: add all the @SerializedName attributes, otherwise proguard could break it
     data class CreateSessionResponse(
         @field:SerializedName("data")
         val data: Response
