@@ -116,32 +116,29 @@ type ScheduleDetails struct {
 }
 
 func (s ScheduleDetails) ScheduledTimestamp() *time.Time {
-	if s.ScheduledDate == nil {
+	if s.ScheduledDate == nil || s.ScheduledTime == nil {
 		return nil
 	}
 
-	if s.ScheduledTime == nil {
-		return nil
-	}
-
-	var (
-		day   = s.ScheduledDate.Day
-		month = s.ScheduledDate.Month
-		year  = s.ScheduledDate.Year
-	)
-
-	var zone *time.Location
-	if s.ScheduledTimeZone != "" {
+	var zone = time.UTC
+	if !s.ScheduledUseLocalDeviceTime && s.ScheduledTimeZone != "" {
 		z, err := time.LoadLocation(s.ScheduledTimeZone)
 		if err != nil {
 			panic(err)
 		}
 		zone = z
-	} else {
-		zone = time.UTC
 	}
 
-	var t = time.Date(int(year), time.Month(month), int(day), 0, 0, int(*s.ScheduledTime), 0, zone)
+	var (
+		d = s.ScheduledDate
+
+		t = time.Date(
+			int(d.Year), time.Month(d.Month), int(d.Day),
+			0, 0, int(*s.ScheduledTime), 0,
+			zone,
+		)
+	)
+
 	return &t
 }
 

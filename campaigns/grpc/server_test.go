@@ -2403,7 +2403,8 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 							NotificationExpiration:                  -1,
 							NotificationAlertOptionPushNotification: true,
 
-							ScheduledType:               campaignspb.ScheduledType_SCHEDULED,
+							ScheduledType: campaignspb.ScheduledType_SCHEDULED,
+							// NOTE: should be ignored
 							ScheduledTimeZone:           "America/Toronto",
 							ScheduledUseLocalDeviceTime: true,
 							// ScheduledTimestamp:          ts(t, "2017-05-04T16:26:25.445494Z"),
@@ -2413,9 +2414,7 @@ func test_UpdateScheduledDeliverySettings_Published(t *testing.T) {
 					},
 				},
 
-				// TODO: will this break once DST is over?
-				// note hardcoded -04:00 tz
-				Tasks: tasksInTimezones(ts2(t, "2017-05-04T16:26:25.000000-04:00").UTC(), zoneinfo.UniqueOffsets, 2, 8),
+				Tasks: tasksInTimezones(ts2(t, "2017-05-04T16:26:25.000000Z"), zoneinfo.UniqueOffsets, 2, 8),
 			},
 		},
 
