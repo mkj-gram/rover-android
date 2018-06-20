@@ -10,6 +10,7 @@ export interface PopoverContainerProps {
     targetParent?: string
     onClick?: (e?: any) => void
     showPopover?: boolean
+    style?: React.CSSProperties
 }
 
 class PopoverContainer extends React.Component<PopoverContainerProps, {}> {
@@ -19,7 +20,14 @@ class PopoverContainer extends React.Component<PopoverContainerProps, {}> {
 
     render() {
         const Fragment = React.Fragment
-        const { id, children, popoverProps, targetParent, onClick } = this.props
+        const {
+            id,
+            children,
+            popoverProps,
+            targetParent,
+            onClick,
+            style
+        } = this.props
 
         return (
             <Fragment>
@@ -32,6 +40,10 @@ class PopoverContainer extends React.Component<PopoverContainerProps, {}> {
                                 onClick={e => {
                                     e.stopPropagation()
                                     onClick()
+                                }}
+                                style={{
+                                    display: 'inline-block',
+                                    ...style
                                 }}
                             >
                                 {children[0]}
