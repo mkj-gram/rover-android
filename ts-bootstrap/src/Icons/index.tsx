@@ -11,6 +11,7 @@ import ArrowRightIcon from './ArrowRightIcon'
 import AudioIcon from './AudioIcon'
 import BarChartIcon from './BarChartIcon'
 import CalendarIcon from './CalendarIcon'
+import CampaignsIcon from './CampaignsIcon'
 import ChangeIcon from './ChangeIcon'
 import CheckCircleIcon from './CheckCircleIcon'
 import CheckIcon from './CheckIcon'
@@ -33,9 +34,12 @@ import MoreIcon from './MoreIcon'
 import PhoneIcon from './PhoneIcon'
 import PlusIcon from './PlusIcon'
 import PlusSquareIcon from './PlusSquareIcon'
+import ProximityIcon from './ProximityIcon'
 import RefreshIcon from './RefreshIcon'
 import RenameIcon from './RenameIcon'
 import SearchIcon from './SearchIcon'
+import SettingsIcon from './SettingsIcon'
+import StudioIcon from './StudioIcon'
 import UserIcon from './UserIcon'
 import VideoIcon from './VideoIcon'
 import ZapIcon from './ZapIcon'
@@ -54,6 +58,7 @@ export {
     AudioIcon,
     BarChartIcon,
     CalendarIcon,
+    CampaignsIcon,
     ChangeIcon,
     CheckCircleIcon,
     CheckIcon,
@@ -76,9 +81,12 @@ export {
     PhoneIcon,
     PlusIcon,
     PlusSquareIcon,
+    ProximityIcon,
     RefreshIcon,
     RenameIcon,
     SearchIcon,
+    SettingsIcon,
+    StudioIcon,
     UserIcon,
     VideoIcon,
     ZapIcon

@@ -4,12 +4,8 @@ import { parse } from 'qs'
 
 import {
     almostWhite,
-    Button,
     cloud,
     charcoal,
-    FilterArrowIcon,
-    GridIcon,
-    PlusSquareIcon,
     silver,
     SegmentControl,
     semibold,
@@ -23,6 +19,7 @@ import {
 
 import CampaignTypeSelector from './CampaignTypeSelector'
 import NewCampaignPopover from './NewCampaignPopover'
+import GridIconPopover from './GridIconPopover'
 
 export interface Props {
     media: Media
@@ -61,12 +58,8 @@ const renderRightContent = (
                     justifyContent: 'space-between'
                 }}
             >
-                <GridIcon
-                    fill={charcoal}
-                    height={media === 'Desktop' ? '20' : '24'}
-                    width={media === 'Desktop' ? '20' : '24'}
-                    viewBox="0 0 24 24"
-                />
+                <GridIconPopover device={media} />
+
                 <UserIcon
                     fill={charcoal}
                     height={media === 'Desktop' ? '20' : '24'}

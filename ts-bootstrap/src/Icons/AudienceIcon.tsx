@@ -1,8 +1,8 @@
 /// <reference path="../../typings/index.d.ts"/>
 import * as React from 'react'
 
-export default () => (
-    <svg width="72" height="72">
+export default ({ width = '72', height = '72', viewBox }: RoverSVGProps) => (
+    <svg width={width} height={height} viewBox={viewBox}>
         <defs>
             <path
                 d="M5 0h62a5 5 0 0 1 5 5v62a5 5 0 0 1-5 5H5a5 5 0 0 1-5-5V5a5 5 0 0 1 5-5z"
