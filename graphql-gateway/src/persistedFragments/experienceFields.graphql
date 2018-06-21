@@ -14,21 +14,6 @@ fragment experienceFields on Experience {
             }
             blocks {
                 __typename
-                action {
-                    __typename
-                    ... on GoToScreenAction {
-                        screenID
-                    }
-                    ... on OpenURLAction {
-                        url
-                    }
-                    ... on PresentExperienceAction {
-                        campaignID
-                    }
-                    ... on PresentWebsiteAction {
-                        url
-                    }
-                }
                 background {
                     ...backgroundFields
                 }
@@ -98,6 +83,19 @@ fragment experienceFields on Experience {
                                 ...heightFields
                             }
                         }
+                    }
+                }
+                tapBehavior {
+                    __typename
+                    ... on GoToScreenBlockTapBehavior {
+                        screenID
+                    }
+                    ... on OpenURLBlockTapBehavior {
+                        url
+                        dismiss
+                    }
+                    ... on PresentWebsiteBlockTapBehavior {
+                        url
                     }
                 }
                 keys

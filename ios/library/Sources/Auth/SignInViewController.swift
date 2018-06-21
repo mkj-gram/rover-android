@@ -131,7 +131,11 @@ open class SignInViewController: UIViewController {
     func setupConstraints() {
         let margins = view.layoutMarginsGuide
         
-        logoTopConstraint = logo.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 80)
+        if #available(iOS 11.0, *) {
+            logoTopConstraint = logo.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 80)
+        } else {
+            logoTopConstraint = logo.topAnchor.constraint(equalTo: view.topAnchor, constant: 80)
+        }
         logoTopConstraint.isActive = true
         
         logo.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true

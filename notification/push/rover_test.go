@@ -41,22 +41,27 @@ func Test_RoverPayload_MarshalJSON(t *testing.T) {
 		{
 			in: &RoverNotification{
 				Id:         "f944c7b4-3dcd-11e8-b467-0ed5f89f718b",
-				CampaignID: 1,
+				CampaignID: "1",
 
 				Title: "a title",
 				Body:  "a body",
+
+				TapBehavior: &tapBehaviorInfo{
+					campaignId:                  1,
+					tapBehaviorType:             "OPEN_APP",
+				},
 
 				IsRead:                      true,
 				IsDeleted:                   true,
 				IsNotificationCenterEnabled: true,
 			},
-			exp: `{"id":"f944c7b4-3dcd-11e8-b467-0ed5f89f718b","campaignID":1,"title":"a title","body":"a body","deliveredAt":"0001-01-01T00:00:00Z","expiresAt":null,"isRead":true,"isDeleted":true,"isNotificationCenterEnabled":true}`,
+			exp: `{"id":"f944c7b4-3dcd-11e8-b467-0ed5f89f718b","campaignID":"1","title":"a title","body":"a body","tapBehavior":{"__typename":"OpenAppNotificationTapBehavior"},"deliveredAt":"0001-01-01T00:00:00Z","expiresAt":null,"isRead":true,"isDeleted":true,"isNotificationCenterEnabled":true}`,
 		},
 
 		{
 			in: &RoverNotification{
 				Id:         "f944c7b4-3dcd-11e8-b467-0ed5f89f718b",
-				CampaignID: 1,
+				CampaignID: "1",
 
 				Title: "a title",
 				Body:  "a body",
@@ -65,8 +70,8 @@ func Test_RoverPayload_MarshalJSON(t *testing.T) {
 					Type: "IMAGE",
 					Url:  "http://example.com/img.png",
 				},
-				Action: &actionInfo{
-					campaignId:                  123,
+				TapBehavior: &tapBehaviorInfo{
+					campaignId:                  1,
 					tapBehaviorType:             "OPEN_EXPERIENCE",
 					tapBehaviorPresentationType: "IN_BROWSER",
 					tapBehaviorUrl:              "https://hello.world",
@@ -78,7 +83,7 @@ func Test_RoverPayload_MarshalJSON(t *testing.T) {
 				IsDeleted:                   true,
 				IsNotificationCenterEnabled: true,
 			},
-			exp: `{"id":"f944c7b4-3dcd-11e8-b467-0ed5f89f718b","campaignID":1,"title":"a title","body":"a body","attachment":{"type":"IMAGE","url":"http://example.com/img.png"},"action":{"__typename":"PresentExperienceAction","campaignID":123},"deliveredAt":"2018-03-01T01:02:03Z","expiresAt":"2017-03-01T01:02:03Z","isRead":true,"isDeleted":true,"isNotificationCenterEnabled":true}`,
+			exp: `{"id":"f944c7b4-3dcd-11e8-b467-0ed5f89f718b","campaignID":"1","title":"a title","body":"a body","attachment":{"type":"IMAGE","url":"http://example.com/img.png"},"tapBehavior":{"__typename":"OpenURLNotificationTapBehavior","url":"rv-inbox://presentExperience?campaignID=1"},"deliveredAt":"2018-03-01T01:02:03Z","expiresAt":"2017-03-01T01:02:03Z","isRead":true,"isDeleted":true,"isNotificationCenterEnabled":true}`,
 		},
 	}
 

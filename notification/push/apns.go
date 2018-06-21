@@ -108,8 +108,7 @@ func ToAPNSRequest(m notification_pubsub.Message, settings *scylla.NotificationS
 		} else {
 			payload = M{
 				"aps": alert(msg),
-				"action": M{
-					"__typename":   "AddNotificationAction",
+				"rover": M{
 					"notification": ToRoverNotification(settings, note),
 				},
 			}

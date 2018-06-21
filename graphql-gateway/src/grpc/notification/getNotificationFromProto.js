@@ -1,40 +1,44 @@
 import RoverApis from '@rover/apis'
 
-const getAction = (n) => {
+const getTapBehavior = (n) => {
 	switch (n.getTapBehaviorType()) {
 		case 0:
 			return {
-				__typename: 'PresentExperienceAction',
-				campaignID: n.getCampaignId()
+				__typename: 'OpenURLNotificationTapBehavior',
+				url: `rv-inbox://presentExperience?campaignID=${n.getCampaignId()}`
 			}
 		case 1:
-			return null
+			return {
+				__typename: 'OpenAppNotificationTapBehavior'
+			}
 		case 2:
 			return {
-				__typename: 'OpenURLAction',
+				__typename: 'OpenURLNotificationTapBehavior',
 				url: n.getTapBehaviorUrl()
 			}
 		case 3:
 			// IN_BROWSER
 			if (n.getTapBehaviorPresentationType() == 2) {
 				return {
-					__typename: 'OpenURLAction',
+					__typename: 'OpenURLNotificationTapBehavior',
 					url: n.getTapBehaviorUrl()
 				}
 			} else {
 				return {
-					__typename: 'PresentWebsiteAction',
+					__typename: 'PresentWebsiteNotificationTapBehavior',
 					url: n.getTapBehaviorUrl()
 				}
 			}
 		default:
-			return null	
+			return {
+				__typename: 'OpenAppNotificationTapBehavior'
+			}
 	}
 }
 
 export default n => ({
 	id: n.getId(),
-	campaignID: n.getCampaignId(),
+	campaignID: n.getCampaignId().toString(),
 	title: n.getTitle(),
 	body: n.getBody(),
 	attachment: (() => {
@@ -56,7 +60,7 @@ export default n => ({
 		attachment.url = n.getAttachmentUrl()
 		return attachment
 	})(),
-	action: getAction(n),
+	tapBehavior: getTapBehavior(n),
 	deliveredAt: RoverApis.Helpers.timestampFromProto(n.getCreatedAt()),
 	expiresAt: null,
 	isRead: n.getIsRead(),

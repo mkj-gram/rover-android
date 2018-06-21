@@ -318,7 +318,7 @@ func TestHandler(t *testing.T) {
 			expReq: &HTTPRequest{
 				Headers: http.Header{
 					"User-Agent":      []string{"Go-http-client/1.1"},
-					"Content-Length":  []string{"473"},
+					"Content-Length":  []string{"484"},
 					"Authorization":   []string{"key=server_key"},
 					"Content-Type":    []string{"application/json"},
 					"Accept-Encoding": []string{"gzip"},
@@ -328,18 +328,17 @@ func TestHandler(t *testing.T) {
 					"collapse_key": "channel-id",
 
 					"data": M{
-						"action": M{
-							"__typename": "AddNotificationAction",
+						"rover": M{
 							"notification": M{
 								"id":         "09702289-4329-11e8-a214-784f43835469",
-								"campaignID": float64(1),
+								"campaignID": "1",
 								"title":      "a title",
 								"body":       "a body",
 								"attachment": M{
 									"type": "IMAGE",
 									"url":  "https://google.ca/cat.png",
 								},
-								"action":                      M{"__typename": "PresentExperienceAction", "campaignID": float64(1)},
+								"tapBehavior":                 M{"__typename": "OpenURLNotificationTapBehavior", "url": "rv-inbox://presentExperience?campaignID=1"},
 								"deliveredAt":                 "2018-04-18T16:53:36.5864073Z",
 								"expiresAt":                   nil,
 								"isRead":                      false,
@@ -566,7 +565,7 @@ func TestHandler(t *testing.T) {
 
 				Headers: http.Header{
 					"User-Agent":       []string{"Go-http-client/1.1"},
-					"Content-Length":   []string{"591"},
+					"Content-Length":   []string{"602"},
 					"Apns-Collapse-Id": []string{"thread"},
 					"Apns-Id":          []string{"09702289-4329-11e8-a214-784f43835469"},
 					"Apns-Topic":       []string{"io.rover.Bagel"},
@@ -586,14 +585,13 @@ func TestHandler(t *testing.T) {
 						"sound":             "sound-file.wav",
 						"thread-id":         "thread",
 					},
-					"action": M{
-						"__typename": "AddNotificationAction",
+					"rover": M{
 						"notification": M{
 							"id":          "09702289-4329-11e8-a214-784f43835469",
-							"campaignID":  float64(1),
+							"campaignID":  "1",
 							"body":        "a body",
 							"title":       "a title",
-							"action":      M{"__typename": "PresentExperienceAction", "campaignID": float64(1)},
+							"tapBehavior": M{"__typename": "OpenURLNotificationTapBehavior", "url": "rv-inbox://presentExperience?campaignID=1"},
 							"deliveredAt": "2018-04-18T16:53:36.5864073Z",
 
 							"attachment": M{

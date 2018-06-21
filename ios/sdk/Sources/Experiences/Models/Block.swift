@@ -7,13 +7,13 @@
 //
 
 public protocol Block: Decodable {
-    var action: BlockAction? { get }
     var background: Background { get }
     var border: Border { get }
     var id: ID { get }
     var insets: Insets { get }
     var opacity: Double { get }
     var position: Position { get }
+    var tapBehavior: BlockTapBehavior { get }
     var keys: [String: String] { get }
     var tags: [String] { get }
 }

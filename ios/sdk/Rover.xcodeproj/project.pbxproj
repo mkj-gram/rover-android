@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		DB0C8E3E2055C62800E0D860 /* InfluenceTrackerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0C8E3D2055C62800E0D860 /* InfluenceTrackerService.swift */; };
 		DB0C8E402055CCBD00E0D860 /* InfluenceTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0C8E3F2055CCBD00E0D860 /* InfluenceTracker.swift */; };
-		DB0C8E432055D5F300E0D860 /* UNNotificationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0C8E422055D5F300E0D860 /* UNNotificationRequest.swift */; };
 		DB0C8F2A20583A5600E0D860 /* RoverAppExtensions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB0C8F2120583A5600E0D860 /* RoverAppExtensions.framework */; };
 		DB0C8F2F20583A5600E0D860 /* RoverAppExtensionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB0C8F2E20583A5600E0D860 /* RoverAppExtensionsTests.swift */; };
 		DB0C8F3120583A5600E0D860 /* RoverAppExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = DB0C8F2320583A5600E0D860 /* RoverAppExtensions.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -34,8 +33,15 @@
 		DB6ADD8020B344BC002F226C /* SessionControllerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD7E20B3449E002F226C /* SessionControllerService.swift */; };
 		DB6ADD8620B34F00002F226C /* SessionControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD8420B34EF8002F226C /* SessionControllerDelegate.swift */; };
 		DB6ADD8920B34F86002F226C /* SessionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD8720B34F81002F226C /* SessionController.swift */; };
-		DB6ADD8A20B351B6002F226C /* OpenURLOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2585920A36DF400400EA2 /* OpenURLOperation.swift */; };
-		DB6ADD8B20B351B6002F226C /* PresentViewOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2585D20A37BF300400EA2 /* PresentViewOperation.swift */; };
+		DB6ADD8A20B351B6002F226C /* OpenURLAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2585920A36DF400400EA2 /* OpenURLAction.swift */; };
+		DB6ADD8B20B351B6002F226C /* PresentViewAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2585D20A37BF300400EA2 /* PresentViewAction.swift */; };
+		DB7BA91F20D96CA600968A30 /* ExperienceRouteHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7BA91D20D96C9900968A30 /* ExperienceRouteHandler.swift */; };
+		DB7BA92320D970E500968A30 /* NotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7BA92120D970A100968A30 /* NotificationHandler.swift */; };
+		DB7BA92720D972A700968A30 /* OpenNotificationAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7BA92520D9729600968A30 /* OpenNotificationAction.swift */; };
+		DB7BA92C20D9811B00968A30 /* NotificationHandlerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7BA92A20D9811100968A30 /* NotificationHandlerService.swift */; };
+		DB7BA93020D982C200968A30 /* NotificationCenterRouteHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7BA92E20D982BE00968A30 /* NotificationCenterRouteHandler.swift */; };
+		DB7BA93320D98C2500968A30 /* WebsiteRouteHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7BA93220D98C2500968A30 /* WebsiteRouteHandler.swift */; };
+		DB7BA93420D98F7E00968A30 /* RouteHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB7BA91A20D9594500968A30 /* RouteHandler.swift */; };
 		DB9469392051E58400C8C3AE /* LoggerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9469382051E58400C8C3AE /* LoggerService.swift */; };
 		DB9DBF7F2055974B00E5C77F /* RoverNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB9DBF762055974B00E5C77F /* RoverNotifications.framework */; };
 		DB9DBF842055974B00E5C77F /* RoverNotificationsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBF832055974B00E5C77F /* RoverNotificationsTests.swift */; };
@@ -48,19 +54,13 @@
 		DB9DBFDE2055983700E5C77F /* LocationAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBFCD2055983700E5C77F /* LocationAssembler.swift */; };
 		DB9DBFE02055983700E5C77F /* LocationContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBFD22055983700E5C77F /* LocationContextProvider.swift */; };
 		DB9DBFE12055983700E5C77F /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBFD42055983700E5C77F /* LocationManager.swift */; };
-		DBADA7F920A4F32500225C80 /* Operation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F020A4F32500225C80 /* Operation.swift */; };
-		DBADA7FA20A4F32500225C80 /* GroupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F120A4F32500225C80 /* GroupOperation.swift */; };
-		DBADA7FB20A4F32500225C80 /* AsynchronousOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F220A4F32500225C80 /* AsynchronousOperation.swift */; };
-		DBADA7FC20A4F32500225C80 /* OperationObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F420A4F32500225C80 /* OperationObserver.swift */; };
+		DBADA7FB20A4F32500225C80 /* Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F220A4F32500225C80 /* Action.swift */; };
+		DBADA7FC20A4F32500225C80 /* ActionObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F420A4F32500225C80 /* ActionObserver.swift */; };
 		DBADA7FD20A4F32500225C80 /* BlockObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F520A4F32500225C80 /* BlockObserver.swift */; };
-		DBADA7FE20A4F32500225C80 /* OperationQueueDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F720A4F32500225C80 /* OperationQueueDelegate.swift */; };
-		DBADA7FF20A4F32500225C80 /* OperationQueue.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA7F820A4F32500225C80 /* OperationQueue.swift */; };
 		DBADA80320A4F37C00225C80 /* Dispatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA80120A4F37C00225C80 /* Dispatcher.swift */; };
 		DBADA80420A4F37C00225C80 /* DispatcherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA80220A4F37C00225C80 /* DispatcherService.swift */; };
-		DBADA81B20A620E100225C80 /* AddNotificationOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA81920A620C900225C80 /* AddNotificationOperation.swift */; };
-		DBADA81E20A6210B00225C80 /* UNNotificationResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA81C20A620FF00225C80 /* UNNotificationResponse.swift */; };
-		DBADA82C20A9EF1B00225C80 /* NotificationPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA82A20A9EEA200225C80 /* NotificationPayload.swift */; };
-		DBADA83020A9EFA900225C80 /* PresentNotificationCenterAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA82E20A9EFA200225C80 /* PresentNotificationCenterAction.swift */; };
+		DBB78A3320DAD88F00AF1A00 /* NotificationAttachment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB78A3120DAD88900AF1A00 /* NotificationAttachment.swift */; };
+		DBB78A3420DAD89400AF1A00 /* NotificationTapBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB78A2F20DAD7B400AF1A00 /* NotificationTapBehavior.swift */; };
 		DBB89B9920D014C700DD797A /* Router.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB00FDF7208D09AE008D1A57 /* Router.swift */; };
 		DBB89B9A20D014C700DD797A /* RouterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB00FDF9208D0A0A008D1A57 /* RouterService.swift */; };
 		DBB89B9E20D0167B00DD797A /* ApplicationMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBB89B9C20D0160100DD797A /* ApplicationMonitor.swift */; };
@@ -116,13 +116,10 @@
 		DBD88AB720C1B99C00085AE0 /* TokenManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49EC4203DE3EB00B54652 /* TokenManagerService.swift */; };
 		DBD88AB820C1B9A700085AE0 /* PushTokenContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE03BA220B4B3CC00F3CE95 /* PushTokenContextProvider.swift */; };
 		DBD88ABE20C1BACF00085AE0 /* DataAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBD88ABC20C1BA7C00085AE0 /* DataAssembler.swift */; };
-		DBD88ABF20C1BC4000085AE0 /* DeepLinkAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA82420A777B100225C80 /* DeepLinkAction.swift */; };
-		DBD88AC020C1BC4000085AE0 /* UniversalLinkAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB08F9A120AB8B1A0029D6DF /* UniversalLinkAction.swift */; };
 		DBD88AC620C1BE1C00085AE0 /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
 		DBE03B3B20AF162700F3CE95 /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
 		DBE660A720D40FCE001D4E65 /* SDKContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBE660A520D40FBA001D4E65 /* SDKContextProvider.swift */; };
 		DBF2584120A107BD00400EA2 /* ObserverSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2584020A107BD00400EA2 /* ObserverSet.swift */; };
-		DBF2584520A32E9400400EA2 /* Action.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2584420A32E9400400EA2 /* Action.swift */; };
 		DBF49DDD203DE00F00B54652 /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
 		DBF49DE2203DE00F00B54652 /* RoverFoundationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DE1203DE00F00B54652 /* RoverFoundationTests.swift */; };
 		DBF49DF6203DE18500B54652 /* FoundationAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DF3203DE18500B54652 /* FoundationAssembler.swift */; };
@@ -145,7 +142,6 @@
 		DBFDF42920AC7A7C0031EF47 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A7C209B8CC500E99F9F /* Notification.swift */; };
 		DBFDF42C20AC7B1E0031EF47 /* NotificationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB00FE2F208FB285008D1A57 /* NotificationCell.swift */; };
 		DBFDF42D20AC7B1E0031EF47 /* NotificationCenterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBF90205597C300E5C77F /* NotificationCenterViewController.swift */; };
-		DBFDF42E20AC7B1E0031EF47 /* NotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA81F20A748E000225C80 /* NotificationHandler.swift */; };
 		DBFDF43020AC7BA10031EF47 /* FetchNotificationsResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2583E20A1054000400EA2 /* FetchNotificationsResult.swift */; };
 		DBFDF43120AC7BA10031EF47 /* NotificationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF2584220A1090100400EA2 /* NotificationStore.swift */; };
 		DBFDF43220AC7BA10031EF47 /* NotificationStoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBF9B205597C300E5C77F /* NotificationStoreService.swift */; };
@@ -165,7 +161,7 @@
 		DBFDF46020AC85430031EF47 /* RectangleBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A68209B8CC500E99F9F /* RectangleBlock.swift */; };
 		DBFDF46120AC85430031EF47 /* Background.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A69209B8CC500E99F9F /* Background.swift */; };
 		DBFDF46220AC85430031EF47 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A6A209B8CC500E99F9F /* Block.swift */; };
-		DBFDF46320AC85430031EF47 /* BlockAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA83120AA03B900225C80 /* BlockAction.swift */; };
+		DBFDF46320AC85430031EF47 /* BlockTapBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA83120AA03B900225C80 /* BlockTapBehavior.swift */; };
 		DBFDF46420AC85430031EF47 /* Image.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A6B209B8CC500E99F9F /* Image.swift */; };
 		DBFDF46520AC85430031EF47 /* Screen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A6C209B8CC500E99F9F /* Screen.swift */; };
 		DBFDF46620AC85430031EF47 /* WebViewBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A6D209B8CC500E99F9F /* WebViewBlock.swift */; };
@@ -180,7 +176,6 @@
 		DBFDF46F20AC85430031EF47 /* Text.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A76209B8CC500E99F9F /* Text.swift */; };
 		DBFDF47020AC85430031EF47 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A77209B8CC500E99F9F /* Color.swift */; };
 		DBFDF47120AC85430031EF47 /* ImageBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1A78209B8CC500E99F9F /* ImageBlock.swift */; };
-		DBFDF47220AC854A0031EF47 /* GoToScreenOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBADA83420AA2A3100225C80 /* GoToScreenOperation.swift */; };
 		DBFDF47320AC854F0031EF47 /* FetchExperienceResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B0C209CAD4400E99F9F /* FetchExperienceResult.swift */; };
 		DBFDF47420AC854F0031EF47 /* ExperienceIdentifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B0A209CACDE00E99F9F /* ExperienceIdentifier.swift */; };
 		DBFDF47520AC854F0031EF47 /* ExperienceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B0E209CAD9600E99F9F /* ExperienceStore.swift */; };
@@ -270,10 +265,8 @@
 		DB00FDF7208D09AE008D1A57 /* Router.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Router.swift; sourceTree = "<group>"; };
 		DB00FDF9208D0A0A008D1A57 /* RouterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouterService.swift; sourceTree = "<group>"; };
 		DB00FE2F208FB285008D1A57 /* NotificationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCell.swift; sourceTree = "<group>"; };
-		DB08F9A120AB8B1A0029D6DF /* UniversalLinkAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalLinkAction.swift; sourceTree = "<group>"; };
 		DB0C8E3D2055C62800E0D860 /* InfluenceTrackerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfluenceTrackerService.swift; sourceTree = "<group>"; };
 		DB0C8E3F2055CCBD00E0D860 /* InfluenceTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfluenceTracker.swift; sourceTree = "<group>"; };
-		DB0C8E422055D5F300E0D860 /* UNNotificationRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UNNotificationRequest.swift; sourceTree = "<group>"; };
 		DB0C8F2120583A5600E0D860 /* RoverAppExtensions.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RoverAppExtensions.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB0C8F2320583A5600E0D860 /* RoverAppExtensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoverAppExtensions.h; sourceTree = "<group>"; };
 		DB0C8F2420583A5600E0D860 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -305,6 +298,13 @@
 		DB709C68207E7EFC00F96C2B /* ImageStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageStore.swift; sourceTree = "<group>"; };
 		DB709C6B207EAEED00F96C2B /* ImageStoreService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageStoreService.swift; sourceTree = "<group>"; };
 		DB709C72207EB47400F96C2B /* ImageOptimization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageOptimization.swift; sourceTree = "<group>"; };
+		DB7BA91A20D9594500968A30 /* RouteHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteHandler.swift; sourceTree = "<group>"; };
+		DB7BA91D20D96C9900968A30 /* ExperienceRouteHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExperienceRouteHandler.swift; sourceTree = "<group>"; };
+		DB7BA92120D970A100968A30 /* NotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationHandler.swift; sourceTree = "<group>"; };
+		DB7BA92520D9729600968A30 /* OpenNotificationAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenNotificationAction.swift; sourceTree = "<group>"; };
+		DB7BA92A20D9811100968A30 /* NotificationHandlerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationHandlerService.swift; sourceTree = "<group>"; };
+		DB7BA92E20D982BE00968A30 /* NotificationCenterRouteHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterRouteHandler.swift; sourceTree = "<group>"; };
+		DB7BA93220D98C2500968A30 /* WebsiteRouteHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsiteRouteHandler.swift; sourceTree = "<group>"; };
 		DB9469382051E58400C8C3AE /* LoggerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerService.swift; sourceTree = "<group>"; };
 		DB9DBEDE2055964E00E5C77F /* NavigationExperienceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationExperienceController.swift; sourceTree = "<group>"; };
 		DB9DBEDF2055964E00E5C77F /* ExperienceContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExperienceContainer.swift; sourceTree = "<group>"; };
@@ -340,23 +340,14 @@
 		DB9DC0302055992400E5C77F /* DeviceAttributes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceAttributes.swift; sourceTree = "<group>"; };
 		DB9DC0312055992400E5C77F /* DeviceAttributesService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DeviceAttributesService.swift; sourceTree = "<group>"; };
 		DB9DC0AD2055B82B00E5C77F /* NotificationExtensionHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationExtensionHelper.swift; sourceTree = "<group>"; };
-		DBADA7F020A4F32500225C80 /* Operation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operation.swift; sourceTree = "<group>"; };
-		DBADA7F120A4F32500225C80 /* GroupOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GroupOperation.swift; sourceTree = "<group>"; };
-		DBADA7F220A4F32500225C80 /* AsynchronousOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsynchronousOperation.swift; sourceTree = "<group>"; };
-		DBADA7F420A4F32500225C80 /* OperationObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationObserver.swift; sourceTree = "<group>"; };
+		DBADA7F220A4F32500225C80 /* Action.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Action.swift; sourceTree = "<group>"; };
+		DBADA7F420A4F32500225C80 /* ActionObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionObserver.swift; sourceTree = "<group>"; };
 		DBADA7F520A4F32500225C80 /* BlockObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlockObserver.swift; sourceTree = "<group>"; };
-		DBADA7F720A4F32500225C80 /* OperationQueueDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationQueueDelegate.swift; sourceTree = "<group>"; };
-		DBADA7F820A4F32500225C80 /* OperationQueue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OperationQueue.swift; sourceTree = "<group>"; };
 		DBADA80120A4F37C00225C80 /* Dispatcher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dispatcher.swift; sourceTree = "<group>"; };
 		DBADA80220A4F37C00225C80 /* DispatcherService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DispatcherService.swift; sourceTree = "<group>"; };
-		DBADA81920A620C900225C80 /* AddNotificationOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNotificationOperation.swift; sourceTree = "<group>"; };
-		DBADA81C20A620FF00225C80 /* UNNotificationResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UNNotificationResponse.swift; sourceTree = "<group>"; };
-		DBADA81F20A748E000225C80 /* NotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationHandler.swift; sourceTree = "<group>"; };
-		DBADA82420A777B100225C80 /* DeepLinkAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkAction.swift; sourceTree = "<group>"; };
-		DBADA82A20A9EEA200225C80 /* NotificationPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPayload.swift; sourceTree = "<group>"; };
-		DBADA82E20A9EFA200225C80 /* PresentNotificationCenterAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentNotificationCenterAction.swift; sourceTree = "<group>"; };
-		DBADA83120AA03B900225C80 /* BlockAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockAction.swift; sourceTree = "<group>"; };
-		DBADA83420AA2A3100225C80 /* GoToScreenOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoToScreenOperation.swift; sourceTree = "<group>"; };
+		DBADA83120AA03B900225C80 /* BlockTapBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockTapBehavior.swift; sourceTree = "<group>"; };
+		DBB78A2F20DAD7B400AF1A00 /* NotificationTapBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationTapBehavior.swift; sourceTree = "<group>"; };
+		DBB78A3120DAD88900AF1A00 /* NotificationAttachment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationAttachment.swift; sourceTree = "<group>"; };
 		DBB89B9C20D0160100DD797A /* ApplicationMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationMonitor.swift; sourceTree = "<group>"; };
 		DBB89B9F20D01CC500DD797A /* ApplicationMonitorService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationMonitorService.swift; sourceTree = "<group>"; };
 		DBB89C4A20D083AF00DD797A /* RoverFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoverFoundation.h; sourceTree = "<group>"; };
@@ -375,9 +366,8 @@
 		DBF2583E20A1054000400EA2 /* FetchNotificationsResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FetchNotificationsResult.swift; sourceTree = "<group>"; };
 		DBF2584020A107BD00400EA2 /* ObserverSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObserverSet.swift; sourceTree = "<group>"; };
 		DBF2584220A1090100400EA2 /* NotificationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationStore.swift; sourceTree = "<group>"; };
-		DBF2584420A32E9400400EA2 /* Action.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Action.swift; sourceTree = "<group>"; };
-		DBF2585920A36DF400400EA2 /* OpenURLOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenURLOperation.swift; sourceTree = "<group>"; };
-		DBF2585D20A37BF300400EA2 /* PresentViewOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentViewOperation.swift; sourceTree = "<group>"; };
+		DBF2585920A36DF400400EA2 /* OpenURLAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenURLAction.swift; sourceTree = "<group>"; };
+		DBF2585D20A37BF300400EA2 /* PresentViewAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentViewAction.swift; sourceTree = "<group>"; };
 		DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RoverFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBF49DD7203DE00F00B54652 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DBF49DDC203DE00F00B54652 /* RoverFoundationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoverFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -616,6 +606,7 @@
 			children = (
 				DB00FDF7208D09AE008D1A57 /* Router.swift */,
 				DB00FDF9208D0A0A008D1A57 /* RouterService.swift */,
+				DB7BA91A20D9594500968A30 /* RouteHandler.swift */,
 			);
 			path = Router;
 			sourceTree = "<group>";
@@ -647,15 +638,6 @@
 				DB0C8E3D2055C62800E0D860 /* InfluenceTrackerService.swift */,
 			);
 			path = InfluenceTracker;
-			sourceTree = "<group>";
-		};
-		DB0C8E412055D5DC00E0D860 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				DB0C8E422055D5F300E0D860 /* UNNotificationRequest.swift */,
-				DBADA81C20A620FF00225C80 /* UNNotificationResponse.swift */,
-			);
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		DB0C8F2220583A5600E0D860 /* AppExtensions */ = {
@@ -756,8 +738,7 @@
 		DB6ADD5B20B33EC0002F226C /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				DBFDF43320AC7F840031EF47 /* Actions */,
-				DBFDF4EC20ACA0140031EF47 /* Operations */,
+				DBFDF4EC20ACA0140031EF47 /* Actions */,
 				DB6ADD7D20B3446D002F226C /* Services */,
 				DB6ADD7620B33F5D002F226C /* UIAssembler.swift */,
 				DB6ADD5C20B33EC0002F226C /* RoverUI.h */,
@@ -782,6 +763,7 @@
 				DB709C67207E7EF200F96C2B /* ImageStore */,
 				DB00FDF6208D099F008D1A57 /* Router */,
 				DB6ADD8320B34EE1002F226C /* SessionController */,
+				DB7BA93120D98C0900968A30 /* WebsiteRouteHandler */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -816,6 +798,47 @@
 			path = ImageStore;
 			sourceTree = "<group>";
 		};
+		DB7BA91C20D96C8B00968A30 /* ExperienceRouteHandler */ = {
+			isa = PBXGroup;
+			children = (
+				DB7BA91D20D96C9900968A30 /* ExperienceRouteHandler.swift */,
+			);
+			path = ExperienceRouteHandler;
+			sourceTree = "<group>";
+		};
+		DB7BA92020D9703300968A30 /* NotificationHandler */ = {
+			isa = PBXGroup;
+			children = (
+				DB7BA92120D970A100968A30 /* NotificationHandler.swift */,
+				DB7BA92A20D9811100968A30 /* NotificationHandlerService.swift */,
+			);
+			path = NotificationHandler;
+			sourceTree = "<group>";
+		};
+		DB7BA92420D9725E00968A30 /* Actions */ = {
+			isa = PBXGroup;
+			children = (
+				DB7BA92520D9729600968A30 /* OpenNotificationAction.swift */,
+			);
+			path = Actions;
+			sourceTree = "<group>";
+		};
+		DB7BA92D20D9829D00968A30 /* NotificationCenterRouteHandler */ = {
+			isa = PBXGroup;
+			children = (
+				DB7BA92E20D982BE00968A30 /* NotificationCenterRouteHandler.swift */,
+			);
+			path = NotificationCenterRouteHandler;
+			sourceTree = "<group>";
+		};
+		DB7BA93120D98C0900968A30 /* WebsiteRouteHandler */ = {
+			isa = PBXGroup;
+			children = (
+				DB7BA93220D98C2500968A30 /* WebsiteRouteHandler.swift */,
+			);
+			path = WebsiteRouteHandler;
+			sourceTree = "<group>";
+		};
 		DB9DBEBA205595F100E5C77F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -840,13 +863,14 @@
 		DB9DBF772055974B00E5C77F /* Notifications */ = {
 			isa = PBXGroup;
 			children = (
-				DBADA82D20A9EF8E00225C80 /* Actions */,
+				DB7BA92420D9725E00968A30 /* Actions */,
 				DB9DBF97205597C300E5C77F /* ContextProviders */,
-				DB0C8E412055D5DC00E0D860 /* Extensions */,
 				DBADA82920A9EE9700225C80 /* Models */,
-				DBADA81820A620BD00225C80 /* Operations */,
-				DBFDF42A20AC7AB80031EF47 /* Services */,
-				DBFDF42B20AC7AF90031EF47 /* UI */,
+				DB0C8E3C2055C61400E0D860 /* InfluenceTracker */,
+				DBFDF42B20AC7AF90031EF47 /* NotificationCenter */,
+				DB7BA92D20D9829D00968A30 /* NotificationCenterRouteHandler */,
+				DB7BA92020D9703300968A30 /* NotificationHandler */,
+				DBFDF42F20AC7B620031EF47 /* NotificationStore */,
 				DB9DBF8E205597C300E5C77F /* NotificationsAssembler.swift */,
 				DB9DBF782055974B00E5C77F /* RoverNotifications.h */,
 				DB9DBF792055974B00E5C77F /* Info.plist */,
@@ -903,85 +927,42 @@
 			path = DeviceAttributes;
 			sourceTree = "<group>";
 		};
-		DBADA7EE20A4F32500225C80 /* Operations */ = {
+		DBADA7EE20A4F32500225C80 /* Actions */ = {
 			isa = PBXGroup;
 			children = (
-				DBADA7EF20A4F32500225C80 /* Operations */,
+				DBADA80020A4F37C00225C80 /* Dispatcher */,
 				DBADA7F320A4F32500225C80 /* Observers */,
-				DBADA7F620A4F32500225C80 /* OperationQueue */,
+				DBADA7F220A4F32500225C80 /* Action.swift */,
 			);
-			path = Operations;
-			sourceTree = "<group>";
-		};
-		DBADA7EF20A4F32500225C80 /* Operations */ = {
-			isa = PBXGroup;
-			children = (
-				DBADA7F020A4F32500225C80 /* Operation.swift */,
-				DBADA7F120A4F32500225C80 /* GroupOperation.swift */,
-				DBADA7F220A4F32500225C80 /* AsynchronousOperation.swift */,
-			);
-			path = Operations;
+			path = Actions;
 			sourceTree = "<group>";
 		};
 		DBADA7F320A4F32500225C80 /* Observers */ = {
 			isa = PBXGroup;
 			children = (
-				DBADA7F420A4F32500225C80 /* OperationObserver.swift */,
+				DBADA7F420A4F32500225C80 /* ActionObserver.swift */,
 				DBADA7F520A4F32500225C80 /* BlockObserver.swift */,
 			);
 			path = Observers;
 			sourceTree = "<group>";
 		};
-		DBADA7F620A4F32500225C80 /* OperationQueue */ = {
-			isa = PBXGroup;
-			children = (
-				DBADA7F720A4F32500225C80 /* OperationQueueDelegate.swift */,
-				DBADA7F820A4F32500225C80 /* OperationQueue.swift */,
-			);
-			path = OperationQueue;
-			sourceTree = "<group>";
-		};
 		DBADA80020A4F37C00225C80 /* Dispatcher */ = {
 			isa = PBXGroup;
 			children = (
-				DBF2584420A32E9400400EA2 /* Action.swift */,
 				DBADA80120A4F37C00225C80 /* Dispatcher.swift */,
 				DBADA80220A4F37C00225C80 /* DispatcherService.swift */,
 			);
 			path = Dispatcher;
 			sourceTree = "<group>";
 		};
-		DBADA81820A620BD00225C80 /* Operations */ = {
-			isa = PBXGroup;
-			children = (
-				DBADA81920A620C900225C80 /* AddNotificationOperation.swift */,
-			);
-			path = Operations;
-			sourceTree = "<group>";
-		};
 		DBADA82920A9EE9700225C80 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				DBFB1A7C209B8CC500E99F9F /* Notification.swift */,
-				DBADA82A20A9EEA200225C80 /* NotificationPayload.swift */,
+				DBB78A3120DAD88900AF1A00 /* NotificationAttachment.swift */,
+				DBB78A2F20DAD7B400AF1A00 /* NotificationTapBehavior.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		DBADA82D20A9EF8E00225C80 /* Actions */ = {
-			isa = PBXGroup;
-			children = (
-				DBADA82E20A9EFA200225C80 /* PresentNotificationCenterAction.swift */,
-			);
-			path = Actions;
-			sourceTree = "<group>";
-		};
-		DBADA83320AA2A2100225C80 /* Operations */ = {
-			isa = PBXGroup;
-			children = (
-				DBADA83420AA2A3100225C80 /* GoToScreenOperation.swift */,
-			);
-			path = Operations;
 			sourceTree = "<group>";
 		};
 		DBB89B9B20D015F200DD797A /* ApplicationMonitor */ = {
@@ -1051,10 +1032,10 @@
 		DBF49DD5203DE00F00B54652 /* Foundation */ = {
 			isa = PBXGroup;
 			children = (
+				DBADA7EE20A4F32500225C80 /* Actions */,
 				DBFDF52220AE2B0B0031EF47 /* Extensions */,
 				DBF49DF7203DE1CF00B54652 /* Container */,
-				DBADA7EE20A4F32500225C80 /* Operations */,
-				DBFB1B23209CB78400E99F9F /* Services */,
+				DBF49E08203DE1E800B54652 /* Logger */,
 				DBFB1A63209B8CC500E99F9F /* Types */,
 				DBB89C4A20D083AF00DD797A /* RoverFoundation.h */,
 				DBF49DF3203DE18500B54652 /* FoundationAssembler.swift */,
@@ -1214,15 +1195,6 @@
 			path = ContextProviders;
 			sourceTree = "<group>";
 		};
-		DBFB1B23209CB78400E99F9F /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				DBADA80020A4F37C00225C80 /* Dispatcher */,
-				DBF49E08203DE1E800B54652 /* Logger */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
 		DBFB1B64209CD7E400E99F9F /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -1257,23 +1229,13 @@
 			path = ScreenViewController;
 			sourceTree = "<group>";
 		};
-		DBFDF42A20AC7AB80031EF47 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				DB0C8E3C2055C61400E0D860 /* InfluenceTracker */,
-				DBFDF42F20AC7B620031EF47 /* NotificationStore */,
-			);
-			path = Services;
-			sourceTree = "<group>";
-		};
-		DBFDF42B20AC7AF90031EF47 /* UI */ = {
+		DBFDF42B20AC7AF90031EF47 /* NotificationCenter */ = {
 			isa = PBXGroup;
 			children = (
 				DB00FE2F208FB285008D1A57 /* NotificationCell.swift */,
 				DB9DBF90205597C300E5C77F /* NotificationCenterViewController.swift */,
-				DBADA81F20A748E000225C80 /* NotificationHandler.swift */,
 			);
-			path = UI;
+			path = NotificationCenter;
 			sourceTree = "<group>";
 		};
 		DBFDF42F20AC7B620031EF47 /* NotificationStore */ = {
@@ -1286,24 +1248,6 @@
 			path = NotificationStore;
 			sourceTree = "<group>";
 		};
-		DBFDF43320AC7F840031EF47 /* Actions */ = {
-			isa = PBXGroup;
-			children = (
-				DBADA82420A777B100225C80 /* DeepLinkAction.swift */,
-				DB08F9A120AB8B1A0029D6DF /* UniversalLinkAction.swift */,
-			);
-			path = Actions;
-			sourceTree = "<group>";
-		};
-		DBFDF43420AC81AB0031EF47 /* UI */ = {
-			isa = PBXGroup;
-			children = (
-				DB00FE2A208FAFC0008D1A57 /* ExperienceViewController */,
-				DB00FE28208FAF88008D1A57 /* ScreenViewController */,
-			);
-			path = UI;
-			sourceTree = "<group>";
-		};
 		DBFDF43520AC81CD0031EF47 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -1311,7 +1255,6 @@
 				DBFB1A65209B8CC500E99F9F /* Barcode.swift */,
 				DBFB1A74209B8CC500E99F9F /* BarcodeBlock.swift */,
 				DBFB1A6A209B8CC500E99F9F /* Block.swift */,
-				DBADA83120AA03B900225C80 /* BlockAction.swift */,
 				DBFB1A71209B8CC500E99F9F /* Border.swift */,
 				DBFB1A67209B8CC500E99F9F /* ButtonBlock.swift */,
 				DBFB1A77209B8CC500E99F9F /* Color.swift */,
@@ -1324,20 +1267,13 @@
 				DBFB1A68209B8CC500E99F9F /* RectangleBlock.swift */,
 				DBFB1A70209B8CC500E99F9F /* Row.swift */,
 				DBFB1A6C209B8CC500E99F9F /* Screen.swift */,
+				DBADA83120AA03B900225C80 /* BlockTapBehavior.swift */,
 				DBFB1A76209B8CC500E99F9F /* Text.swift */,
 				DBFB1A6F209B8CC500E99F9F /* TextBlock.swift */,
 				DBFB1A6E209B8CC500E99F9F /* WebView.swift */,
 				DBFB1A6D209B8CC500E99F9F /* WebViewBlock.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		DBFDF43620AC81F10031EF47 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-				DBFB1B09209CACAC00E99F9F /* ExperienceStore */,
-			);
-			path = Services;
 			sourceTree = "<group>";
 		};
 		DBFDF43720AC82610031EF47 /* Services */ = {
@@ -1362,9 +1298,10 @@
 			children = (
 				DBFB1B64209CD7E400E99F9F /* Extensions */,
 				DBFDF43520AC81CD0031EF47 /* Models */,
-				DBADA83320AA2A2100225C80 /* Operations */,
-				DBFDF43620AC81F10031EF47 /* Services */,
-				DBFDF43420AC81AB0031EF47 /* UI */,
+				DB7BA91C20D96C8B00968A30 /* ExperienceRouteHandler */,
+				DBFB1B09209CACAC00E99F9F /* ExperienceStore */,
+				DB00FE2A208FAFC0008D1A57 /* ExperienceViewController */,
+				DB00FE28208FAF88008D1A57 /* ScreenViewController */,
 				DBFB1B62209CD46200E99F9F /* ExperiencesAssembler.swift */,
 				DBFDF44420AC84430031EF47 /* RoverExperiences.h */,
 				DBFDF44520AC84430031EF47 /* Info.plist */,
@@ -1402,13 +1339,13 @@
 			path = Vendor;
 			sourceTree = "<group>";
 		};
-		DBFDF4EC20ACA0140031EF47 /* Operations */ = {
+		DBFDF4EC20ACA0140031EF47 /* Actions */ = {
 			isa = PBXGroup;
 			children = (
-				DBF2585920A36DF400400EA2 /* OpenURLOperation.swift */,
-				DBF2585D20A37BF300400EA2 /* PresentViewOperation.swift */,
+				DBF2585920A36DF400400EA2 /* OpenURLAction.swift */,
+				DBF2585D20A37BF300400EA2 /* PresentViewAction.swift */,
 			);
-			path = Operations;
+			path = Actions;
 			sourceTree = "<group>";
 		};
 		DBFDF52220AE2B0B0031EF47 /* Extensions */ = {
@@ -2047,16 +1984,16 @@
 				DBB89B9A20D014C700DD797A /* RouterService.swift in Sources */,
 				DB6ADD7320B33F3A002F226C /* ImageOptimization.swift in Sources */,
 				DBB89B9E20D0167B00DD797A /* ApplicationMonitor.swift in Sources */,
-				DB6ADD8A20B351B6002F226C /* OpenURLOperation.swift in Sources */,
+				DB6ADD8A20B351B6002F226C /* OpenURLAction.swift in Sources */,
 				DB6ADD8620B34F00002F226C /* SessionControllerDelegate.swift in Sources */,
 				DB6ADD8920B34F86002F226C /* SessionController.swift in Sources */,
 				DB6ADD7220B33F3A002F226C /* ImageConfiguration.swift in Sources */,
 				DBB89BA120D01CD700DD797A /* ApplicationMonitorService.swift in Sources */,
-				DBD88ABF20C1BC4000085AE0 /* DeepLinkAction.swift in Sources */,
 				DB6ADD7420B33F3A002F226C /* ImageStore.swift in Sources */,
-				DB6ADD8B20B351B6002F226C /* PresentViewOperation.swift in Sources */,
+				DB6ADD8B20B351B6002F226C /* PresentViewAction.swift in Sources */,
+				DB7BA93420D98F7E00968A30 /* RouteHandler.swift in Sources */,
 				DB6ADD7820B33F68002F226C /* UIAssembler.swift in Sources */,
-				DBD88AC020C1BC4000085AE0 /* UniversalLinkAction.swift in Sources */,
+				DB7BA93320D98C2500968A30 /* WebsiteRouteHandler.swift in Sources */,
 				DB6ADD8020B344BC002F226C /* SessionControllerService.swift in Sources */,
 				DB6ADD7520B33F3A002F226C /* ImageStoreService.swift in Sources */,
 				DBB89B9920D014C700DD797A /* Router.swift in Sources */,
@@ -2075,20 +2012,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DB0C8E432055D5F300E0D860 /* UNNotificationRequest.swift in Sources */,
 				DB9DBFA2205597C300E5C77F /* NotificationsAssembler.swift in Sources */,
+				DB7BA93020D982C200968A30 /* NotificationCenterRouteHandler.swift in Sources */,
 				DBFDF42D20AC7B1E0031EF47 /* NotificationCenterViewController.swift in Sources */,
-				DBADA83020A9EFA900225C80 /* PresentNotificationCenterAction.swift in Sources */,
 				DBFDF42C20AC7B1E0031EF47 /* NotificationCell.swift in Sources */,
+				DBB78A3420DAD89400AF1A00 /* NotificationTapBehavior.swift in Sources */,
 				DBFDF43120AC7BA10031EF47 /* NotificationStore.swift in Sources */,
+				DB7BA92C20D9811B00968A30 /* NotificationHandlerService.swift in Sources */,
+				DBB78A3320DAD88F00AF1A00 /* NotificationAttachment.swift in Sources */,
 				DBFDF43220AC7BA10031EF47 /* NotificationStoreService.swift in Sources */,
-				DBADA81E20A6210B00225C80 /* UNNotificationResponse.swift in Sources */,
+				DB7BA92720D972A700968A30 /* OpenNotificationAction.swift in Sources */,
 				DB0C8E402055CCBD00E0D860 /* InfluenceTracker.swift in Sources */,
 				DB9DBFA8205597C300E5C77F /* NotificationAuthorizationContextProvider.swift in Sources */,
-				DBFDF42E20AC7B1E0031EF47 /* NotificationHandler.swift in Sources */,
-				DBADA82C20A9EF1B00225C80 /* NotificationPayload.swift in Sources */,
+				DB7BA92320D970E500968A30 /* NotificationHandler.swift in Sources */,
 				DBFDF42920AC7A7C0031EF47 /* Notification.swift in Sources */,
-				DBADA81B20A620E100225C80 /* AddNotificationOperation.swift in Sources */,
 				DB0C8E3E2055C62800E0D860 /* InfluenceTrackerService.swift in Sources */,
 				DBFDF43020AC7BA10031EF47 /* FetchNotificationsResult.swift in Sources */,
 			);
@@ -2182,17 +2119,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBADA7FC20A4F32500225C80 /* OperationObserver.swift in Sources */,
-				DBADA7FE20A4F32500225C80 /* OperationQueueDelegate.swift in Sources */,
+				DBADA7FC20A4F32500225C80 /* ActionObserver.swift in Sources */,
 				DBF49E02203DE1DE00B54652 /* Assembler.swift in Sources */,
-				DBADA7FB20A4F32500225C80 /* AsynchronousOperation.swift in Sources */,
+				DBADA7FB20A4F32500225C80 /* Action.swift in Sources */,
 				DBFB1AF3209CA82800E99F9F /* ID.swift in Sources */,
 				DBF49E05203DE1DE00B54652 /* ServiceFactory.swift in Sources */,
 				DBF2584120A107BD00400EA2 /* ObserverSet.swift in Sources */,
-				DBF2584520A32E9400400EA2 /* Action.swift in Sources */,
 				DBF49E06203DE1DE00B54652 /* ServiceKey.swift in Sources */,
 				DBF49E03203DE1DE00B54652 /* ServiceEntry.swift in Sources */,
-				DBADA7FF20A4F32500225C80 /* OperationQueue.swift in Sources */,
 				DBADA80320A4F37C00225C80 /* Dispatcher.swift in Sources */,
 				DBFDF52420AE2B1C0031EF47 /* DateFormatter.swift in Sources */,
 				DBADA7FD20A4F32500225C80 /* BlockObserver.swift in Sources */,
@@ -2204,10 +2138,8 @@
 				DBF49DF6203DE18500B54652 /* FoundationAssembler.swift in Sources */,
 				DBF49E0B203DE1F600B54652 /* LogLevel.swift in Sources */,
 				DBF49E07203DE1DE00B54652 /* ServiceScope.swift in Sources */,
-				DBADA7FA20A4F32500225C80 /* GroupOperation.swift in Sources */,
 				DB9469392051E58400C8C3AE /* LoggerService.swift in Sources */,
 				DBADA80420A4F37C00225C80 /* DispatcherService.swift in Sources */,
-				DBADA7F920A4F32500225C80 /* Operation.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2230,7 +2162,6 @@
 				DBFDF45D20AC85430031EF47 /* Barcode.swift in Sources */,
 				DBFDF47020AC85430031EF47 /* Color.swift in Sources */,
 				DBFDF45C20AC853B0031EF47 /* Text+attributedText.swift in Sources */,
-				DBFDF47220AC854A0031EF47 /* GoToScreenOperation.swift in Sources */,
 				DBFDF47620AC854F0031EF47 /* ExperienceStoreService.swift in Sources */,
 				DBFDF47420AC854F0031EF47 /* ExperienceIdentifier.swift in Sources */,
 				DBFDF47F20AC855E0031EF47 /* WebViewCell.swift in Sources */,
@@ -2253,9 +2184,10 @@
 				DBFDF48020AC85650031EF47 /* ScreenViewController.swift in Sources */,
 				DBFDF46620AC85430031EF47 /* WebViewBlock.swift in Sources */,
 				DBFDF46A20AC85430031EF47 /* Border.swift in Sources */,
-				DBFDF46320AC85430031EF47 /* BlockAction.swift in Sources */,
+				DBFDF46320AC85430031EF47 /* BlockTapBehavior.swift in Sources */,
 				DBFDF46E20AC85430031EF47 /* Position.swift in Sources */,
 				DBFDF47320AC854F0031EF47 /* FetchExperienceResult.swift in Sources */,
+				DB7BA91F20D96CA600968A30 /* ExperienceRouteHandler.swift in Sources */,
 				DBFDF45B20AC853B0031EF47 /* Color+uiColor.swift in Sources */,
 				DBFDF47120AC85430031EF47 /* ImageBlock.swift in Sources */,
 				DBFDF46420AC85430031EF47 /* Image.swift in Sources */,

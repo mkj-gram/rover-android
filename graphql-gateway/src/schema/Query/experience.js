@@ -349,37 +349,6 @@ const normalizeBlock = data => {
         return null
     }
 
-    const action = (data => {
-        if (data === null || data === undefined) {
-            return null
-        }
-
-        const url = data['url']
-        if (typeof url === 'string') {
-            try {
-                // Throws an error if `url` is not a valid URL
-                new URL(url)
-            } catch(err) {
-                return null
-            }
-
-            return {
-                __typename: 'OpenURLAction',
-                url
-            }
-        }
-    
-        const screenID = data['screen-id']
-        if (typeof screenID === 'string') {
-            return {
-                __typename: 'GoToScreenAction',
-                screenID
-            }
-        }
-    
-        return null
-    })(data['action'])
-
     const insets = (data => {
         if (data === null || data === undefined) {
             return {
@@ -518,8 +487,52 @@ const normalizeBlock = data => {
         }
     })
 
+    const tapBehavior = (data => {
+        if (data === null || data === undefined) {
+            return {
+                __typename: 'NoneBlockTapBehavior'
+            }
+        }
+
+        const url = data['url']
+        if (typeof url === 'string') {
+            try {
+                // Throws an error if `url` is not a valid URL
+                new URL(url)
+            } catch(err) {
+                return {
+                    __typename: 'NoneBlockTapBehavior'
+                }
+            }
+
+            if (url.startsWith('http')) {
+                return {
+                    __typename: 'PresentWebsiteBlockTapBehavior',
+                    url
+                }
+            } else {
+                return {
+                    __typename: 'OpenURLBlockTapBehavior',
+                    url,
+                    dismiss: true
+                }
+            }
+        }
+    
+        const screenID = data['screen-id']
+        if (typeof screenID === 'string') {
+            return {
+                __typename: 'GoToScreenBlockTapBehavior',
+                screenID
+            }
+        }
+        
+        return {
+            __typename: 'NoneBlockTapBehavior'
+        }
+    })(data['action'])
+
     return {
-        action,
         id: data['id'],
         insets,   
         opacity: normalizeNumber(data['opacity'], 1.0),
@@ -527,6 +540,7 @@ const normalizeBlock = data => {
             horizontalAlignment,
             verticalAlignment,
         },
+        tapBehavior,
         keys: normalizeKeys(data['custom-keys']),
         tags: []
     }

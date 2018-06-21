@@ -31,6 +31,26 @@ public struct UIAssembler {
 extension UIAssembler: Assembler {
     public func assemble(container: Container) {
         
+        // MARK: Action (openURL)
+        
+        container.register(Action.self, name: "openURL", scope: .transient) { (resolver, url: URL) in
+            return OpenURLAction(url: url)
+        }
+        
+        // MARK: Action (presentView)
+        
+        container.register(Action.self, name: "presentView", scope: .transient) { (resolver, viewControllerToPresent: UIViewController) in
+            let logger = resolver.resolve(Logger.self)!
+            return PresentViewAction(viewControllerToPresent: viewControllerToPresent, animated: true, logger: logger)
+        }
+        
+        // MARK: Action (presentWebsite)
+        
+        container.register(Action.self, name: "presentWebsite", scope: .transient) { (resolver, url: URL) in
+            let viewControllerToPresent = resolver.resolve(UIViewController.self, name: "website", arguments: url)!
+            return resolver.resolve(Action.self, name: "presentView", arguments: viewControllerToPresent)!
+        }
+        
         // MARK: ApplicationMonitor
         
         container.register(ApplicationMonitor.self) { resolver in
@@ -48,18 +68,12 @@ extension UIAssembler: Assembler {
             return ImageStoreService(logger: logger, session: session)
         }
         
-        // MARK: Operation (openURL)
+        // MARK: RouteHandler (website)
         
-        container.register(Operation.self, name: "openURL", scope: .transient) { (resolver, url: URL) in
-            return OpenURLOperation(url: url)
-        }
-        
-        // MARK: Operation (presentWebsite)
-        
-        container.register(Operation.self, name: "presentWebsite", scope: .transient) { (resolver, url: URL) in
-            let viewControllerToPresent = resolver.resolve(UIViewController.self, name: "website", arguments: url)!
-            let logger = resolver.resolve(Logger.self)!
-            return PresentViewOperation(viewControllerToPresent: viewControllerToPresent, animated: true, logger: logger)
+        container.register(RouteHandler.self, name: "website") { resolver in
+            return WebsiteRouteHandler(actionProvider: { url in
+                return resolver.resolve(Action.self, name: "presentWebsite", arguments: url)!
+            })
         }
         
         // MARK: Router
@@ -86,5 +100,9 @@ extension UIAssembler: Assembler {
         var applicationMonitor = resolver.resolve(ApplicationMonitor.self)!
         applicationMonitor.isSessionTrackingEnabled = isApplicationSessionTrackingEnabled
         applicationMonitor.isVersionTrackingEnabled = isApplicationVersionTrackingEnabled
+        
+        let handler = resolver.resolve(RouteHandler.self, name: "website")!
+        let router = resolver.resolve(Router.self)!
+        router.addHandler(handler)
     }
 }

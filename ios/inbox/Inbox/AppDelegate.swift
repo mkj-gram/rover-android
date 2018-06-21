@@ -8,6 +8,7 @@
 
 import Components
 import RoverData
+import RoverNotifications
 import UIKit
 import UserNotifications
 
@@ -25,6 +26,16 @@ import UserNotifications
         if let tokenManager = Rover.shared?.resolve(TokenManager.self) {
             tokenManager.setToken(deviceToken)
         }
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        let router = Rover.shared!.resolve(Router.self)!
+        return router.handle(url)
+    }
+    
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+        let router = Rover.shared!.resolve(Router.self)!
+        return router.handle(userActivity)
     }
     
     func configureAppearance() {
@@ -45,10 +56,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        
-        if let action = response.action {
-            let dispatcher = Rover.shared!.resolve(Dispatcher.self)!
-            dispatcher.dispatch(action)
-        }
+        let notificationHandler = Rover.shared!.resolve(NotificationHandler.self)!
+        notificationHandler.handle(response, completionHandler: completionHandler)
     }
 }

@@ -13,10 +13,16 @@ class RouterService: Router {
     let urlSchemes: [String]
     let dispatcher: Dispatcher
     
+    var handlers = [RouteHandler]()
+    
     init(associatedDomains: [String], urlSchemes: [String], dispatcher: Dispatcher) {
         self.associatedDomains = associatedDomains
         self.urlSchemes = urlSchemes
         self.dispatcher = dispatcher
+    }
+    
+    func addHandler(_ handler: RouteHandler) {
+        handlers.append(handler)
     }
     
     func handle(_ userActivity: NSUserActivity) -> Bool {
@@ -24,7 +30,7 @@ class RouterService: Router {
             return false
         }
         
-        dispatcher.dispatch(action)
+        dispatcher.dispatch(action, completionHandler: nil)
         return true
     }
     
@@ -40,48 +46,46 @@ class RouterService: Router {
         guard let action = action(for: url) else {
             return false
         }
-
-        dispatcher.dispatch(action)
+        
+        dispatcher.dispatch(action, completionHandler: nil)
         return true
     }
     
     func action(for url: URL) -> Action? {
-        return universalLinkAction(url: url) ?? deepLinkAction(url: url)
+        if isUniversalLink(url: url) {
+            for handler in handlers {
+                if let action = handler.universalLinkAction(url: url) {
+                    return action
+                }
+            }
+        } else if isDeepLink(url: url) {
+            for handler in handlers {
+                if let action = handler.deepLinkAction(url: url) {
+                    return action
+                }
+            }
+        }
+        
+        return nil
     }
     
-    func universalLinkAction(url: URL) -> Action? {
+    func isUniversalLink(url: URL) -> Bool {
         guard let scheme = url.scheme, ["http", "https"].contains(scheme) else {
-            return nil
+            return false
         }
 
         guard let host = url.host, associatedDomains.contains(host) else {
-            return nil
+            return false
         }
         
-        return UniversalLinkAction(url: url)
+        return true
     }
 
-    func deepLinkAction(url: URL) -> Action? {
-        guard let scheme = url.scheme, urlSchemes.contains(scheme) else {
-            return nil
+    func isDeepLink(url: URL) -> Bool {
+        guard let scheme = url.scheme else {
+            return false
         }
 
-        guard let host = url.host, let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            return nil
-        }
-
-        switch host {
-        case "presentExperience":
-            guard let queryItem = components.queryItems?.first(where: { $0.name == "campaignID" }), let value = queryItem.value else {
-                return nil
-            }
-            
-            let campaignID = ID(rawValue: value)
-            return DeepLinkAction.presentExperience(campaignID: campaignID)
-        case "presentNotificationCenter":
-            return DeepLinkAction.presentNotificationCenter
-        default:
-            return nil
-        }
+        return urlSchemes.contains(scheme)
     }
 }

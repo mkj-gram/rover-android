@@ -9,19 +9,11 @@ import {
     GraphQLNonNull,
     GraphQLObjectType,
     GraphQLString,
-    GraphQLUnionType,
-    graphql
+    GraphQLUnionType
 } from 'graphql'
 
 import GraphQLJSON from 'graphql-type-json'
-
-import { 
-    GoToScreenAction, 
-    OpenURLAction, 
-    PresentExperienceAction, 
-    PresentNotificationCenterAction, 
-    PresentWebsiteAction 
-} from './Action'
+import URL from './URL'
 
 const Background = new GraphQLObjectType({
     name: 'Background',
@@ -114,9 +106,6 @@ export const BarcodeBlock = new GraphQLObjectType({
     name: 'BarcodeBlock',
     interfaces: () => [Block],
     fields: () => ({
-        action: {
-            type: BlockAction
-        },
         background: {
             type: new GraphQLNonNull(Background)
         },
@@ -138,6 +127,9 @@ export const BarcodeBlock = new GraphQLObjectType({
         position: {
             type: new GraphQLNonNull(Position)
         },
+        tapBehavior: {
+            type: new GraphQLNonNull(BlockTapBehavior)
+        },
         keys: {
             type: new GraphQLNonNull(GraphQLJSON)
         },
@@ -150,9 +142,6 @@ export const BarcodeBlock = new GraphQLObjectType({
 const Block = new GraphQLInterfaceType({
     name: 'Block',
     fields: () => ({
-        action: {
-            type: BlockAction
-        },
         background: {
             type: new GraphQLNonNull(Background)
         },
@@ -170,6 +159,9 @@ const Block = new GraphQLInterfaceType({
         },
         position: {
             type: new GraphQLNonNull(Position)
+        },
+        tapBehavior: {
+            type: new GraphQLNonNull(BlockTapBehavior)
         },
         keys: {
             type: new GraphQLNonNull(GraphQLJSON)
@@ -196,21 +188,64 @@ const Block = new GraphQLInterfaceType({
     }
 })
 
-const BlockAction = new GraphQLUnionType({
-    name: 'BlockAction',
-    types: () => [GoToScreenAction, OpenURLAction, PresentExperienceAction, PresentNotificationCenterAction, PresentWebsiteAction],
+export const GoToScreenBlockTapBehavior = new GraphQLObjectType({
+    name: 'GoToScreenBlockTapBehavior',
+    description: 'A tap behavior indicating the experience should navigate to a new screen when the block is tapped',
+    fields: () => ({
+        screenID: {
+            type: new GraphQLNonNull(GraphQLString)
+        }
+    })
+})
+
+export const NoneBlockTapBehavior = new GraphQLObjectType({
+    name: 'NoneBlockTapBehavior',
+    description: 'A tap behavior indicating no action should be taken when the block is tapped',
+    fields: () => ({
+        placeholder: {
+            type: new GraphQLNonNull(GraphQLString),
+            description: 'This property should not be used. It is simply a placeholder because GraphQL does not permit types without any fields.',
+            resolve: () => 'placeholder'
+        }
+    })
+})
+
+export const OpenURLBlockTapBehavior = new GraphQLObjectType({
+    name: 'OpenURLBlockTapBehavior',
+    description: 'A tap behavior indicating a URL (website or deep link) should be opened when the block is tapped',
+    fields: () => ({
+        url: {
+            type: new GraphQLNonNull(URL)
+        },
+        dismiss: {
+            type: new GraphQLNonNull(GraphQLBoolean)
+        }
+    })
+})
+
+export const PresentWebsiteBlockTapBehavior = new GraphQLObjectType({
+    name: 'PresentWebsiteBlockTapBehavior',
+    description: 'A tap behavior indicating a website should be presented within the app when the block is tapped',
+    fields: () => ({
+        url: {
+            type: new GraphQLNonNull(URL)
+        }
+    })
+})
+
+const BlockTapBehavior = new GraphQLUnionType({
+    name: 'BlockTapBehavior',
+    types: () => [GoToScreenBlockTapBehavior, NoneBlockTapBehavior, OpenURLBlockTapBehavior, PresentWebsiteBlockTapBehavior],
     resolveType: data => {
         switch (data['__typename']) {
-            case 'GoToScreenAction':
-                return GoToScreenAction
-            case 'OpenURLAction':
-                return OpenURLAction
-            case 'PresentExperienceAction':
-                return PresentExperienceAction
-            case 'PresentNotificationCenterAction':
-                return PresentNotificationCenterAction
-            case 'PresentWebsiteAction':
-                return PresentWebsiteAction
+            case 'GoToScreenBehavior':
+                return GoToScreenBehavior
+            case 'NoneBlockTapBehavior':
+                return NoneBlockTapBehavior
+            case 'OpenURLBehavior':
+                return OpenURLBehavior
+            case 'PresentWebsiteBlockTapBehavior':
+                return PresentWebsiteBlockTapBehavior
         }
     }
 })
@@ -234,9 +269,6 @@ export const ButtonBlock = new GraphQLObjectType({
     name: 'ButtonBlock',
     interfaces: () => [Block],
     fields: () => ({
-        action: {
-            type: BlockAction
-        },
         background: {
             type: new GraphQLNonNull(Background)
         },
@@ -254,6 +286,9 @@ export const ButtonBlock = new GraphQLObjectType({
         },
         position: {
             type: new GraphQLNonNull(Position)
+        },
+        tapBehavior: {
+            type: new GraphQLNonNull(BlockTapBehavior)
         },
         text: {
             type: new GraphQLNonNull(Text)
@@ -369,9 +404,6 @@ export const ImageBlock = new GraphQLObjectType({
     name: 'ImageBlock',
     interfaces: () => [Block],
     fields: () => ({
-        action: {
-            type: BlockAction
-        },
         background: {
             type: new GraphQLNonNull(Background)
         },
@@ -392,6 +424,9 @@ export const ImageBlock = new GraphQLObjectType({
         },
         position: {
             type: new GraphQLNonNull(Position)
+        },
+        tapBehavior: {
+            type: new GraphQLNonNull(BlockTapBehavior)
         },
         keys: {
             type: new GraphQLNonNull(GraphQLJSON)
@@ -583,9 +618,6 @@ export const RectangleBlock = new GraphQLObjectType({
     name: 'RectangleBlock',
     interfaces: () => [Block],
     fields: () => ({
-        action: {
-            type: BlockAction
-        },
         background: {
             type: new GraphQLNonNull(Background)
         },
@@ -603,6 +635,9 @@ export const RectangleBlock = new GraphQLObjectType({
         },
         position: {
             type: new GraphQLNonNull(Position)
+        },
+        tapBehavior: {
+            type: new GraphQLNonNull(BlockTapBehavior)
         },
         keys: {
             type: new GraphQLNonNull(GraphQLJSON)
@@ -812,9 +847,6 @@ export const TextBlock = new GraphQLObjectType({
     name: 'TextBlock',
     interfaces: () => [Block],
     fields: () => ({
-        action: {
-            type: BlockAction
-        },
         background: {
             type: new GraphQLNonNull(Background)
         },
@@ -832,6 +864,9 @@ export const TextBlock = new GraphQLObjectType({
         },
         position: {
             type: new GraphQLNonNull(Position)
+        },
+        tapBehavior: {
+            type: new GraphQLNonNull(BlockTapBehavior)
         },
         text: {
             type: new GraphQLNonNull(Text)
@@ -861,9 +896,6 @@ export const WebViewBlock = new GraphQLObjectType({
     name: 'WebViewBlock',
     interfaces: () => [Block],
     fields: () => ({
-        action: {
-            type: BlockAction
-        },
         background: {
             type: new GraphQLNonNull(Background)
         },
@@ -881,6 +913,9 @@ export const WebViewBlock = new GraphQLObjectType({
         },
         position: {
             type: new GraphQLNonNull(Position)
+        },
+        tapBehavior: {
+            type: new GraphQLNonNull(BlockTapBehavior)
         },
         webView: {
             type: new GraphQLNonNull(WebView)

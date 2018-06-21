@@ -4,14 +4,6 @@ import Mutation from './Mutation'
 import Query from './Query'
 
 import {
-    AddNotificationAction,
-    GoToScreenAction,
-    OpenURLAction,
-    PresentExperienceAction,
-    PresentWebsiteAction
-} from './Action'
-
-import {
     AutomatedNotificationCampaign,
     ScheduledNotificationCampaign
 } from './Campaign'
@@ -19,11 +11,21 @@ import {
 import {
     BarcodeBlock,
     ButtonBlock,
+    GoToScreenBlockTapBehavior,
     ImageBlock,
+    NoneBlockTapBehavior,
+    OpenURLBlockTapBehavior,
+    PresentWebsiteBlockTapBehavior,
     RectangleBlock,
     TextBlock,
     WebViewBlock
 } from './Experience'
+
+import {
+    OpenAppNotificationTapBehavior,
+    OpenURLNotificationTapBehavior,
+    PresentWebsiteNotificationTapBehavior
+} from './Notification'
 
 import {
     BooleanPredicate,
@@ -40,7 +42,6 @@ const schema = new GraphQLSchema({
     query: Query,
     mutation: Mutation,
     types: [
-        AddNotificationAction,
         AutomatedNotificationCampaign,
         BarcodeBlock,
         BooleanPredicate,
@@ -48,12 +49,15 @@ const schema = new GraphQLSchema({
         DatePredicate,
         FloatPredicate,
         GeofencePredicate,
-        GoToScreenAction,
+        GoToScreenBlockTapBehavior,
         ImageBlock,
+        NoneBlockTapBehavior,
         NumberPredicate,
-        OpenURLAction,
-        PresentExperienceAction,
-        PresentWebsiteAction,
+        OpenAppNotificationTapBehavior,
+        OpenURLBlockTapBehavior,
+        OpenURLNotificationTapBehavior,
+        PresentWebsiteBlockTapBehavior,
+        PresentWebsiteNotificationTapBehavior,
         RectangleBlock,
         ScheduledNotificationCampaign,
         StringArrayPredicate,

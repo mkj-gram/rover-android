@@ -3,7 +3,7 @@ package push
 import (
 	"encoding/json"
 	"time"
-
+	"fmt"
 	"github.com/roverplatform/rover/notification/scylla"
 )
 
@@ -12,7 +12,7 @@ type Attachment struct {
 	Url  string `json:"url"`
 }
 
-type actionInfo struct {
+type tapBehaviorInfo struct {
 	tapBehaviorType             string
 	campaignId                  int
 	tapBehaviorPresentationType string
@@ -24,44 +24,48 @@ type actionInfo struct {
 // see rover/protos/campaigns/v1/campaigns.proto:58
 // and graphql-gateway/src/grpc/notification/getNotificationFromProto.js
 // for mappings
-func (action *actionInfo) MarshalJSON() ([]byte, error) {
+func (tapBehavior *tapBehaviorInfo) MarshalJSON() ([]byte, error) {
 	type M = map[string]interface{}
 	var payload M
 
-	switch action.tapBehaviorType {
+	switch tapBehavior.tapBehaviorType {
 	// 0
 	case string(scylla.TapBehaviorType_OPEN_EXPERIENCE):
 		payload = M{
-			"__typename": "PresentExperienceAction",
-			"campaignID": action.campaignId,
+			"__typename": "OpenURLNotificationTapBehavior",
+			"url": fmt.Sprintf("rv-inbox://presentExperience?campaignID=%d", tapBehavior.campaignId),
 		}
 		// 1
 	case string(scylla.TapBehaviorType_OPEN_APP):
-		payload = nil
+		payload = M{
+			"__typename": "OpenAppNotificationTapBehavior",
+		}
 		// 2
 	case string(scylla.TapBehaviorType_OPEN_DEEP_LINK):
 		payload = M{
-			"__typename": "OpenURLAction",
-			"url":        action.tapBehaviorUrl,
+			"__typename": "OpenURLNotificationTapBehavior",
+			"url":        tapBehavior.tapBehaviorUrl,
 		}
 		// 3
 	case string(scylla.TapBehaviorType_OPEN_WEBSITE):
-		switch action.tapBehaviorPresentationType {
+		switch tapBehavior.tapBehaviorPresentationType {
 		case string(scylla.TapBehaviorPresentationType_IN_BROWSER):
 			payload = M{
-				"__typename": "OpenURLAction",
-				"url":        action.tapBehaviorUrl,
+				"__typename": "OpenURLNotificationTapBehavior",
+				"url":        tapBehavior.tapBehaviorUrl,
 			}
 
 		default:
 			payload = M{
-				"__typename": "PresentWebsiteAction",
-				"url":        action.tapBehaviorUrl,
+				"__typename": "PresentWebsiteNotificationTapBehavior",
+				"url":        tapBehavior.tapBehaviorUrl,
 			}
 		}
 
 	default:
-		payload = nil
+		payload = M{
+			"__typename": "OpenAppNotificationTapBehavior",
+		}
 	}
 
 	return json.Marshal(payload)
@@ -69,13 +73,13 @@ func (action *actionInfo) MarshalJSON() ([]byte, error) {
 
 type RoverNotification struct {
 	Id         string `json:"id"`
-	CampaignID int32  `json:"campaignID"`
+	CampaignID string  `json:"campaignID"`
 
 	Title string `json:"title"`
 	Body  string `json:"body"`
 
 	Attachment *Attachment `json:"attachment,omitempty"`
-	Action     *actionInfo `json:"action,omitempty"`
+	TapBehavior *tapBehaviorInfo `json:"tapBehavior"`
 
 	DeliveredAt time.Time  `json:"deliveredAt"`
 	ExpiresAt   *time.Time `json:"expiresAt"`
@@ -89,7 +93,7 @@ func ToRoverNotification(settings *scylla.NotificationSettings, note *scylla.Not
 	rn := &RoverNotification{
 		Id: note.Id.String(),
 
-		CampaignID: note.CampaignId,
+		CampaignID: fmt.Sprintf("%d", note.CampaignId),
 
 		Title: note.Title,
 		Body:  note.Body,
@@ -97,7 +101,7 @@ func ToRoverNotification(settings *scylla.NotificationSettings, note *scylla.Not
 		// see below
 		Attachment: nil,
 
-		Action: &actionInfo{
+		TapBehavior: &tapBehaviorInfo{
 			tapBehaviorPresentationType: string(settings.TapBehaviorPresentationType),
 			tapBehaviorUrl:              settings.TapBehaviorUrl,
 			campaignId:                  int(settings.CampaignId),

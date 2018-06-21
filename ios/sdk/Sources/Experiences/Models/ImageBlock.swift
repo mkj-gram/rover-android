@@ -7,7 +7,6 @@
 //
 
 public struct ImageBlock: Block {
-    public var action: BlockAction?
     public var background: Background
     public var border: Border
     public var id: ID
@@ -15,11 +14,11 @@ public struct ImageBlock: Block {
     public var insets: Insets
     public var opacity: Double
     public var position: Position
+    public var tapBehavior: BlockTapBehavior
     public var keys: [String: String]
     public var tags: [String]
     
-    public init(action: BlockAction?, background: Background, border: Border, id: ID, image: Image, insets: Insets, opacity: Double, position: Position, keys: [String: String], tags: [String]) {
-        self.action = action
+    public init(background: Background, border: Border, id: ID, image: Image, insets: Insets, opacity: Double, position: Position, tapBehavior: BlockTapBehavior, keys: [String: String], tags: [String]) {
         self.background = background
         self.border = border
         self.id = id
@@ -27,6 +26,7 @@ public struct ImageBlock: Block {
         self.insets = insets
         self.opacity = opacity
         self.position = position
+        self.tapBehavior = tapBehavior
         self.keys = keys
         self.tags = tags
     }

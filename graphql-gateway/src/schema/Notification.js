@@ -3,7 +3,6 @@ import {
     GraphQLEnumType,
     GraphQLID,
     GraphQLInputObjectType,
-    GraphQLList,
     GraphQLNonNull,
     GraphQLString,
     GraphQLObjectType,
@@ -11,7 +10,7 @@ import {
 } from 'graphql'
 
 import { GraphQLDateTime } from 'graphql-iso-date'
-import { OpenURLAction, PresentExperienceAction, PresentWebsiteAction } from './Action'
+import URL from './URL'
 
 const Notification = new GraphQLObjectType({
     name: 'Notification',
@@ -31,8 +30,8 @@ const Notification = new GraphQLObjectType({
         attachment: {
             type: NotificationAttachment
         },
-        action: {
-            type: NotificationAction
+        tapBehavior: {
+            type: new GraphQLNonNull(NotificationTapBehavior)
         },
         deliveredAt: {
             type: new GraphQLNonNull(GraphQLDateTime)
@@ -50,21 +49,6 @@ const Notification = new GraphQLObjectType({
             type: new GraphQLNonNull(GraphQLBoolean)
         }
     })
-})
-
-const NotificationAction = new GraphQLUnionType({
-    name: 'NotificationAction',
-    types: () => [OpenURLAction, PresentExperienceAction, PresentWebsiteAction],
-    resolveType: data => {
-        switch (data['__typename']) {
-            case 'OpenURLAction':
-                return OpenURLAction
-            case 'PresentExperienceAction':
-                return PresentExperienceAction
-            case 'PresentWebsiteAction':
-                return PresentWebsiteAction
-        }
-    }
 })
 
 export const NotificationAttachment = new GraphQLObjectType({
@@ -98,6 +82,56 @@ const NotificationAttachmentType = new GraphQLEnumType({
         IMAGE: { value: 'image' },
         VIDEO: { value: 'video' }
     }
+})
+
+const NotificationTapBehavior = new GraphQLUnionType({
+    name: 'NotificationTapBehavior',
+    types: () => [OpenAppNotificationTapBehavior, OpenURLNotificationTapBehavior, PresentWebsiteNotificationTapBehavior],
+    resolveType: data => {
+        switch (data['__typename']) {
+            case 'OpenAppNotificationTapBehavior':
+                return OpenAppNotificationTapBehavior
+            case 'OpenURLNotificationTapBehavior':
+                return OpenURLNotificationTapBehavior
+            case 'PresentWebsiteNotificationTapBehavior':
+                return PresentWebsiteNotificationTapBehavior
+        }
+    }
+})
+
+export const OpenAppNotificationTapBehavior = new GraphQLObjectType({
+    name: 'OpenAppNotificationTapBehavior',
+    description: 'A tap behavior indicating the app should be opened when the notification is tapped, but no further action is required',
+    fields: () => ({
+        placeholder: {
+            type: new GraphQLNonNull(GraphQLString),
+            description: 'This property should not be used. It is simply a placeholder because GraphQL does not permit types without any fields.',
+            resolve: () => 'placeholder'
+        }
+    })
+})
+
+export const OpenURLNotificationTapBehavior = new GraphQLObjectType({
+    name: 'OpenURLNotificationTapBehavior',
+    description: 'A tap behavior indicating a URL (website or deep link) should be opened when the notification is tapped',
+    fields: () => ({
+        url: {
+            type: new GraphQLNonNull(URL)
+        },
+        dismiss: {
+            type: new GraphQLNonNull(GraphQLBoolean)
+        }
+    })
+})
+
+export const PresentWebsiteNotificationTapBehavior = new GraphQLObjectType({
+    name: 'PresentWebsiteNotificationTapBehavior',
+    description: 'A tap behavior indicating a website should be presented within the app when the notification is tapped',
+    fields: () => ({
+        url: {
+            type: new GraphQLNonNull(URL)
+        }
+    })
 })
 
 export default Notification

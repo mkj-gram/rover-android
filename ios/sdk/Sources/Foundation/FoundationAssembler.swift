@@ -19,8 +19,7 @@ public struct FoundationAssembler: Assembler {
         
         container.register(Dispatcher.self) { resolver in
             let logger = resolver.resolve(Logger.self)!
-            let operationQueue = OperationQueue()
-            return DispatcherService(logger: logger, operationQueue: operationQueue, resolver: resolver)
+            return DispatcherService(logger: logger)
         }
         
         // MARK: Logger

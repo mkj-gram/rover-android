@@ -7,15 +7,12 @@ fragment notificationFields on Notification {
         type
         url
     }
-    action {
+    tapBehavior {
         __typename
-        ...on OpenURLAction {
+        ... on OpenURLNotificationTapBehavior {
             url
         }
-        ...on PresentExperienceAction {
-            campaignID
-        }
-        ...on PresentWebsiteAction {
+        ... on PresentWebsiteNotificationTapBehavior {
             url
         }
     }

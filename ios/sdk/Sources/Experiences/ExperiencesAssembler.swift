@@ -13,6 +13,18 @@ public struct ExperiencesAssembler: Assembler {
     
     public func assemble(container: Container) {
         
+        // MARK: Action (presentExperience)
+        
+        container.register(Action.self, name: "presentExperience", scope: .transient) { (resolver, campaignID: ID) in
+            let identifier = ExperienceIdentifier.campaignID(id: campaignID)
+            return resolver.resolve(Action.self, name: "presentExperience", arguments: identifier)!
+        }
+        
+        container.register(Action.self, name: "presentExperience", scope: .transient) { (resolver, identifier: ExperienceIdentifier) in
+            let viewControllerToPresent = resolver.resolve(UIViewController.self, name: "experience", arguments: identifier)!
+            return resolver.resolve(Action.self, name: "presentView", arguments: viewControllerToPresent)!
+        }
+        
         // MARK: ExperienceStore
         
         container.register(ExperienceStore.self) { resolver in
@@ -21,32 +33,12 @@ public struct ExperiencesAssembler: Assembler {
             return ExperienceStoreService(client: client, logger: logger)
         }
         
-        // MARK: Operation (goToScreen)
+        // MARK: RouteHandler (experience)
         
-        container.register(Operation.self, name: "goToScreen", scope: .transient) { (resolver, screenID: ID) in
-            return GoToScreenOperation(screenID: screenID, viewControllerProvider: { (experience, screen) in
-                return resolver.resolve(UIViewController.self, name: "screen", arguments: experience, screen)!
+        container.register(RouteHandler.self, name: "experience") { resolver in
+            return ExperienceRouteHandler(actionProvider: { identifier in
+                return resolver.resolve(Action.self, name: "presentExperience", arguments: identifier)!
             })
-        }
-        
-        // MARK: Operation (presentExperience)
-        
-        container.register(Operation.self, name: "presentExperience", scope: .transient) { (resolver, campaignID: ID) in
-            let identifier = ExperienceIdentifier.campaignID(id: campaignID)
-            return resolver.resolve(Operation.self, name: "presentExperience", arguments: identifier)!
-        }
-        
-        container.register(Operation.self, name: "presentExperience", scope: .transient) { (resolver, identifier: ExperienceIdentifier) in
-            let viewControllerToPresent = resolver.resolve(UIViewController.self, name: "experience", arguments: identifier)!
-            let logger = resolver.resolve(Logger.self)!
-            return PresentViewOperation(viewControllerToPresent: viewControllerToPresent, animated: true, logger: logger)
-        }
-        
-        // MARK: Operation (universalLink)
-        
-        container.register(Operation.self, name: "universalLink", scope: .transient) { (resolver, url: URL) in
-            let identifier = ExperienceIdentifier.campaignURL(url: url)
-            return resolver.resolve(Operation.self, name: "presentExperience", arguments: identifier)!
         }
         
         // MARK: UICollectionViewLayout (screen)
@@ -79,12 +71,28 @@ public struct ExperiencesAssembler: Assembler {
         // MARK: UIViewController (screen)
         
         container.register(UIViewController.self, name: "screen", scope: .transient) { (resolver, experience: Experience, screen: Screen) in
-            let collectionViewLayout = resolver.resolve(UICollectionViewLayout.self, name: "screen", arguments: screen)!
-            let dispatcher = resolver.resolve(Dispatcher.self)!
-            let eventQueue = resolver.resolve(EventQueue.self)
-            let imageStore = resolver.resolve(ImageStore.self)!
-            let sessionController = resolver.resolve(SessionController.self)!
-            return ScreenViewController(collectionViewLayout: collectionViewLayout, experience: experience, screen: screen, dispatcher: dispatcher, eventQueue: eventQueue, imageStore: imageStore, sessionController: sessionController)
+            return ScreenViewController(
+                collectionViewLayout: resolver.resolve(UICollectionViewLayout.self, name: "screen", arguments: screen)!,
+                experience: experience,
+                screen: screen,
+                dispatcher: resolver.resolve(Dispatcher.self)!,
+                eventQueue: resolver.resolve(EventQueue.self),
+                imageStore: resolver.resolve(ImageStore.self)!,
+                sessionController: resolver.resolve(SessionController.self)!,
+                viewControllerProvider: { (experience, screen) in
+                    return resolver.resolve(UIViewController.self, name: "screen", arguments: experience, screen)!
+                },
+                presentWebsiteActionProvider: { url in
+                    return resolver.resolve(Action.self, name: "presentWebsite", arguments: url)!
+                }
+            )
+        }
+    }
+    
+    public func containerDidAssemble(resolver: Resolver) {
+        if let router = resolver.resolve(Router.self) {
+            let handler = resolver.resolve(RouteHandler.self, name: "experience")!
+            router.addHandler(handler)
         }
     }
 }

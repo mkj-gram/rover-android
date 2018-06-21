@@ -41,8 +41,7 @@ func ToFCMRequest(m notification_pubsub.Message, settings *scylla.NotificationSe
 			}
 		} else {
 			payload = M{
-				"action": M{
-					"__typename":   "AddNotificationAction",
+				"rover": M{
 					"notification": ToRoverNotification(settings, note),
 				},
 			}
