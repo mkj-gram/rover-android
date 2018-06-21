@@ -60,6 +60,7 @@ class SelectableList extends React.Component<
                         }
                     >
                         {child}
+
                         <div
                             style={{
                                 height: 1,

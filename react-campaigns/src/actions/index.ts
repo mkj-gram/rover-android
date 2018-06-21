@@ -66,8 +66,14 @@ export const renameCampaign = (name: string, campaignId: number) =>
 export const duplicateCampaign = (name: string, campaignId: number) =>
     campaignsActions.duplicateCampaign(name, campaignId)
 
+export const duplicateListViewCampaign = (name: string, campaignId: number) =>
+    campaignsActions.duplicateListViewCampaign(name, campaignId)
+
 export const archiveCampaign = (campaignId: number) =>
     campaignsActions.archiveCampaign(campaignId)
+
+export const archiveListViewCampaign = (campaignId: number) =>
+    campaignsActions.archiveListViewCampaign(campaignId)
 
 export const updateNotificationSettings = () =>
     campaignsActions.updateNotificationSettings()

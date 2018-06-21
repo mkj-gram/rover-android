@@ -72,3 +72,20 @@ export const getFormatDate = (campaign: Campaign, dateField: string) => {
     }
     return formatDate(date)
 }
+
+export const getDuplicateCampaignName = (campaign: Campaign) => {
+    const { name } = campaign
+    const duplicatedCampaignRegEx = /copy\s?\d*$/
+
+    if (!duplicatedCampaignRegEx.exec(name)) {
+        return `${name} copy`
+    } else {
+        const copyNumber = /\d*$/.exec(name)[0]
+        if (!copyNumber) {
+            return `${name} 2`
+        } else {
+            const newCopyNumber = (parseInt(copyNumber, 10) + 1).toString()
+            return name.replace(/\d*$/, newCopyNumber)
+        }
+    }
+}

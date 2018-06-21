@@ -10,7 +10,6 @@ import {
     charcoal,
     GearIcon,
     green,
-    MoreIcon,
     ProgressBar,
     red,
     steel,
@@ -29,6 +28,8 @@ import {
     isScheduledCampaign,
     isAutomatedNotificationCampaign
 } from '../utils/getCampaignType'
+
+import CampaignsListShowMorePopover from './CampaignsListShowMorePopover'
 
 export interface Props {
     campaigns: StringMap<Campaign>
@@ -210,12 +211,7 @@ const renderCampaignProgressState = (
     getDisplayTime: (campaign: Campaign, timeField: string) => string
 ) => {
     if (isScheduledCampaign(campaign)) {
-        const {
-            scheduledDate,
-            scheduledTime,
-            scheduledUseLocalDeviceTime,
-            scheduledTimeZone
-        } = campaign
+        const { scheduledUseLocalDeviceTime, scheduledTimeZone } = campaign
 
         // tslint:disable-next-line:switch-default
         switch (campaign.scheduledDeliveryStatus) {
@@ -468,6 +464,7 @@ const renderListButtons = (
     pushToOverview: (campaignId: string) => void
 ) => {
     const { campaignId, campaignStatus } = campaign
+
     if (campaignStatus === 'DRAFT') {
         return (
             <Button
@@ -487,6 +484,9 @@ const renderListButtons = (
                       height="20"
                       width="20"
                       viewBox="0 0 24 24"
+                      style={{
+                          marginRight: 8
+                      }}
                   />
               ))
             : (icon = (
@@ -495,6 +495,9 @@ const renderListButtons = (
                       height="20"
                       width="20"
                       viewBox="0 0 24 24"
+                      style={{
+                          marginRight: 8
+                      }}
                   />
               ))
     }
@@ -507,6 +510,9 @@ const renderListButtons = (
                       height="20"
                       width="20"
                       viewBox="0 0 24 24"
+                      style={{
+                          marginRight: 8
+                      }}
                   />
               ))
             : (icon = (
@@ -515,17 +521,18 @@ const renderListButtons = (
                       height="20"
                       width="20"
                       viewBox="0 0 24 24"
+                      style={{
+                          marginRight: 8
+                      }}
                   />
               ))
     }
     return (
         <div style={{ flex: 'none', width: 48 }}>
             {icon}
-            <MoreIcon
-                fill={charcoal}
-                height="20"
-                width="20"
-                viewBox="0 0 24 24"
+            <CampaignsListShowMorePopover
+                campaign={campaign}
+                device="Desktop"
             />
         </div>
     )

@@ -8,9 +8,9 @@ import {
     archiveCampaign,
     createEditableCampaign
 } from '../../../actions'
-import { getCampaign } from '../../../reducers'
+import { getCampaign, getDuplicateCampaignName } from '../../../reducers'
 import { handleCloseOverviewModalDisplay } from '../../../actions'
-import { Link } from 'react-router-dom'
+
 import * as H from 'history'
 
 import {
@@ -19,8 +19,7 @@ import {
     CloseIcon,
     MoreIcon,
     Text,
-    PopoverContainer,
-    titanium
+    PopoverContainer
 } from '@rover/ts-bootstrap/dist/src'
 
 import ShowMorePopoverChildren from '../../utils/ShowMorePopoverChildren'
@@ -52,6 +51,7 @@ export interface DispatchProps {
 export type StateProps = {
     campaignName: string
     campaignType: string
+    getDuplicateCampaignName: () => string
 }
 
 class OverviewModalHeader extends React.Component<
@@ -108,29 +108,11 @@ class OverviewModalHeader extends React.Component<
 
     handleShowMoreSelection(val: string) {
         const {
-            campaignName,
             campaignId,
             archiveCampaign,
-            duplicateCampaign
+            duplicateCampaign,
+            getDuplicateCampaignName
         } = this.props
-
-        const getDuplicateCampaignName = () => {
-            const duplicatedCampaignRegEx = /copy\s?\d*$/
-
-            if (!duplicatedCampaignRegEx.exec(campaignName)) {
-                return `${campaignName} copy`
-            } else {
-                const copyNumber = /\d*$/.exec(campaignName)[0]
-                if (!copyNumber) {
-                    return `${campaignName} 2`
-                } else {
-                    const newCopyNumber = (
-                        parseInt(copyNumber, 10) + 1
-                    ).toString()
-                    return campaignName.replace(/\d*$/, newCopyNumber)
-                }
-            }
-        }
 
         if (val === 'Rename') {
             this.setState({
@@ -201,13 +183,7 @@ class OverviewModalHeader extends React.Component<
     }
 
     render() {
-        const {
-            campaignName,
-            campaignType,
-            onExit,
-            onMore,
-            device
-        } = this.props
+        const { campaignType, device } = this.props
 
         const { name, rename, showPopover } = this.state
 
@@ -352,7 +328,8 @@ const mapStateToProps = (
 
     return {
         campaignName: campaign.name,
-        campaignType: campaign.campaignType
+        campaignType: campaign.campaignType,
+        getDuplicateCampaignName: () => getDuplicateCampaignName(campaign)
     }
 }
 

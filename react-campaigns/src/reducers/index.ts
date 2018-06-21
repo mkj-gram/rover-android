@@ -121,6 +121,9 @@ export const getCampaignDisplayTime = (state: Campaign, timeField: string) =>
 export const getCampaignFormatDate = (state: Campaign, dateField: string) =>
     campaignsSelector.getFormatDate(state, dateField)
 
+export const getDuplicateCampaignName = (campaign: Campaign) =>
+    campaignsSelector.getDuplicateCampaignName(campaign)
+
 // Editable Campaign
 // Active Popover
 export const getActivePopover = (state: State) =>

@@ -451,6 +451,116 @@ export const fetchCampaign: ActionCreator<
     )
 }
 
+export const duplicateListViewCampaign: ActionCreator<
+    ThunkAction<Promise<Action | void>, State, void>
+> = (name: string, campaignId: number) => (
+    dispatch: Dispatch<State>,
+    getState: () => State
+): Promise<Action | void> => {
+    const query: DocumentNode = gql`
+        mutation DuplicateCampaign($name: String!, $campaignId: Int!) {
+            duplicateCampaign(name: $name, campaignId: $campaignId) {
+                campaignId
+                name
+                campaignType
+                campaignStatus
+                UIState
+                ... on NotificationCampaign {
+                    experienceId
+                    notificationTitle
+                    notificationBody
+                    notificationAttachment {
+                        type
+                        url
+                    }
+                    notificationTapBehaviorType
+                    notificationTapPresentationType
+                    notificationTapBehaviorUrl
+                    notificationIosContentAvailable
+                    notificationIosMutableContent
+                    notificationIosSound
+                    notificationIosCategoryIdentifier
+                    notificationIosThreadIdentifier
+                    notificationAndroidChannelId
+                    notificationAndroidSound
+                    notificationAndroidTag
+                    notificationExpiration
+                    notificationAttributesMap
+                    notificationAlertOptionPushNotification
+                    notificationAlertOptionNotificationCenter
+                    notificationAlertOptionBadgeNumber
+                }
+                ... on ScheduledNotificationCampaign {
+                    scheduledType
+                    scheduledTimeZone
+                    scheduledDate
+                    scheduledTime
+                    scheduledUseLocalDeviceTime
+                    scheduledDeliveryStatus
+                }
+                ... on SegmentableCampaign {
+                    segmentIds
+                    segmentCondition
+                }
+                ... on AutomatedNotificationCampaign {
+                    automatedMonday
+                    automatedTuesday
+                    automatedWednesday
+                    automatedThursday
+                    automatedFriday
+                    automatedSaturday
+                    automatedSunday
+                    automatedStartDate
+                    automatedEndDate
+                    automatedStartTime
+                    automatedEndTime
+                    automatedTimeZone
+                    automatedUseLocalDeviceTime
+                    automatedEventName
+                }
+            }
+        }
+    `
+
+    const request = {
+        query,
+        variables: {
+            name,
+            campaignId
+        }
+    }
+
+    return Environment(request).then(
+        ({ data, errors }) => {
+            if (errors) {
+                return handleError(
+                    'DUPLICATE_CAMPAIGN_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
+            } else {
+                const campaigns = {
+                    ...getState().campaigns,
+                    [data.duplicateCampaign.campaignId]: {
+                        ...data.duplicateCampaign
+                    }
+                }
+
+                return dispatch({
+                    type: 'DUPLICATE_CAMPAIGN_SUCCESS',
+                    campaigns
+                })
+            }
+        },
+        ({ result }) =>
+            handleError(
+                'DUPLICATE_CAMPAIGN_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
+    )
+}
+
 export const duplicateCampaign: ActionCreator<
     ThunkAction<Promise<number>, State, void>
 > = (name: string, campaignId: number) => (
@@ -695,6 +805,56 @@ export const archiveCampaign: ActionCreator<
                 }, 4000)
             }).then(res => Promise.resolve(false))
         }
+    )
+}
+
+export const archiveListViewCampaign: ActionCreator<
+    ThunkAction<Promise<Action | void>, State, void>
+> = (campaignId: number) => (
+    dispatch: Dispatch<State>,
+    getState: () => State
+): Promise<Action | void> => {
+    const query: DocumentNode = gql`
+        mutation ArchiveCampaign($campaignId: Int!) {
+            archiveCampaign(campaignId: $campaignId)
+        }
+    `
+
+    const request = {
+        query,
+        variables: {
+            campaignId
+        }
+    }
+
+    return Environment(request).then(
+        ({ errors }) => {
+            if (errors) {
+                return handleError(
+                    'ARCHIVE_CAMPAIGN_FAILURE',
+                    dispatch,
+                    errors[0].message
+                )
+            } else {
+                const campaigns = {
+                    ...getState().campaigns,
+                    [campaignId]: {
+                        ...getState().campaigns[campaignId],
+                        campaignStatus: 'ARCHIVED'
+                    }
+                }
+                return dispatch({
+                    type: 'ARCHIVE_CAMPAIGN_SUCCESS',
+                    campaigns
+                })
+            }
+        },
+        ({ result }) =>
+            handleError(
+                'ARCHIVE_CAMPAIGN_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
     )
 }
 
