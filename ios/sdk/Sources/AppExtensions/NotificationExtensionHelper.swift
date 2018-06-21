@@ -26,7 +26,7 @@ public class NotificationExtensionHelper {
         }
         
         struct Payload: Decodable {
-            struct Action: Decodable {
+            struct Rover: Decodable {
                 struct Notification: Decodable {
                     struct Attachment: Decodable {
                         var url: URL
@@ -36,10 +36,10 @@ public class NotificationExtensionHelper {
                     var attachment: Attachment?
                 }
                 
-                var notification: Notification?
+                var notification: Notification
             }
             
-            var action: Action
+            var rover: Rover
         }
         
         let decoder = JSONDecoder()
@@ -52,12 +52,7 @@ public class NotificationExtensionHelper {
             return
         }
         
-        guard let notification = payload.action.notification else {
-            
-            // This isn't an AddNotificationAction so there's no notification to track or modify
-            return
-        }
-        
+        let notification = payload.rover.notification
         setLastReceivedNotification(notificationID: notification.id)
         
         if let attachment = notification.attachment {

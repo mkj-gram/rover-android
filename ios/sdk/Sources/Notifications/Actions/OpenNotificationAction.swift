@@ -35,13 +35,16 @@ class OpenNotificationAction: Action {
         case .openApp:
             break
         case .openURL(let url):
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            DispatchQueue.main.sync {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
         case .presentWebsite(let url):
             let action = presentWebsiteActionProvider(url)
             produceAction(action)
         }
         
-        let eventInfo = notification.openedEvent()
+        let eventInfo = notification.openedEvent(source: .pushNotification)
         eventQueue.addEvent(eventInfo)
+        finish()
     }
 }

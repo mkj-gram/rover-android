@@ -21,6 +21,7 @@
 		DB1FBEFC2062C5EF00850D59 /* BluetoothAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB1FBEFB2062C5EF00850D59 /* BluetoothAssembler.swift */; };
 		DB1FBF292062D00A00850D59 /* BluetoothManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB1FBF282062D00A00850D59 /* BluetoothManager.swift */; };
 		DB1FBF2B2062D01400850D59 /* BluetoothManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB1FBF2A2062D01400850D59 /* BluetoothManagerService.swift */; };
+		DB496F5320DBECD800DF5949 /* NotificationSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB496F5220DBECD800DF5949 /* NotificationSource.swift */; };
 		DB6ADD6320B33EC0002F226C /* RoverUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD5A20B33EC0002F226C /* RoverUI.framework */; };
 		DB6ADD6820B33EC0002F226C /* RoverUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD6720B33EC0002F226C /* RoverUITests.swift */; };
 		DB6ADD6A20B33EC0002F226C /* RoverUI.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADD5C20B33EC0002F226C /* RoverUI.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -283,6 +284,7 @@
 		DB1FBEFB2062C5EF00850D59 /* BluetoothAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothAssembler.swift; sourceTree = "<group>"; };
 		DB1FBF282062D00A00850D59 /* BluetoothManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothManager.swift; sourceTree = "<group>"; };
 		DB1FBF2A2062D01400850D59 /* BluetoothManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothManagerService.swift; sourceTree = "<group>"; };
+		DB496F5220DBECD800DF5949 /* NotificationSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSource.swift; sourceTree = "<group>"; };
 		DB6ADD5A20B33EC0002F226C /* RoverUI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RoverUI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB6ADD5C20B33EC0002F226C /* RoverUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RoverUI.h; sourceTree = "<group>"; };
 		DB6ADD5D20B33EC0002F226C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -960,6 +962,7 @@
 			children = (
 				DBFB1A7C209B8CC500E99F9F /* Notification.swift */,
 				DBB78A3120DAD88900AF1A00 /* NotificationAttachment.swift */,
+				DB496F5220DBECD800DF5949 /* NotificationSource.swift */,
 				DBB78A2F20DAD7B400AF1A00 /* NotificationTapBehavior.swift */,
 			);
 			path = Models;
@@ -2136,6 +2139,7 @@
 				DBF49E0C203DE1F600B54652 /* Logger.swift in Sources */,
 				DBB89BE820D0415600DD797A /* Rover.swift in Sources */,
 				DBF49DF6203DE18500B54652 /* FoundationAssembler.swift in Sources */,
+				DB496F5320DBECD800DF5949 /* NotificationSource.swift in Sources */,
 				DBF49E0B203DE1F600B54652 /* LogLevel.swift in Sources */,
 				DBF49E07203DE1DE00B54652 /* ServiceScope.swift in Sources */,
 				DB9469392051E58400C8C3AE /* LoggerService.swift in Sources */,

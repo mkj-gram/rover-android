@@ -66,10 +66,11 @@ class InfluenceTrackerService: InfluenceTracker {
         }
         
         let attributes: Attributes = [
-            "notificationID": lastReceivedNotification.notificationID
+            "notificationID": lastReceivedNotification.notificationID,
+            "source": NotificationSource.influencedOpen.rawValue
         ]
         
-        let event = EventInfo(name: "Influenced Open", namespace: "rover", attributes: attributes)
+        let event = EventInfo(name: "Notification Opened", namespace: "rover", attributes: attributes)
         eventQueue.addEvent(event)
     }
 }

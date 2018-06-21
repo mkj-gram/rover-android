@@ -294,7 +294,7 @@ extension NotificationCenterViewController: UITableViewDelegate {
             dispatcher.dispatch(action, completionHandler: nil)
         }
         
-        let eventInfo = notification.openedEvent()
+        let eventInfo = notification.openedEvent(source: .notificationCenter)
         eventQueue.addEvent(eventInfo)
     }
     
