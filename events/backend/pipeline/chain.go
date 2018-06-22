@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"github.com/pkg/errors"
 	"github.com/roverplatform/rover/apis/go/event/v1"
 )
 
@@ -26,7 +27,7 @@ func (c chain) Handle(ctx Context, e *event.Event) error {
 	for _, handler := range c.handlers {
 		err = handler.Handle(ctx, e)
 		if err != nil {
-			return err
+			return errors.Wrap(err, c.name)
 		}
 	}
 

@@ -216,7 +216,7 @@ func TestNewTracker(t *testing.T) {
 				test.mock(repo)
 			}
 
-			var gotErr = errors.Cause(tracker.NewTracker(repo).Handle(ctx, test.req))
+			var gotErr = errors.Cause(tracker.NewTracker(repo, 10).Handle(ctx, test.req))
 			if diff := rtesting.Diff(test.exp, test.req, test.expErr, gotErr); diff != nil {
 				t.Fatal(rtesting.Difff(diff))
 			}

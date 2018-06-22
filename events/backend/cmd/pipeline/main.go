@@ -61,6 +61,11 @@ var (
 	// Device
 	//
 	deviceModelNameJSONMapPath = flag.String("device-model-name-map-path", "", "device model name to marketing name json map file path")
+
+	//
+	// Schema
+	//
+	schemaCacheSize = flag.Int("schema-cache-size", 1000, "number of event schemas to keep in cache")
 )
 
 func main() {
@@ -147,7 +152,7 @@ func main() {
 	livenessProbes = append(livenessProbes, schemaProbe)
 	readinessProbes = append(readinessProbes, schemaProbe)
 
-	handler := pipeline.NewChain("SchemaTracker").Then(tracker.NewTracker(schemaDB))
+	handler := pipeline.NewChain("SchemaTracker").Then(tracker.NewTracker(schemaDB, *schemaCacheSize))
 
 	//
 	// Reverse Geocoding

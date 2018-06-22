@@ -18,7 +18,12 @@ type SchemaRepository interface {
 	UpdateAttributeSchema(ctx context.Context, eventSchema schema.EventSchema, newSchema map[string]schema.Type) (*schema.EventSchema, error)
 }
 
-func NewTracker(db SchemaRepository) pipeline.Handler {
+func NewTracker(db SchemaRepository, cacheSize int) pipeline.Handler {
+	if cacheSize == 0 {
+		cacheSize = 1000
+	}
+	// Wrap the db with our write through cache
+	db = newSchemaCache(db, cacheSize)
 	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
 
 		var (
