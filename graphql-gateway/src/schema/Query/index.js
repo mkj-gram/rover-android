@@ -9,6 +9,7 @@ import segmentFromPredicates from './segmentFromPredicates'
 import segmentSchema from './segmentSchema'
 import segmentSize from './segmentSize'
 import stringSuggestion from './stringSuggestion'
+import user from './user'
 
 const Query = new GraphQLObjectType({
     name: 'Query',
@@ -21,7 +22,8 @@ const Query = new GraphQLObjectType({
         segmentFromPredicates,
         segmentSchema,
         segmentSize,
-        stringSuggestion
+        stringSuggestion,
+        user
     }
 })
 
