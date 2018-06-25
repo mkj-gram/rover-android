@@ -9,11 +9,9 @@ import io.rover.rover.core.data.domain.AttributeValue
 import io.rover.rover.core.events.EventQueueService
 import io.rover.rover.core.events.EventQueueServiceInterface
 import io.rover.rover.core.events.domain.Event
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.operations.ActionBehaviour
-import io.rover.rover.core.operations.ActionBehaviourMappingInterface
-import io.rover.rover.core.routing.ActionIntentBackstackSynthesizerInterface
-import io.rover.rover.core.ui.OpenAppAction
+import io.rover.rover.core.routing.Router
+import io.rover.rover.core.routing.TopLevelNavigation
+import io.rover.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
 import io.rover.rover.platform.DateFormattingInterface
 import org.json.JSONObject
 
@@ -24,8 +22,9 @@ open class NotificationOpen(
     private val applicationContext: Context,
     private val dateFormatting: DateFormattingInterface,
     private val eventsService: EventQueueServiceInterface,
-    private val actionBehaviorMapping: ActionBehaviourMappingInterface,
-    private val actionIntentBackstackSynthesizer: ActionIntentBackstackSynthesizerInterface
+    private val router: Router,
+    private val topLevelNavigation: TopLevelNavigation,
+    private val embeddedWebBrowserDisplay: EmbeddedWebBrowserDisplayInterface
 ): NotificationOpenInterface {
     override fun pendingIntentForAndroidNotification(notification: Notification): PendingIntent {
         return TransientNotificationLaunchActivity.generateLaunchIntent(
@@ -34,24 +33,30 @@ open class NotificationOpen(
         )
     }
 
-    override fun intentStackForOpeningNotificationFromNotificationsDrawer(notificationJson: String): List<Intent> {
-        // side-effect: issue open event.
-        val notification = Notification.decodeJson(JSONObject(notificationJson), dateFormatting)
-
+    private fun intentForNotification(notification: Notification): Intent {
         issueNotificationOpenedEvent(
             notification,
             NotificationSource.Push
+
         )
 
-        val actionBehaviour = actionBehaviorMapping.mapToBehaviour(
-            notification.action ?: OpenAppAction()
-        ) as? ActionBehaviour.IntentAction ?: throw RuntimeException("Non-intent ActionBehaviours for opening notifications are not supported.")
+        return when(notification.tapBehavior) {
+            is Notification.TapBehavior.OpenApp -> topLevelNavigation.openAppIntent()
+            is Notification.TapBehavior.OpenUri -> router.route(
+                notification.tapBehavior.uri,
+                false
+            )
+            is Notification.TapBehavior.PresentWebsite -> embeddedWebBrowserDisplay.intentForViewingWebsiteViaEmbeddedBrowser(
+                notification.tapBehavior.url.toString()
+            )
+        }
+    }
 
+    override fun intentForOpeningNotificationFromJson(notificationJson: String): Intent {
+        // side-effect: issue open event.
+        val notification = Notification.decodeJson(JSONObject(notificationJson), dateFormatting)
 
-        return actionIntentBackstackSynthesizer.synthesizeNotificationIntentStack(
-            actionBehaviour.intent,
-            notification.isNotificationCenterEnabled
-        )
+        return intentForNotification(notification)
     }
 
     override fun intentForOpeningNotificationDirectly(notification: Notification): Intent? {
@@ -60,36 +65,7 @@ open class NotificationOpen(
 
         // Not appropriate to re-open the app when opening notification directly, do nothing.
 
-        if(notification.action == null) return null
-
-        val actionBehaviour = actionBehaviorMapping.mapToBehaviour(
-            notification.action
-        )
-
-        return when(actionBehaviour) {
-            is ActionBehaviour.NotAvailable -> {
-                log.w("No behaviour mapping was available for ${notification.action}.  Perhaps you neglected to add an assembler to Rover.initialize()?")
-                null
-            }
-            is ActionBehaviour.Intrinsic -> {
-                /* no-op */
-                null
-            }
-            is ActionBehaviour.IntentAction -> {
-                // side-effect: issue open event.
-                issueNotificationOpenedEvent(
-                    notification,
-                    NotificationSource.NotificationCenter
-                )
-
-                actionBehaviour.intent
-            }
-            is ActionBehaviour.HeadlessAction -> {
-                log.w("Headless actions are not well supported in the Notification Center.  Executing behaviour in the background with no user feedback.")
-                actionBehaviour.exec()
-                null
-            }
-        }
+        return intentForNotification(notification)
     }
 
     protected fun issueNotificationOpenedEvent(notification: Notification, source: NotificationSource) {

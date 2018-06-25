@@ -38,12 +38,11 @@ internal fun DeviceContext.asJson(): JSONObject {
             DeviceContext::screenWidth,
             DeviceContext::screenHeight,
             DeviceContext::timeZone,
-            DeviceContext::isBluetoothEnabled
+            DeviceContext::isBluetoothEnabled,
+            DeviceContext::sdkVersion
         )
 
         props.forEach { putProp(this@asJson, it) }
-
-        putProp(this@asJson, DeviceContext::frameworks, "frameworks") { JSONObject(this@asJson.frameworks) }
 
         putProp(this@asJson, DeviceContext::attributes, "attributes") { it.encodeJson() }
 
@@ -79,7 +78,7 @@ internal fun DeviceContext.Companion.decodeJson(json: JSONObject): DeviceContext
         radio = json.safeOptString("radio"),
         screenWidth = json.safeOptInt("screenWidth"),
         screenHeight = json.safeOptInt("screenHeight"),
-        frameworks = json.getJSONObject("frameworks").asStringHash(),
+        sdkVersion = json.safeOptString("sdkVersion"),
         timeZone = json.safeOptString("timeZone"),
         isBluetoothEnabled = json.safeOptBoolean("isBluetoothEnabled"),
         attributes = json.getJSONObject("attributes").toFlatAttributesHash()

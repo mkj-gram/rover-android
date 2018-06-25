@@ -39,3 +39,13 @@ fun String.roverTextHtmlAsSpanned(): SpannableStringBuilder {
         Html.fromHtml(this, Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH) as SpannableStringBuilder
     }
 }
+
+/**
+ * Parse the given string as URI query parameters.
+ */
+fun String.parseAsQueryParameters(): Map<String, String> {
+    return split("&").map {
+        val keyAndValue = it.split("=")
+        Pair(keyAndValue.first(), keyAndValue[1])
+    }.associate { it }
+}

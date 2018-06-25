@@ -63,7 +63,7 @@ class InboxApplication : Application() {
             CoreAssembler(
                 "",
                 this,
-                "experiences"
+                "inbox"
             ),
             NotificationsAssembler(
                 this,

@@ -107,6 +107,8 @@ class NotificationCenterListViewModel(
     protected fun trackEnterNotificationCenter() {
         sessionTracker.enterSession(
             "NotificationCenter",
+            "Notification Center Displayed",
+            "Notification Center Viewed",
             hashMapOf()
         )
     }
@@ -114,6 +116,7 @@ class NotificationCenterListViewModel(
     protected fun trackLeaveNotificationCenter() {
         sessionTracker.leaveSession(
             "NotificationCenter",
+            "Notification Center Dismissed",
             hashMapOf()
         )
     }

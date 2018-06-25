@@ -1,8 +1,5 @@
 package io.rover.notifications.graphql
 
-import android.os.Build
-import io.rover.rover.platform.DateFormattingInterface
-import io.rover.rover.platform.whenNotNull
 import io.rover.notifications.domain.Notification
 import io.rover.notifications.domain.NotificationAttachment
 import io.rover.rover.core.data.graphql.getDate
@@ -11,9 +8,10 @@ import io.rover.rover.core.data.graphql.safeGetString
 import io.rover.rover.core.data.graphql.safeGetUri
 import io.rover.rover.core.data.graphql.safeOptDate
 import io.rover.rover.core.data.graphql.safeOptString
+import io.rover.rover.platform.DateFormattingInterface
+import io.rover.rover.platform.whenNotNull
 import org.json.JSONException
 import org.json.JSONObject
-import java.net.MalformedURLException
 import java.net.URL
 
 internal fun Notification.encodeJson(dateFormatting: DateFormattingInterface): JSONObject {
@@ -28,7 +26,7 @@ internal fun Notification.encodeJson(dateFormatting: DateFormattingInterface): J
         putProp(this@encodeJson, Notification::deliveredAt, "deliveredAt") { dateFormatting.dateAsIso8601(it)}
         putProp(this@encodeJson, Notification::expiresAt, "expiresAt") { it.whenNotNull { dateFormatting.dateAsIso8601(it) } }
         putProp(this@encodeJson, Notification::attachment, "attachment") { it.whenNotNull { it.encodeJson() }}
-        putProp(this@encodeJson, Notification::action, "action") { it?.encodeJson() ?: JSONObject.NULL }
+        putProp(this@encodeJson, Notification::tapBehavior, "tapBehavior") { it.encodeJson() }
     }
 }
 
@@ -70,49 +68,40 @@ internal fun Notification.Companion.decodeJson(json: JSONObject, dateFormatting:
         expiresAt = json.safeOptDate("expiresAt", dateFormatting),
         deliveredAt = json.getDate("deliveredAt", dateFormatting),
         isNotificationCenterEnabled = json.getBoolean("isNotificationCenterEnabled"),
-        action = json.optJSONObject("action").whenNotNull { Notification.Action.decodeJson(it) },
+        tapBehavior = Notification.TapBehavior.decodeJson(json.getJSONObject("tapBehavior")),
         attachment = if (json.has("attachment") && !json.isNull("attachment")) NotificationAttachment.decodeJson(json.getJSONObject("attachment")) else null
     )
 }
 
-internal fun Notification.Action.Companion.decodeJson(json: JSONObject): Notification.Action {
+
+internal fun Notification.TapBehavior.Companion.decodeJson(json: JSONObject): Notification.TapBehavior {
     val typeName = json.safeGetString("__typename")
+
     return when(typeName) {
-        "OpenURLAction" -> Notification.Action.OpenURL(
-            json.safeGetUri("url")
+        "OpenURLNotificationTapBehavior" -> Notification.TapBehavior.OpenUri(
+            uri = json.safeGetUri("url")
         )
-        "PresentExperienceAction" -> Notification.Action.PresentExperience(
-            json.safeGetString("campaignID")
+        "PresentWebsiteNotificationTapBehavior" -> Notification.TapBehavior.PresentWebsite(
+            url = json.safeGetUri("url")
         )
-        "PresentWebsiteAction" -> Notification.Action.PresentWebsite(
-            try {
-                json.safeGetUri("url").toURL()
-            } catch (e: MalformedURLException) {
-                if (Build.VERSION.SDK_INT >= 27) {
-                    throw JSONException("Non-web URI for PresentWebsiteAction", e)
-                } else {
-                    throw JSONException("Non-web URI for PresentWebsiteAction: ${e.message}")
-                }
-            }
-        )
-        else -> throw Exception("Unsupported Notification action type: '$typeName'")
+        "OpenAppNotificationTapBehavior" -> Notification.TapBehavior.OpenApp()
+        else -> throw JSONException("Unsupported Block TapBehavior type `$typeName`.")
     }
 }
 
-internal fun Notification.Action.encodeJson(): JSONObject {
+internal fun Notification.TapBehavior.encodeJson(): JSONObject {
     return JSONObject().apply {
         put("__typename", when(this@encodeJson) {
-            is Notification.Action.PresentWebsite -> {
-                putProp(this@encodeJson, Notification.Action.PresentWebsite::url, "url") { url.toString() }
-                "PresentWebsiteAction"
+            is Notification.TapBehavior.OpenApp -> {
+                "OpenAppNotificationTapBehavior"
             }
-            is Notification.Action.PresentExperience -> {
-                putProp(this@encodeJson, Notification.Action.PresentExperience::campaignId, "campaignID")
-                "PresentExperienceAction"
+            is Notification.TapBehavior.OpenUri -> {
+                putProp(this@encodeJson, Notification.TapBehavior.OpenUri::uri, "url") { it.toString() }
+                "OpenURLNotificationTapBehavior"
             }
-            is Notification.Action.OpenURL -> {
-                putProp(this@encodeJson, Notification.Action.OpenURL::url, "url").toString()
-                "OpenURLAction"
+            is Notification.TapBehavior.PresentWebsite -> {
+                putProp(this@encodeJson, Notification.TapBehavior.PresentWebsite::url) { it.toString() }
+                "PresentWebsiteNotificationTapBehavior"
             }
         })
     }

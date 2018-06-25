@@ -1,9 +1,8 @@
 package io.rover.experiences.ui.blocks.concerns.layout
 
-import android.graphics.Rect
 import io.rover.experiences.ui.blocks.concerns.border.BorderViewModel
-import io.rover.rover.core.ui.RectF
 import io.rover.experiences.ui.navigation.NavigateTo
+import io.rover.rover.core.ui.RectF
 import io.rover.rover.core.ui.concerns.BindableView
 import org.reactivestreams.Publisher
 
@@ -133,8 +132,6 @@ interface BlockViewModelInterface : LayoutableViewModel {
 
         /**
          * Block has been touched, but not clicked.
-         *
-         * TODO: may not be appropriate to use MotionEvent.
          */
         class Touched(
             override val blockId: String
@@ -150,14 +147,6 @@ interface BlockViewModelInterface : LayoutableViewModel {
 
     val events: Publisher<Event>
 }
-
-// TODO: remove!
-//enum class Alignment {
-//    Bottom,
-//    Fill,
-//    Center,
-//    Top
-//}
 
 data class Insets(
     val top: Int,

@@ -1,10 +1,8 @@
 package io.rover.rover.core.data.domain
 
 import android.util.DisplayMetrics
-import io.rover.rover.core.container.Resolver
 import io.rover.rover.core.data.domain.BackgroundScale.X3
-import io.rover.rover.core.operations.Action
-import io.rover.rover.core.operations.ActionBehaviour
+import io.rover.rover.core.routing.Router
 import java.net.URI
 import java.net.URL
 
@@ -83,7 +81,7 @@ data class Position(
 }
 
 interface Block {
-    val action: Action?
+    val tapBehavior: TapBehavior?
     val background: Background
     val border: Border
     val id: ID
@@ -94,43 +92,29 @@ interface Block {
 
     companion object;
 
-    sealed class Action: io.rover.rover.core.operations.Action {
-        class OpenUrlAction(
-            val url: URI
-        ) : Action() {
-            override fun operation(resolver: Resolver): ActionBehaviour {
-                return resolver.resolve(ActionBehaviour::class.java, "openURL", url) ?: ActionBehaviour.NotAvailable()
-            }
+    sealed class TapBehavior {
+        /**
+         * Tapping the block should navigate to the given screen in the experience.
+         */
+        data class GoToScreen(val screenId: ID): TapBehavior()
 
-            companion object;
-        }
+        /**
+         * Tapping the block should open the following URI.  The URI may be a Rover deep link URI,
+         * so it will be run through the [Router] before it should be opened on Android as an
+         * Intent.
+         */
+        data class OpenUri(val uri: URI): TapBehavior()
 
-        class GoToScreenAction(
-            val screenId: ID
-        ) : Action() {
-            override fun operation(resolver: Resolver): ActionBehaviour {
-                return resolver.resolve(ActionBehaviour::class.java, "goToScreenAction", screenId) ?: ActionBehaviour.NotAvailable()
-            }
+        data class PresentWebsite(val url: URI): TapBehavior()
 
-            companion object
-        }
-
-        class PresentWebsite(
-            val url: URI
-        ) : Action() {
-            override fun operation(resolver: Resolver): ActionBehaviour {
-                return resolver.resolve(ActionBehaviour::class.java, "presentWebsite", url) ?: ActionBehaviour.NotAvailable()
-            }
-
-            companion object
-        }
+        class None: TapBehavior()
 
         companion object
     }
 }
 
 data class BarcodeBlock(
-    override val action: Block.Action?,
+    override val tapBehavior: Block.TapBehavior?,
     override val id: ID,
     override val insets: Insets,
     override val opacity: Double,
@@ -149,7 +133,7 @@ data class ButtonBlock(
     override val opacity: Double,
     override val position: Position,
     override val keys: Attributes,
-    override val action: Block.Action?,
+    override val tapBehavior: Block.TapBehavior?,
     override val background: Background,
     override val border: Border,
     val text: Text
@@ -158,7 +142,7 @@ data class ButtonBlock(
 }
 
 data class ImageBlock(
-    override val action: Block.Action?,
+    override val tapBehavior: Block.TapBehavior?,
     override val id: ID,
     override val insets: Insets,
     override val opacity: Double,
@@ -172,7 +156,7 @@ data class ImageBlock(
 }
 
 data class RectangleBlock(
-    override val action: Block.Action?,
+    override val tapBehavior: Block.TapBehavior?,
     override val id: ID,
     override val insets: Insets,
     override val opacity: Double,
@@ -185,7 +169,7 @@ data class RectangleBlock(
 }
 
 data class TextBlock(
-    override val action: Block.Action?,
+    override val tapBehavior: Block.TapBehavior?,
     override val id: ID,
     override val insets: Insets,
     override val opacity: Double,
@@ -199,7 +183,7 @@ data class TextBlock(
 }
 
 data class WebViewBlock(
-    override val action: Block.Action?,
+    override val tapBehavior: Block.TapBehavior?,
     override val id: ID,
     override val insets: Insets,
     override val opacity: Double,

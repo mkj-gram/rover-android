@@ -200,6 +200,8 @@ class ExperienceViewModel(
     protected fun trackEnterExperience(experience: Experience) {
         sessionTracker.enterSession(
             ExperienceSessionKey(experience.id.rawValue, experience.campaignId),
+            "Experience Presented",
+            "Experience Viewed",
             sessionEventAttributes(experience)
         )
     }
@@ -207,6 +209,7 @@ class ExperienceViewModel(
     protected fun trackLeaveExperience(experience: Experience) {
         sessionTracker.leaveSession(
             ExperienceSessionKey(experience.id.rawValue, experience.campaignId),
+            "Experience Dismissed",
             sessionEventAttributes(experience)
         )
     }

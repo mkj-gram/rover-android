@@ -16,10 +16,6 @@ import io.rover.rover.core.ui.Rect
  * as a part of other view models that do implement [LayoutableViewModel].
  */
 interface LayoutableViewModel : BindableViewModel {
-    // TODO: in here go parameters common to the display of both Rows and Blocks.  So, possibly,
-    // insets, backgrounds, and colours.  Basically, these ViewModels will
-    // wrap the [Background] and [Border] model interfaces.
-
     /**
      * Measures and returns a [RectF] of the placement the view model (with origin being the
      * bounds).

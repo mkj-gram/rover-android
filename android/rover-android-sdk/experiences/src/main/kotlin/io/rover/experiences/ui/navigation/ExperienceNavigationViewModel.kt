@@ -134,6 +134,13 @@ open class ExperienceNavigationViewModel(
                                 Pair("destinationExperienceID", AttributeValue.String(experience.id.rawValue))
                             )
                         }
+                        is NavigateTo.PresentWebsiteAction -> {
+                            hashMapOf(
+                                Pair("action", AttributeValue.String("presentWebsite")),
+                                // not possible to navigate to a screen in another experience as of yet:
+                                Pair("url", AttributeValue.String(action.navigateTo.url.toString()))
+                            )
+                        }
                         is NavigateTo.External -> {
                             hashMapOf(
                                 Pair("action", AttributeValue.String("openURL"))
@@ -167,7 +174,12 @@ open class ExperienceNavigationViewModel(
                     when (action.navigateTo) {
                         is NavigateTo.External -> {
                             externalNavigationEvents.onNext(
-                                ExperienceExternalNavigationEvent.Action(action.navigateTo.actionBehaviour)
+                                ExperienceExternalNavigationEvent.OpenUri(action.navigateTo.uri)
+                            )
+                        }
+                        is NavigateTo.PresentWebsiteAction -> {
+                            externalNavigationEvents.onNext(
+                                ExperienceExternalNavigationEvent.PresentWebsite(action.navigateTo.url)
                             )
                         }
                         is NavigateTo.GoToScreenAction -> {
@@ -303,6 +315,7 @@ open class ExperienceNavigationViewModel(
         if(currentScreenId != null) {
             sessionTracker.leaveSession(
                 ExperienceScreenSessionKey(experience.id.rawValue, currentScreenId),
+                "Screen Dismissed",
                 sessionEventAttributes(currentScreenId)
             )
         }
@@ -315,6 +328,8 @@ open class ExperienceNavigationViewModel(
     protected fun trackEnterScreen(screenId: String) {
         sessionTracker.enterSession(
             ExperienceScreenSessionKey(experience.id.rawValue, screenId),
+            "Screen Presented",
+            "Screen Viewed",
             sessionEventAttributes(screenId)
         )
     }

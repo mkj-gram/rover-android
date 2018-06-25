@@ -74,14 +74,10 @@ interface NotificationOpenInterface {
     fun pendingIntentForAndroidNotification(notification: Notification): PendingIntent
 
     /**
-     * Return a stack of intents (meant to be a synthesized back stack) for opening a notification
-     * from the Android notification drawer. This is called by the transient notification launch
-     * activity to replace itself with a new stack.
-     *
-     * The returned Intents should be started immediately with [ContextCompat.startActivities]. This
-     * method in fact has a side-effect of dispatching an analytics Event.
+     * Return an intent for opening a notification from the Android notification drawer. This is
+     * called by the transient notification launch activity to replace itself with a new stack.
      */
-    fun intentStackForOpeningNotificationFromNotificationsDrawer(notificationJson: String): List<Intent>
+    fun intentForOpeningNotificationFromJson(notificationJson: String): Intent
 
     /**
      * Return an intent for directly opening the notification within the app.

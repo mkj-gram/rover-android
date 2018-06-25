@@ -4,11 +4,8 @@ import android.app.Application
 import android.arch.lifecycle.ProcessLifecycleOwner
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.support.annotation.ColorInt
-import io.rover.rover.BuildConfig
 import io.rover.rover.core.assets.AndroidAssetService
 import io.rover.rover.core.assets.AssetService
 import io.rover.rover.core.assets.ImageDownloader
@@ -18,11 +15,8 @@ import io.rover.rover.core.container.Assembler
 import io.rover.rover.core.container.Container
 import io.rover.rover.core.container.Resolver
 import io.rover.rover.core.container.Scope
-import io.rover.rover.core.context.ModulesTracker
-import io.rover.rover.core.context.ModulesTrackerInterface
 import io.rover.rover.core.data.AuthenticationContext
 import io.rover.rover.core.data.ServerKey
-import io.rover.rover.core.data.domain.Attributes
 import io.rover.rover.core.data.graphql.GraphQlApiService
 import io.rover.rover.core.data.graphql.GraphQlApiServiceInterface
 import io.rover.rover.core.data.http.AsyncTaskAndHttpUrlConnectionNetworkClient
@@ -41,30 +35,24 @@ import io.rover.rover.core.events.contextproviders.DeviceContextProvider
 import io.rover.rover.core.events.contextproviders.DeviceIdentifierContextProvider
 import io.rover.rover.core.events.contextproviders.DeviceNameContextProvider
 import io.rover.rover.core.events.contextproviders.LocaleContextProvider
-import io.rover.rover.core.events.contextproviders.ModulesContextProvider
 import io.rover.rover.core.events.contextproviders.ReachabilityContextProvider
-import io.rover.rover.core.events.contextproviders.RoverSdkCoreVersionContextProvider
 import io.rover.rover.core.events.contextproviders.ScreenContextProvider
+import io.rover.rover.core.events.contextproviders.SdkVersionContextProvider
 import io.rover.rover.core.events.contextproviders.TelephonyContextProvider
 import io.rover.rover.core.events.contextproviders.TimeZoneContextProvider
-import io.rover.rover.core.events.domain.Event
-import io.rover.rover.core.operations.ActionBehaviour
-import io.rover.rover.core.operations.ActionBehaviourMapping
-import io.rover.rover.core.operations.ActionBehaviourMappingInterface
 import io.rover.rover.core.permissions.PermissionsNotifier
 import io.rover.rover.core.permissions.PermissionsNotifierInterface
-import io.rover.rover.core.routing.ActionIntentBackstackSynthesizer
-import io.rover.rover.core.routing.ActionIntentBackstackSynthesizerInterface
 import io.rover.rover.core.routing.DefaultTopLevelNavigation
 import io.rover.rover.core.routing.LinkOpenInterface
+import io.rover.rover.core.routing.Router
+import io.rover.rover.core.routing.RouterService
 import io.rover.rover.core.routing.TopLevelNavigation
+import io.rover.rover.core.routing.routes.OpenAppRoute
 import io.rover.rover.core.routing.website.EmbeddedWebBrowserDisplay
 import io.rover.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
 import io.rover.rover.core.streams.Scheduler
 import io.rover.rover.core.streams.forAndroidMainThread
 import io.rover.rover.core.tracking.ApplicationSessionEmitter
-import io.rover.rover.core.tracking.SessionDirection
-import io.rover.rover.core.tracking.SessionEventProvider
 import io.rover.rover.core.tracking.SessionStore
 import io.rover.rover.core.tracking.SessionStoreInterface
 import io.rover.rover.core.tracking.SessionTracker
@@ -80,7 +68,6 @@ import io.rover.rover.platform.IoMultiplexingExecutor
 import io.rover.rover.platform.LocalStorage
 import io.rover.rover.platform.SharedPreferencesLocalStorage
 import io.rover.rover.platform.whenNotNull
-import java.net.URI
 import java.net.URL
 import java.util.concurrent.Executor
 
@@ -106,7 +93,7 @@ class CoreAssembler @JvmOverloads constructor(
      * any Rover functionality to work, it is required for clickable deep/universal links to work from
      * anywhere else. TODO explain how once the stuff to do so is built
      */
-    private val deepLinkSchemaSlug: String,
+    private val deepLinkSchemeSlug: String,
 
     @param:ColorInt
     private val chromeTabBackgroundColor: Int = Color.BLACK,
@@ -122,8 +109,8 @@ class CoreAssembler @JvmOverloads constructor(
             application
         }
 
-        container.register(Scope.Singleton, ModulesTrackerInterface::class.java) { _ ->
-            ModulesTracker()
+        container.register(Scope.Singleton, String::class.java, "deepLinkScheme") { _ ->
+            "rv-$deepLinkSchemeSlug"
         }
 
         container.register(Scope.Singleton, NetworkClient::class.java) { _ ->
@@ -211,10 +198,6 @@ class CoreAssembler @JvmOverloads constructor(
             ReachabilityContextProvider(application)
         }
 
-        container.register(Scope.Singleton, ContextProvider::class.java, "coreVersion") { _ ->
-            RoverSdkCoreVersionContextProvider()
-        }
-
         container.register(Scope.Singleton, ContextProvider::class.java, "screen") { _ ->
             ScreenContextProvider(application.resources)
         }
@@ -239,12 +222,6 @@ class CoreAssembler @JvmOverloads constructor(
             )
         }
 
-        container.register(Scope.Singleton, ContextProvider::class.java, "modules") { resolver ->
-            ModulesContextProvider(
-                resolver.resolveSingletonOrFail(ModulesTrackerInterface::class.java)
-            )
-        }
-
         container.register(Scope.Singleton, ContextProvider::class.java, "application") { _ ->
             ApplicationContextProvider(application)
         }
@@ -257,6 +234,10 @@ class CoreAssembler @JvmOverloads constructor(
             DeviceIdentifierContextProvider(
                 resolver.resolveSingletonOrFail(DeviceIdentificationInterface::class.java)
             )
+        }
+
+        container.register(Scope.Singleton, ContextProvider::class.java, "sdkVersion") { _ ->
+            SdkVersionContextProvider()
         }
 
         BluetoothAdapter.getDefaultAdapter().whenNotNull { bluetoothAdapter ->
@@ -300,10 +281,9 @@ class CoreAssembler @JvmOverloads constructor(
 
         container.register(
             Scope.Singleton,
-            ActionIntentBackstackSynthesizerInterface::class.java
+            Router::class.java
         ) { resolver ->
-            ActionIntentBackstackSynthesizer(
-                application,
+            RouterService(
                 resolver.resolveSingletonOrFail(TopLevelNavigation::class.java)
             )
         }
@@ -313,9 +293,8 @@ class CoreAssembler @JvmOverloads constructor(
             LinkOpenInterface::class.java
         ) { resolver ->
             LinkOpen(
-                resolver.resolveSingletonOrFail(ActionBehaviourMappingInterface::class.java),
-                resolver.resolveSingletonOrFail(ActionIntentBackstackSynthesizerInterface::class.java),
-                deepLinkSchemaSlug
+                resolver.resolveSingletonOrFail(Router::class.java),
+                deepLinkSchemeSlug
             )
         }
 
@@ -326,14 +305,13 @@ class CoreAssembler @JvmOverloads constructor(
         }
 
         container.register(
-            Scope.Transient,
+            Scope.Singleton,
             SessionTrackerInterface::class.java
-        ) { resolver, eventProvider: SessionEventProvider, keepAliveTime: Int ->
+        ) { resolver ->
             SessionTracker(
                 resolver.resolveSingletonOrFail(EventQueueServiceInterface::class.java),
                 resolver.resolveSingletonOrFail(SessionStoreInterface::class.java),
-                eventProvider,
-                keepAliveTime
+                10
             )
         }
 
@@ -341,73 +319,9 @@ class CoreAssembler @JvmOverloads constructor(
             Scope.Singleton,
             ApplicationSessionEmitter::class.java
         ) { resolver ->
-            val eventProvider = object : SessionEventProvider {
-                override fun eventForSessionBoundary(direction: SessionDirection, attributes: Attributes): Event {
-                    return Event(
-                        when(direction) {
-                            SessionDirection.Start -> "App Opened"
-                            SessionDirection.Stop -> "App Closed"
-                        }, hashMapOf()
-                    )
-                }
-            }
-
             ApplicationSessionEmitter(
                 ProcessLifecycleOwner.get().lifecycle,
-                resolver.resolve(SessionTrackerInterface::class.java, null, eventProvider, 60) ?: throw RuntimeException("Could not create Session Tracker for application session. ")
-            )
-        }
-
-        container.register(
-            Scope.Singleton,
-            ActionBehaviourMappingInterface::class.java
-        ) { resolver ->
-            ActionBehaviourMapping(resolver)
-        }
-
-        container.register(
-            Scope.Transient,
-            ActionBehaviour::class.java,
-            "openURL"
-        ) { _, url: URI ->
-            // what if I map them
-            ActionBehaviour.IntentAction(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(url.toString())
-                )
-            )
-        }
-
-        container.register(
-            Scope.Transient,
-            ActionBehaviour::class.java,
-            "presentWebsite"
-        ) { resolver, url: URL ->
-            ActionBehaviour.IntentAction(
-                resolver.resolveSingletonOrFail(EmbeddedWebBrowserDisplayInterface::class.java).intentForViewingWebsiteViaEmbeddedBrowser(
-                    url.toString()
-                )
-            )
-        }
-
-        container.register(
-            Scope.Transient,
-            ActionBehaviour::class.java,
-            "presentNotificationCenter"
-        ) { resolver ->
-            ActionBehaviour.IntentAction(
-                resolver.resolveSingletonOrFail(TopLevelNavigation::class.java).displayNotificationCenterIntent()
-            )
-        }
-
-        container.register(
-            Scope.Transient,
-            ActionBehaviour::class.java,
-            "openApp"
-        ) { resolver ->
-            ActionBehaviour.IntentAction(
-                resolver.resolveSingletonOrFail(TopLevelNavigation::class.java).openAppIntent()
+                resolver.resolveSingletonOrFail(SessionTrackerInterface::class.java)
             )
         }
     }
@@ -419,26 +333,26 @@ class CoreAssembler @JvmOverloads constructor(
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "device"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "locale"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "reachability"),
-            resolver.resolveSingletonOrFail(ContextProvider::class.java, "coreVersion"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "screen"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "telephony"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "timeZone"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "attributes"),
-            resolver.resolveSingletonOrFail(ContextProvider::class.java, "modules"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "application"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "deviceName"),
-            resolver.resolveSingletonOrFail(ContextProvider::class.java, "deviceIdentifier")
+            resolver.resolveSingletonOrFail(ContextProvider::class.java, "deviceIdentifier"),
+            resolver.resolveSingletonOrFail(ContextProvider::class.java, "sdkVersion")
         ).forEach { eventQueue.addContextProvider(it) }
-
-        resolver.resolveSingletonOrFail(ModulesTrackerInterface::class.java).version(
-            "core",
-            BuildConfig.VERSION_NAME
-        )
 
         resolver.resolveSingletonOrFail(VersionTrackerInterface::class.java).trackAppVersion()
 
         resolver.resolveSingletonOrFail(ApplicationSessionEmitter::class.java).start()
 
         resolver.resolve(ContextProvider::class.java, "bluetooth").whenNotNull { eventQueue.addContextProvider(it) }
+
+        resolver.resolveSingletonOrFail(Router::class.java).apply {
+            registerRoute(
+                OpenAppRoute(resolver.resolveSingletonOrFail(TopLevelNavigation::class.java))
+            )
+        }
     }
 }

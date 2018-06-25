@@ -1,19 +1,17 @@
 package io.rover.experiences.ui.blocks.concerns.layout
 
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.streams.PublishSubject
-import io.rover.rover.core.streams.share
-import io.rover.rover.platform.whenNotNull
-import io.rover.rover.core.data.domain.Block
-import io.rover.rover.core.data.domain.HorizontalAlignment
-import io.rover.rover.core.data.domain.Position
-import io.rover.rover.core.data.domain.VerticalAlignment
 import io.rover.experiences.ui.layout.ViewType
 import io.rover.experiences.ui.layout.screen.ScreenViewModel
 import io.rover.experiences.ui.navigation.NavigateTo
+import io.rover.rover.core.data.domain.Block
 import io.rover.rover.core.data.domain.Height
-import io.rover.rover.core.operations.ActionBehaviourMappingInterface
+import io.rover.rover.core.data.domain.HorizontalAlignment
+import io.rover.rover.core.data.domain.VerticalAlignment
+import io.rover.rover.core.logging.log
+import io.rover.rover.core.streams.PublishSubject
+import io.rover.rover.core.streams.share
 import io.rover.rover.core.ui.RectF
+import io.rover.rover.platform.whenNotNull
 
 /**
  * A mixin used by all blocks that contains the block layout and positioning concerns.
@@ -24,7 +22,6 @@ import io.rover.rover.core.ui.RectF
 class BlockViewModel(
     private val block: Block,
     private val paddingDeflections: Set<LayoutPaddingDeflection> = emptySet(),
-    private val actionBehaviourMapping: ActionBehaviourMappingInterface,
     private val measurable: Measurable? = null
 ) : BlockViewModelInterface {
 
@@ -141,20 +138,19 @@ class BlockViewModel(
     override val events = eventSource.share()
 
     override val isClickable: Boolean
-    get() = block.action != null
+    get() = block.tapBehavior != null && block.tapBehavior !is Block.TapBehavior.None
 
     override fun click() {
         // I don't have an epic (any other asynchronous behaviour to compose) here, just a single
         // event emitter, so I'll just publish an event directly.
-        val action = block.action
+        val tapBehavior = block.tapBehavior
 
-        val navigateTo = when (action) {
+        val navigateTo = when (tapBehavior) {
             null -> null
-            is Block.Action.GoToScreenAction -> { NavigateTo.GoToScreenAction(action.screenId.rawValue) }
-            else -> {
-                val behaviour = actionBehaviourMapping.mapToBehaviour(action)
-                NavigateTo.External(behaviour)
-            }
+            is Block.TapBehavior.GoToScreen -> { NavigateTo.GoToScreenAction(tapBehavior.screenId.rawValue) }
+            is Block.TapBehavior.OpenUri -> { NavigateTo.External(tapBehavior.uri) }
+            is Block.TapBehavior.PresentWebsite -> { NavigateTo.PresentWebsiteAction(tapBehavior.url) }
+            is Block.TapBehavior.None -> return
         }
 
         navigateTo.whenNotNull {

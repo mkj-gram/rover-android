@@ -69,7 +69,7 @@ class ModelFactories {
 
         fun emptyRectangleBlock(): RectangleBlock {
             return RectangleBlock(
-                action = null,
+                tapBehavior = null,
                 position = Position(
                     horizontalAlignment = HorizontalAlignment.Fill(
                         0.0, 0.0

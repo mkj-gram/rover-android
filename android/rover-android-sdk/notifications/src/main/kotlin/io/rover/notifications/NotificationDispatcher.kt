@@ -10,24 +10,28 @@ import android.support.annotation.DrawableRes
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
+import io.rover.notifications.domain.NotificationAttachment
+import io.rover.notifications.ui.concerns.NotificationsRepositoryInterface
 import io.rover.rover.R
 import io.rover.rover.core.assets.AssetService
 import io.rover.rover.core.data.NetworkResult
 import io.rover.rover.core.logging.log
-import io.rover.rover.core.operations.ActionBehaviour
 import io.rover.rover.core.streams.PublisherOperators
 import io.rover.rover.core.streams.Scheduler
 import io.rover.rover.core.streams.doOnNext
 import io.rover.rover.core.streams.map
 import io.rover.rover.core.streams.onErrorReturn
+import io.rover.rover.core.streams.subscribe
 import io.rover.rover.core.streams.subscribeOn
 import io.rover.rover.core.streams.timeout
-import io.rover.notifications.domain.NotificationAttachment
-import io.rover.notifications.ui.concerns.NotificationsRepositoryInterface
 import org.reactivestreams.Publisher
 import java.util.concurrent.TimeUnit
 
-class PushNotificationActionBehaviourBuilder(
+/**
+ * Responsible for adding a [Notification] to the Android notification area as well as the Rover
+ * Notification Center.
+ */
+class NotificationDispatcher(
     private val applicationContext: Context,
 
     private val mainThreadScheduler: Scheduler,
@@ -63,12 +67,10 @@ class PushNotificationActionBehaviourBuilder(
      */
     private val defaultChannelId: String? = null
 ) {
-    fun build(notificationFromAction: io.rover.notifications.domain.Notification): ActionBehaviour.HeadlessAction {
-        return ActionBehaviour.HeadlessAction(
-            PublisherOperators.defer {
-                processNotification(notificationFromAction)
-            }.subscribeOn(mainThreadScheduler)
-        )
+    fun ingest(notificationFromAction: io.rover.notifications.domain.Notification) {
+        PublisherOperators.defer {
+            processNotification(notificationFromAction)
+        }.subscribeOn(mainThreadScheduler).subscribe {} // TODO: do not use subscriber like this, it will leak
     }
 
     /**

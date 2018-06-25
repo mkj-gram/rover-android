@@ -3,30 +3,25 @@ package io.rover.notifications
 import android.app.Application
 import android.content.Context
 import android.support.annotation.DrawableRes
+import io.rover.notifications.routing.routes.PresentNotificationCenterRoute
+import io.rover.notifications.ui.NotificationCenterListViewModel
+import io.rover.notifications.ui.concerns.NotificationCenterListViewModelInterface
+import io.rover.notifications.ui.concerns.NotificationsRepositoryInterface
 import io.rover.rover.core.assets.AssetService
 import io.rover.rover.core.container.Assembler
 import io.rover.rover.core.container.Container
 import io.rover.rover.core.container.Resolver
 import io.rover.rover.core.container.Scope
-import io.rover.rover.core.data.domain.Attributes
 import io.rover.rover.core.data.state.StateManagerServiceInterface
 import io.rover.rover.core.events.ContextProvider
 import io.rover.rover.core.events.EventQueueServiceInterface
-import io.rover.rover.core.events.contextproviders.FirebasePushTokenContextProvider
-import io.rover.rover.core.events.domain.Event
-import io.rover.rover.core.operations.ActionBehaviour
-import io.rover.rover.core.operations.ActionBehaviourMappingInterface
-import io.rover.rover.core.routing.TopLevelNavigation
-import io.rover.rover.core.streams.Scheduler
-import io.rover.rover.core.tracking.SessionEventProvider
-import io.rover.rover.core.tracking.SessionTrackerInterface
-import io.rover.rover.core.tracking.SessionDirection
-import io.rover.notifications.domain.Notification
-import io.rover.notifications.ui.NotificationCenterListViewModel
-import io.rover.notifications.ui.concerns.NotificationCenterListViewModelInterface
-import io.rover.notifications.ui.concerns.NotificationsRepositoryInterface
 import io.rover.rover.core.events.PushTokenTransmissionChannel
-import io.rover.rover.core.routing.ActionIntentBackstackSynthesizerInterface
+import io.rover.rover.core.events.contextproviders.FirebasePushTokenContextProvider
+import io.rover.rover.core.routing.Router
+import io.rover.rover.core.routing.TopLevelNavigation
+import io.rover.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
+import io.rover.rover.core.streams.Scheduler
+import io.rover.rover.core.tracking.SessionTrackerInterface
 import io.rover.rover.platform.DateFormattingInterface
 import io.rover.rover.platform.LocalStorage
 import java.util.concurrent.Executor
@@ -102,20 +97,9 @@ class NotificationsAssembler @JvmOverloads constructor(
             Scope.Transient, // can be a singleton because it is stateless and has no parameters.
             NotificationCenterListViewModelInterface::class.java
         ) { resolver ->
-            val eventProvider = object : SessionEventProvider {
-                override fun eventForSessionBoundary(direction: SessionDirection, attributes: Attributes): Event {
-                    return Event(
-                        when(direction) {
-                            SessionDirection.Start -> "Notification Center Presented"
-                            SessionDirection.Stop -> "Notification Center Dismissed"
-                        }, hashMapOf()
-                    )
-                }
-            }
-
             NotificationCenterListViewModel(
                 resolver.resolveSingletonOrFail(NotificationsRepositoryInterface::class.java),
-                resolver.resolve(SessionTrackerInterface::class.java, null, eventProvider, 60)!!
+                resolver.resolveSingletonOrFail(SessionTrackerInterface::class.java)
             )
         }
 
@@ -127,8 +111,9 @@ class NotificationsAssembler @JvmOverloads constructor(
                 applicationContext,
                 resolver.resolveSingletonOrFail(DateFormattingInterface::class.java),
                 resolver.resolveSingletonOrFail(EventQueueServiceInterface::class.java),
-                resolver.resolveSingletonOrFail(ActionBehaviourMappingInterface::class.java),
-                resolver.resolveSingletonOrFail(ActionIntentBackstackSynthesizerInterface::class.java)
+                resolver.resolveSingletonOrFail(Router::class.java),
+                resolver.resolveSingletonOrFail(TopLevelNavigation::class.java),
+                resolver.resolveSingletonOrFail(EmbeddedWebBrowserDisplayInterface::class.java)
             )
         }
 
@@ -149,8 +134,8 @@ class NotificationsAssembler @JvmOverloads constructor(
         ) { resolver ->
             PushReceiver(
                 resolver.resolveSingletonOrFail(PushTokenTransmissionChannel::class.java),
-                resolver.resolveSingletonOrFail(DateFormattingInterface::class.java),
-                resolver.resolveSingletonOrFail(ActionBehaviourMappingInterface::class.java)
+                resolver.resolveSingletonOrFail(NotificationDispatcher::class.java),
+                resolver.resolveSingletonOrFail(DateFormattingInterface::class.java)
             )
         }
 
@@ -160,9 +145,9 @@ class NotificationsAssembler @JvmOverloads constructor(
 
         container.register(
             Scope.Singleton,
-            PushNotificationActionBehaviourBuilder::class.java
+            NotificationDispatcher::class.java
         ) { resolver ->
-            PushNotificationActionBehaviourBuilder(
+            NotificationDispatcher(
                 applicationContext,
                 resolver.resolveSingletonOrFail(Scheduler::class.java, "main"),
                 resolver.resolveSingletonOrFail(NotificationsRepositoryInterface::class.java),
@@ -172,26 +157,6 @@ class NotificationsAssembler @JvmOverloads constructor(
                 smallIconResId,
                 smallIconDrawableLevel,
                 defaultChannelId
-            )
-        }
-
-        container.register(
-            Scope.Transient,
-            ActionBehaviour::class.java,
-            "addNotification"
-        ) { resolver, notification: Notification ->
-            resolver.resolveSingletonOrFail(PushNotificationActionBehaviourBuilder::class.java).build(
-                notification
-            )
-        }
-
-        container.register(
-            Scope.Transient,
-            ActionBehaviour::class.java,
-            "presentNotificationCenter"
-        ) { resolver ->
-            ActionBehaviour.IntentAction(
-                resolver.resolveSingletonOrFail(TopLevelNavigation::class.java).displayNotificationCenterIntent()
             )
         }
     }
@@ -212,5 +177,14 @@ class NotificationsAssembler @JvmOverloads constructor(
         resolver.resolveSingletonOrFail(NotificationsRepositoryInterface::class.java)
 
         resolver.resolveSingletonOrFail(InfluenceTrackerServiceInterface::class.java).startListening()
+
+        resolver.resolveSingletonOrFail(Router::class.java).apply {
+            registerRoute(
+                PresentNotificationCenterRoute(
+                    resolver.resolveSingletonOrFail(String::class.java, "deepLinkScheme"),
+                    resolver.resolveSingletonOrFail(TopLevelNavigation::class.java)
+                )
+            )
+        }
     }
 }

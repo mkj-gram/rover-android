@@ -360,7 +360,7 @@ fun TitleBar.encodeJson(): JSONObject {
 
 internal fun BarcodeBlock.Companion.decodeJson(json: JSONObject): BarcodeBlock {
     return BarcodeBlock(
-        action = Block.Action.optDecodeJson(json.optJSONObject("action")),
+        tapBehavior = Block.TapBehavior.optDecodeJson(json.optJSONObject("tapBehavior")),
         background = Background.decodeJson(json.getJSONObject("background")),
         border = Border.decodeJson(json.getJSONObject("border")),
         id = ID(json.safeGetString("id")),
@@ -449,7 +449,7 @@ internal fun Block.encodeJson(): JSONObject {
 
 internal fun Block.encodeSharedJson(): JSONObject {
     return JSONObject().apply {
-        putProp(this@encodeSharedJson, Block::action, "action") { it?.optEncodeJson() ?: JSONObject.NULL }
+        putProp(this@encodeSharedJson, Block::tapBehavior, "tapBehavior") { it?.optEncodeJson() ?: JSONObject.NULL }
         putProp(this@encodeSharedJson, Block::id, "id") { it.rawValue }
         putProp(this@encodeSharedJson, Block::insets, "insets") { it.encodeJson() }
         putProp(this@encodeSharedJson, Block::opacity, "opacity")
@@ -503,7 +503,7 @@ internal fun ImageBlock.encodeJson(): JSONObject {
 
 internal fun ButtonBlock.Companion.decodeJson(json: JSONObject): ButtonBlock {
     return ButtonBlock(
-        action = Block.Action.optDecodeJson(json.optJSONObject("action")),
+        tapBehavior = Block.TapBehavior.optDecodeJson(json.optJSONObject("tapBehavior")),
         background = Background.decodeJson(json.getJSONObject("background")),
         border = Border.decodeJson(json.getJSONObject("border")),
         id = ID(json.safeGetString("id")),
@@ -517,7 +517,7 @@ internal fun ButtonBlock.Companion.decodeJson(json: JSONObject): ButtonBlock {
 
 internal fun RectangleBlock.Companion.decodeJson(json: JSONObject): RectangleBlock {
     return RectangleBlock(
-        action = Block.Action.optDecodeJson(json.optJSONObject("action")),
+        tapBehavior = Block.TapBehavior.optDecodeJson(json.optJSONObject("tapBehavior")),
         background = Background.decodeJson(json.getJSONObject("background")),
         border = Border.decodeJson(json.getJSONObject("border")),
         id = ID(json.safeGetString("id")),
@@ -530,7 +530,7 @@ internal fun RectangleBlock.Companion.decodeJson(json: JSONObject): RectangleBlo
 
 internal fun WebViewBlock.Companion.decodeJson(json: JSONObject): WebViewBlock {
     return WebViewBlock(
-        action = Block.Action.optDecodeJson(json.optJSONObject("action")),
+        tapBehavior = Block.TapBehavior.optDecodeJson(json.optJSONObject("tapBehavior")),
         background = Background.decodeJson(json.getJSONObject("background")),
         border = Border.decodeJson(json.getJSONObject("border")),
         id = ID(json.safeGetString("id")),
@@ -551,7 +551,7 @@ internal fun WebView.Companion.decodeJson(json: JSONObject): WebView {
 
 internal fun TextBlock.Companion.decodeJson(json: JSONObject): TextBlock {
     return TextBlock(
-        action = Block.Action.optDecodeJson(json.optJSONObject("action")),
+        tapBehavior = Block.TapBehavior.optDecodeJson(json.optJSONObject("tapBehavior")),
         background = Background.decodeJson(json.getJSONObject("background")),
         border = Border.decodeJson(json.getJSONObject("border")),
         id = ID(json.safeGetString("id")),
@@ -565,7 +565,7 @@ internal fun TextBlock.Companion.decodeJson(json: JSONObject): TextBlock {
 
 internal fun ImageBlock.Companion.decodeJson(json: JSONObject): ImageBlock {
     return ImageBlock(
-        action = Block.Action.optDecodeJson(json.optJSONObject("action")),
+        tapBehavior = Block.TapBehavior.optDecodeJson(json.optJSONObject("tapBehavior")),
         background = Background.decodeJson(json.getJSONObject("background")),
         border = Border.decodeJson(json.getJSONObject("border")),
         id = ID(json.safeGetString("id")),
@@ -577,45 +577,42 @@ internal fun ImageBlock.Companion.decodeJson(json: JSONObject): ImageBlock {
     )
 }
 
-internal val Block.Action.OpenUrlAction.Companion.resourceName get() = "OpenURLAction"
-internal val Block.Action.GoToScreenAction.Companion.resourceName get() = "GoToScreenAction"
-internal val Block.Action.PresentWebsite.Companion.resourceName get() = "PresentWebsiteAction"
-
-internal fun Block.Action.Companion.optDecodeJson(json: JSONObject?): Block.Action? {
+internal fun Block.TapBehavior.Companion.optDecodeJson(json: JSONObject?): Block.TapBehavior? {
     if (json == null) return null
-    // BlockAction has subclasses, so we need to delegate to the appropriate deserializer for each
-    // block action type.
-
     val typeName = json.safeGetString("__typename")
 
-    return when (typeName) {
-        Block.Action.OpenUrlAction.resourceName -> Block.Action.OpenUrlAction(
+    return when(typeName) {
+        "NoneBlockTapBehavior" -> Block.TapBehavior.None()
+        "OpenURLBehavior" -> Block.TapBehavior.OpenUri(
+            uri = json.safeGetUri("url")
+        )
+        "GoToScreenBehavior" -> Block.TapBehavior.GoToScreen(
+            screenId = ID(json.getString("id"))
+        )
+        "PresentWebsiteBlockTapBehavior" -> Block.TapBehavior.PresentWebsite(
             url = json.safeGetUri("url")
         )
-        Block.Action.GoToScreenAction.resourceName -> Block.Action.GoToScreenAction(
-            screenId = ID(json.safeGetString("screenID"))
-        )
-        Block.Action.PresentWebsite.resourceName -> Block.Action.PresentWebsite(
-            url = json.safeGetUri("url")
-        )
-        else -> throw JSONException("Unsupported Block Action type '$typeName'.")
+        else -> throw JSONException("Unsupported Block TapBehavior type `$typeName`.")
     }
 }
 
-internal fun Block.Action.optEncodeJson(): JSONObject {
+internal fun Block.TapBehavior.optEncodeJson(): JSONObject {
     return JSONObject().apply {
-        put("__typename", when (this@optEncodeJson) {
-            is Block.Action.OpenUrlAction -> {
-                putProp(this@optEncodeJson, Block.Action.OpenUrlAction::url) { it.toString() }
-                Block.Action.OpenUrlAction.resourceName
+        put("__typename", when(this@optEncodeJson) {
+            is Block.TapBehavior.GoToScreen -> {
+                putProp(this@optEncodeJson, Block.TapBehavior.GoToScreen::screenId) { it.toString() }
+                "GoToScreenBehavior"
             }
-            is Block.Action.GoToScreenAction -> {
-                putProp(this@optEncodeJson, Block.Action.GoToScreenAction::screenId, "screenID") { it.rawValue }
-                Block.Action.GoToScreenAction.resourceName
+            is Block.TapBehavior.OpenUri -> {
+                putProp(this@optEncodeJson, Block.TapBehavior.OpenUri::uri, "url") { it.toString() }
+                "OpenURLBehavior"
             }
-            is Block.Action.PresentWebsite -> {
-                putProp(this@optEncodeJson, Block.Action.PresentWebsite::url) { it.toString() }
-                Block.Action.PresentWebsite.resourceName
+            is Block.TapBehavior.PresentWebsite -> {
+                putProp(this@optEncodeJson, Block.TapBehavior.PresentWebsite::url) { it.toString() }
+                "PresentWebsiteBlockTapBehavior"
+            }
+            is Block.TapBehavior.None -> {
+                "NoneBlockTapBehavior"
             }
         })
     }

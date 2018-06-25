@@ -1,6 +1,6 @@
 package io.rover.experiences.ui.navigation
 
-import io.rover.rover.core.operations.ActionBehaviour
+import io.rover.rover.core.routing.Router
 import java.net.URI
 
 /**
@@ -8,13 +8,17 @@ import java.net.URI
  */
 sealed class NavigateTo {
     /**
-     * Navigate to something external to the experience.
+     * Navigate to something external to the experience through the Rover URI [Router].
      */
     class External(
-        val actionBehaviour: ActionBehaviour
+        val uri: URI
     ): NavigateTo()
 
     class GoToScreenAction(
         val screenId: String
+    ) : NavigateTo()
+
+    class PresentWebsiteAction(
+        val url: URI
     ) : NavigateTo()
 }

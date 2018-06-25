@@ -27,24 +27,17 @@ class RegionRepository(
 
     private val queryFragment = """
         regions {
-            __typename
-            ... on BeaconRegion {
-                uuid
-                major
-                minor
-            }
-            ... on GeofenceRegion {
-                latitude
-                longitude
-                radius
-            }
+            ...regionFields
         }
     """
 
     private fun decodeRegionsPayload(data: JSONObject): List<Region> =
         data.getJSONArray("regions").getObjectIterable().map { regionJson -> Region.decodeJson(regionJson) }
 
-    private val updates = stateManagerService.updatesForQueryFragment(queryFragment)
+    private val updates = stateManagerService.updatesForQueryFragment(
+        queryFragment,
+        listOf("regionFields")
+    )
         .map { networkResult ->
             when(networkResult) {
                 is NetworkResult.Success -> decodeRegionsPayload(networkResult.response)

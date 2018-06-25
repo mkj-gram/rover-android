@@ -1,26 +1,19 @@
 package io.rover.notifications
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import io.rover.notifications.domain.PushAction
+import io.rover.notifications.domain.Notification
 import io.rover.notifications.graphql.decodeJson
-import io.rover.rover.core.events.EventQueueServiceInterface
 import io.rover.rover.core.events.PushTokenTransmissionChannel
 import io.rover.rover.core.logging.log
-import io.rover.rover.core.operations.ActionBehaviour
-import io.rover.rover.core.operations.ActionBehaviourMappingInterface
-import io.rover.rover.core.streams.subscribe
 import io.rover.rover.platform.DateFormattingInterface
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.MalformedURLException
 
-
 open class PushReceiver(
     private val pushTokenTransmissionChannel: PushTokenTransmissionChannel,
-    private val dateFormatting: DateFormattingInterface,
-    private val actionBehaviourMapping: ActionBehaviourMappingInterface
+    private val notificationDispatcher: NotificationDispatcher,
+    private val dateFormatting: DateFormattingInterface
 ): PushReceiverInterface {
 
     override fun onTokenRefresh(token: String?) {
@@ -39,27 +32,25 @@ open class PushReceiver(
 
         log.v("Received a push notification. Raw parameters: $parameters")
 
-        if(!parameters.containsKey("action")) {
-            log.w("Invalid push notification received: `action` data parameter not present. Possibly was a Display-only push notification, or otherwise not intended for the Rover SDK. Ignoring.")
+        if(!parameters.containsKey("rover")) {
+            log.w("Invalid push notification received: `rover` data parameter not present. Possibly was a Display-only push notification, or otherwise not intended for the Rover SDK. Ignoring.")
         }
 
-        val action = parameters["action"] ?: return
-        handleRoverNotificationObject(action)
+        val notificationJson = parameters["rover"] ?: return
+        handleRoverNotificationObject(notificationJson)
     }
 
     override fun onMessageReceivedDataAsBundle(parameters: Bundle) {
         val rover = parameters.getString("rover") ?: return
-        // TODO: this will instead become a generic push notification type which contain an ACTION thingy instead,
-        // which itself may include a Rover Notification.  Once the action is dispatched to
         handleRoverNotificationObject(rover)
     }
 
 
     private fun handleRoverNotificationObject(roverJson: String) {
-        val pushAction = try {
-            val roverJsonObject = JSONObject(roverJson)
-            PushAction.decodeJson(
-                roverJsonObject,
+        val notification = try {
+            val notificationJsonObject = JSONObject(roverJson).getJSONObject("notification")
+            Notification.decodeJson(
+                notificationJsonObject,
                 dateFormatting
             )
         } catch (e: JSONException) {
@@ -72,27 +63,10 @@ open class PushReceiver(
             return
         }
 
-        execute(pushAction)
+        notificationDispatcher.ingest(notification)
     }
 
     override fun onMessageReceivedNotification(notification: io.rover.notifications.domain.Notification) {
-        execute(
-            PushAction.AddNotificationAction(notification)
-        )
-    }
-
-    private fun execute(pushAction: PushAction) {
-        val behaviour = actionBehaviourMapping.mapToBehaviour(pushAction)
-
-        when(behaviour) {
-            is ActionBehaviour.IntentAction, is ActionBehaviour.Intrinsic, is ActionBehaviour.NotAvailable -> {
-                log.w("Received action in push notification that may not be processed. This is a bug. PushAction: $pushAction")
-            }
-            is ActionBehaviour.HeadlessAction -> {
-                behaviour.behaviour.subscribe {
-                    log.v("Headless behaviour completed.")
-                }
-            }
-        }
+        notificationDispatcher.ingest(notification)
     }
 }

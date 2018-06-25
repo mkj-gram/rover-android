@@ -4,32 +4,32 @@ import android.content.Context
 import android.os.Parcelable
 import android.util.DisplayMetrics
 import io.rover.experiences.routing.ExperienceEnabledTopLevelNavigation
-import io.rover.rover.core.assets.AssetService
-import io.rover.rover.core.assets.ImageOptimizationServiceInterface
-import io.rover.rover.core.container.Assembler
-import io.rover.rover.core.container.Container
-import io.rover.rover.core.container.Resolver
-import io.rover.rover.core.container.Scope
-import io.rover.rover.core.data.domain.*
-import io.rover.rover.core.data.graphql.GraphQlApiServiceInterface
-import io.rover.rover.core.events.EventQueueServiceInterface
+import io.rover.experiences.routing.routes.PresentExperienceRoute
 import io.rover.experiences.ui.ExperienceViewModel
 import io.rover.experiences.ui.ExperienceViewModelInterface
 import io.rover.experiences.ui.blocks.barcode.BarcodeBlockViewModel
 import io.rover.experiences.ui.blocks.barcode.BarcodeBlockViewModelInterface
 import io.rover.experiences.ui.blocks.barcode.BarcodeViewModel
 import io.rover.experiences.ui.blocks.barcode.BarcodeViewModelInterface
-import io.rover.experiences.ui.blocks.button.*
+import io.rover.experiences.ui.blocks.button.ButtonBlockViewModel
+import io.rover.experiences.ui.blocks.button.ButtonBlockViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.background.BackgroundViewModel
 import io.rover.experiences.ui.blocks.concerns.background.BackgroundViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.border.BorderViewModel
 import io.rover.experiences.ui.blocks.concerns.border.BorderViewModelInterface
-import io.rover.experiences.ui.blocks.concerns.layout.*
+import io.rover.experiences.ui.blocks.concerns.layout.BlockViewModel
+import io.rover.experiences.ui.blocks.concerns.layout.BlockViewModelInterface
+import io.rover.experiences.ui.blocks.concerns.layout.CompositeBlockViewModelInterface
+import io.rover.experiences.ui.blocks.concerns.layout.LayoutPaddingDeflection
+import io.rover.experiences.ui.blocks.concerns.layout.Measurable
 import io.rover.experiences.ui.blocks.concerns.text.AndroidRichTextToSpannedTransformer
 import io.rover.experiences.ui.blocks.concerns.text.RichTextToSpannedTransformer
 import io.rover.experiences.ui.blocks.concerns.text.TextViewModel
 import io.rover.experiences.ui.blocks.concerns.text.TextViewModelInterface
-import io.rover.experiences.ui.blocks.image.*
+import io.rover.experiences.ui.blocks.image.ImageBlockViewModel
+import io.rover.experiences.ui.blocks.image.ImageBlockViewModelInterface
+import io.rover.experiences.ui.blocks.image.ImageViewModel
+import io.rover.experiences.ui.blocks.image.ImageViewModelInterface
 import io.rover.experiences.ui.blocks.rectangle.RectangleBlockViewModel
 import io.rover.experiences.ui.blocks.rectangle.RectangleBlockViewModelInterface
 import io.rover.experiences.ui.blocks.text.TextBlockViewModel
@@ -50,15 +50,33 @@ import io.rover.experiences.ui.navigation.ExperienceNavigationViewModelInterface
 import io.rover.experiences.ui.toolbar.ExperienceToolbarViewModel
 import io.rover.experiences.ui.toolbar.ExperienceToolbarViewModelInterface
 import io.rover.experiences.ui.toolbar.ToolbarConfiguration
-import io.rover.rover.core.context.ModulesTrackerInterface
+import io.rover.rover.core.assets.AssetService
+import io.rover.rover.core.assets.ImageOptimizationServiceInterface
+import io.rover.rover.core.container.Assembler
+import io.rover.rover.core.container.Container
+import io.rover.rover.core.container.Resolver
+import io.rover.rover.core.container.Scope
+import io.rover.rover.core.data.domain.Background
+import io.rover.rover.core.data.domain.Barcode
+import io.rover.rover.core.data.domain.BarcodeBlock
+import io.rover.rover.core.data.domain.Block
+import io.rover.rover.core.data.domain.Border
+import io.rover.rover.core.data.domain.ButtonBlock
+import io.rover.rover.core.data.domain.Experience
+import io.rover.rover.core.data.domain.Image
+import io.rover.rover.core.data.domain.ImageBlock
+import io.rover.rover.core.data.domain.RectangleBlock
+import io.rover.rover.core.data.domain.Row
+import io.rover.rover.core.data.domain.Screen
+import io.rover.rover.core.data.domain.Text
+import io.rover.rover.core.data.domain.TextBlock
+import io.rover.rover.core.data.domain.WebViewBlock
+import io.rover.rover.core.data.graphql.GraphQlApiServiceInterface
+import io.rover.rover.core.events.EventQueueServiceInterface
+import io.rover.rover.core.routing.Router
 import io.rover.rover.core.routing.TopLevelNavigation
-import io.rover.rover.core.events.domain.Event
-import io.rover.rover.core.operations.ActionBehaviour
-import io.rover.rover.core.operations.ActionBehaviourMappingInterface
 import io.rover.rover.core.streams.Scheduler
-import io.rover.rover.core.tracking.SessionEventProvider
 import io.rover.rover.core.tracking.SessionTrackerInterface
-import io.rover.rover.core.tracking.SessionDirection
 
 /**
  * This is the Rover User Experience plugin.  It contains the entire Rover Experiences system.
@@ -107,19 +125,10 @@ class ExperiencesAssembler: Assembler {
             Scope.Transient,
             ExperienceNavigationViewModelInterface::class.java
         ) { resolver: Resolver, experience: Experience, icicle: Parcelable? ->
-            val eventProvider = object : SessionEventProvider {
-                override fun eventForSessionBoundary(direction: SessionDirection, attributes: Attributes): Event {
-                    return when(direction) {
-                        SessionDirection.Start -> Event("Screen Presented", attributes)
-                        SessionDirection.Stop -> Event("Screen Dismissed", attributes)
-                    }
-                }
-            }
-
             ExperienceNavigationViewModel(
                 experience,
                 resolver.resolveSingletonOrFail(EventQueueServiceInterface::class.java),
-                resolver.resolve(SessionTrackerInterface::class.java, null, eventProvider, 60)!!,
+                resolver.resolveSingletonOrFail(SessionTrackerInterface::class.java),
                 { screen -> resolver.resolve(ScreenViewModelInterface::class.java, null, screen)!! },
                 { toolbarConfiguration -> resolver.resolve(ExperienceToolbarViewModelInterface::class.java, null, toolbarConfiguration)!! },
                 icicle
@@ -164,20 +173,11 @@ class ExperiencesAssembler: Assembler {
             Scope.Transient,
             ExperienceViewModelInterface::class.java
         ) { resolver: Resolver, experienceRequest: ExperienceViewModel.ExperienceRequest, icicle: Parcelable? ->
-            val eventProvider = object : SessionEventProvider {
-                override fun eventForSessionBoundary(direction: SessionDirection, attributes: Attributes): Event {
-                    return when(direction) {
-                        SessionDirection.Start -> Event("Experience Presented", attributes)
-                        SessionDirection.Stop -> Event("Experience Dismissed", attributes)
-                    }
-                }
-            }
-
             ExperienceViewModel(
                 experienceRequest,
                 resolver.resolveSingletonOrFail(GraphQlApiServiceInterface::class.java),
                 resolver.resolveSingletonOrFail(Scheduler::class.java, "main"),
-                resolver.resolve(SessionTrackerInterface::class.java, null, eventProvider, 60)!!,
+                resolver.resolveSingletonOrFail(SessionTrackerInterface::class.java),
                 { experience: Experience, navigationIcicle: Parcelable? ->
                     resolver.resolve(ExperienceNavigationViewModelInterface::class.java, null, experience, navigationIcicle)!!
                 },
@@ -198,7 +198,6 @@ class ExperiencesAssembler: Assembler {
             BlockViewModel(
                 block,
                 deflectors,
-                resolver.resolveSingletonOrFail(ActionBehaviourMappingInterface::class.java),
                 measurable
             )
         }
@@ -410,33 +409,16 @@ class ExperiencesAssembler: Assembler {
                 layout, displayMetrics
             )
         }
-        container.register(
-            Scope.Transient,
-            ActionBehaviour::class.java,
-            "presentExperience"
-        ) { resolver, campaignId: String ->
-            val navigation = resolver.resolveSingletonOrFail(TopLevelNavigation::class.java)
-
-            ActionBehaviour.IntentAction(
-                navigation.displayExperienceIntentByCampaignId(campaignId)
-            )
-        }
-
-        container.register(
-            Scope.Transient,
-            ActionBehaviour::class.java,
-            "goToScreen"
-        ) { _, _: String ->
-            // goToScreen must be handled in place by the experience navigation view model.  it
-            // cannot be reslolved to an ActionBehaviour.
-            ActionBehaviour.Intrinsic()
-        }
     }
 
     override fun afterAssembly(resolver: Resolver) {
-        resolver.resolveSingletonOrFail(ModulesTrackerInterface::class.java).version(
-            "experiences",
-            BuildConfig.VERSION_NAME
-        )
+        resolver.resolveSingletonOrFail(Router::class.java).apply {
+            registerRoute(
+                PresentExperienceRoute(
+                    resolver.resolveSingletonOrFail(String::class.java, "deepLinkScheme"),
+                    resolver.resolveSingletonOrFail(TopLevelNavigation::class.java)
+                )
+            )
+        }
     }
 }

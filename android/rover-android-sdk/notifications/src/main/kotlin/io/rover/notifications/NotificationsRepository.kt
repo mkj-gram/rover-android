@@ -119,33 +119,9 @@ class NotificationsRepository(
         }.subscribeOn(ioExecutor)
     }
 
-    // TODO: change to use server-provided fragment
     private val queryFragment: String = """
         notifications {
-            id
-            title
-            body
-            deliveredAt
-            expiresAt
-            isRead
-            isDeleted
-            isNotificationCenterEnabled
-            action {
-                __typename
-                ... on OpenURLAction {
-                    url
-                }
-                ... on PresentExperienceAction {
-                    campaignID
-                }
-                ... on PresentWebsiteAction {
-                    url
-                }
-            }
-            attachment {
-                type
-                url
-            }
+          ...notificationFields
         }
     """
 
@@ -154,7 +130,8 @@ class NotificationsRepository(
      * notifications updates, along with the side-effect of updating local state.
      */
     private val stateStoreObserverChain = stateManagerService.updatesForQueryFragment(
-        queryFragment
+        queryFragment,
+        listOf("notificationFields")
     ).flatMap { networkResult ->
         when(networkResult) {
             is NetworkResult.Error -> {
@@ -168,19 +145,25 @@ class NotificationsRepository(
                 )
             }
             is NetworkResult.Success -> {
-                PublisherOperators.concat(
-                    PublisherOperators.just(
-                        NotificationsRepositoryInterface.Emission.Event.Refreshing(false)
-                    ),
-                    mergeWithLocalStorage(decodeNotificationsPayload(networkResult.response))
-                        .flatMap { notifications ->
-                            // side-effect: update local storage!
-                            replaceLocalStorage(notifications).map {
-                                NotificationsRepositoryInterface.Emission.Update(it)
+                try {
+                    val newNotifications = decodeNotificationsPayload(networkResult.response)
+                    PublisherOperators.concat(
+                        PublisherOperators.just(
+                            NotificationsRepositoryInterface.Emission.Event.Refreshing(false)
+                        ),
+                        mergeWithLocalStorage(newNotifications)
+                            .flatMap { notifications ->
+                                // side-effect: update local storage!
+                                replaceLocalStorage(notifications).map {
+                                    NotificationsRepositoryInterface.Emission.Update(it)
+                                }
                             }
-                        }
-                ).onErrorReturn { jsonError ->
-                    NotificationsRepositoryInterface.Emission.Event.FetchFailure(jsonError.message ?: "Unknown")
+                    )
+                } catch (jsonError: JSONException) {
+                    PublisherOperators.concat(
+                        PublisherOperators.just(NotificationsRepositoryInterface.Emission.Event.Refreshing(false)),
+                        PublisherOperators.just(NotificationsRepositoryInterface.Emission.Event.FetchFailure(jsonError.message ?: "Unknown"))
+                    )
                 }
             }
         }
@@ -297,7 +280,9 @@ class NotificationsRepository(
 
     @Throws(JSONException::class)
     private fun decodeNotificationsPayload(data: JSONObject): List<Notification> =
-        data.getJSONArray("notifications").getObjectIterable().map { notificationJson -> Notification.decodeJson(notificationJson, dateFormatting)}
+        data.getJSONArray("notifications").getObjectIterable().map {
+            notificationJson -> Notification.decodeJson(notificationJson, dateFormatting)
+        }
 
     companion object {
         private const val STORAGE_CONTEXT_IDENTIFIER = "io.rover.rover.notification-storage"

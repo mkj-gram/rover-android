@@ -1,5 +1,6 @@
 package io.rover.experiences.ui.layout
 
+import android.content.Context
 import io.rover.experiences.ExperiencesAssembler
 import io.rover.experiences.MeasurementService
 import io.rover.experiences.ui.blocks.concerns.layout.CompositeBlockViewModelInterface
@@ -18,7 +19,7 @@ import io.rover.rover.core.data.domain.Height
 import io.rover.rover.core.data.domain.HorizontalAlignment
 import io.rover.rover.core.data.domain.Position
 import io.rover.rover.core.data.domain.VerticalAlignment
-import io.rover.rover.core.operations.ActionBehaviourMappingInterface
+import io.rover.rover.core.routing.Router
 import io.rover.rover.core.streams.Scheduler
 import io.rover.rover.core.ui.RectF
 import org.amshove.kluent.mock
@@ -63,8 +64,19 @@ class RowViewModelSpec : Spek({
 
                         container.register(
                             Scope.Singleton,
-                            ActionBehaviourMappingInterface::class.java
-                        ) { _: Resolver -> mock() }
+                            Router::class.java
+                        ) { _ -> mock() }
+
+                        container.register(
+                            Scope.Singleton,
+                            String::class.java,
+                            "deepLinkScheme"
+                        ) { _ -> "rv-inbox "}
+
+                        container.register(
+                            Scope.Singleton,
+                            Context::class.java
+                        ) { _ -> mock() }
                     }
                 }
             )

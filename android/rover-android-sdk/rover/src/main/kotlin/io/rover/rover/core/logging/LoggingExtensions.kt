@@ -141,6 +141,7 @@ class EventQueueLogger(
     }
 
     override fun w(logTag: String, message: String) {
+        nextLogger.w(logTag, message)
         logMessage(
             Event(
                 "Log Message",

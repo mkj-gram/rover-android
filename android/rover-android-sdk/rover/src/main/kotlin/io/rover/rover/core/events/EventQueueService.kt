@@ -115,7 +115,7 @@ class EventQueueService(
     private fun flushEvents(minBatchSize: Int) {
         serialQueueExecutor.execute {
             if(isFlushingEvents) {
-                log.w("Skipping flush, already in progress")
+                log.v("Skipping flush, already in progress")
                 return@execute
             }
             if(eventQueue.isEmpty()) {
@@ -135,10 +135,10 @@ class EventQueueService(
             graphQlApiService.sendEventsTask(events) { networkResult ->
                 when(networkResult) {
                     is NetworkResult.Error -> {
-                        log.w("Error delivering ${events.count()} to the Rover API: ${networkResult.throwable.message}")
+                        log.i("Error delivering ${events.count()} events to the Rover API: ${networkResult.throwable.message}")
 
                         if(networkResult.shouldRetry) {
-                            log.w("... will leave them enqueued for a future retry.")
+                            log.i("... will leave them enqueued for a future retry.")
                         } else {
                             removeEvents(events)
                         }

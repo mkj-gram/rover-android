@@ -10,7 +10,6 @@ class ViewBlock(
     override val view: View,
     private val paddingContributors: Set<PaddingContributor> = emptySet()
 ) : ViewBlockInterface {
-    // State:
     override var viewModel: BindableView.Binding<BlockViewModelInterface>? by ViewModelBinding { binding, subscriptionCallback ->
         val viewModel = binding?.viewModel
 

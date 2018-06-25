@@ -1,8 +1,6 @@
 package io.rover.notifications.domain
 
-import io.rover.rover.core.container.Resolver
-import io.rover.rover.core.operations.Action
-import io.rover.rover.core.operations.ActionBehaviour
+import io.rover.notifications.NotificationsAssembler
 import java.net.URI
 import java.net.URL
 import java.util.Date
@@ -21,8 +19,8 @@ data class Notification(
     val id: String,
 
     /**
-     * An Android channel ID.  If not set, Rover will use the default channel id set for the whole
-     * Push Plugin (see [PushPluginAssembler]).
+     * An Android channel ID.  If not set, Rover will use the default channel id set in (see
+     * [NotificationsAssembler]).
      */
     val channelId: String?,
 
@@ -53,33 +51,16 @@ data class Notification(
 
     val deliveredAt: Date,
 
-    val action: Action?,
+    val tapBehavior: TapBehavior,
 
     val attachment: NotificationAttachment?
 ) {
     companion object;
 
-    /**
-     * The allowable behaviours that can be embedded in a notification.
-     */
-    sealed class Action: io.rover.rover.core.operations.Action {
-        data class OpenURL(val url: URI) : Action() {
-            // TODO how do I move these out of the model definition?
-            override fun operation(resolver: Resolver): ActionBehaviour {
-                return resolver.resolve(ActionBehaviour::class.java, "openURL", url) ?: ActionBehaviour.NotAvailable()
-            }
-        }
-        data class PresentExperience(val campaignId: String): Action() {
-            override fun operation(resolver: Resolver): ActionBehaviour {
-                return resolver.resolve(ActionBehaviour::class.java, "presentExperience", campaignId) ?: ActionBehaviour.NotAvailable()
-            }
-        }
-
-        data class PresentWebsite(val url: URL): Action() {
-            override fun operation(resolver: Resolver): ActionBehaviour {
-                return resolver.resolve(ActionBehaviour::class.java, "presentWebsite", url) ?: ActionBehaviour.NotAvailable()
-            }
-        }
+    sealed class TapBehavior {
+        data class PresentWebsite(val url: URI): TapBehavior()
+        data class OpenUri(val uri: URI): TapBehavior()
+        class OpenApp: TapBehavior()
 
         companion object
     }

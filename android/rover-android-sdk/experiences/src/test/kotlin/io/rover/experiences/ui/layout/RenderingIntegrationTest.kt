@@ -1,5 +1,6 @@
 package io.rover.experiences.ui.layout
 
+import android.content.Context
 import io.rover.experiences.ExperiencesAssembler
 import io.rover.experiences.MeasurementService
 import io.rover.experiences.ui.layout.screen.ScreenViewModelInterface
@@ -16,7 +17,7 @@ import io.rover.rover.core.data.graphql.operations.data.decodeJson
 import io.rover.rover.core.logging.GlobalStaticLogHolder
 import io.rover.rover.core.logging.JvmLogger
 import io.rover.rover.core.logging.log
-import io.rover.rover.core.operations.ActionBehaviourMappingInterface
+import io.rover.rover.core.routing.Router
 import io.rover.rover.core.streams.Scheduler
 import org.amshove.kluent.mock
 import org.amshove.kluent.shouldBeLessThan
@@ -47,10 +48,6 @@ class RenderingIntegrationTest : Spek({
                             mock()
                         }
 
-                        container.register(Scope.Singleton, ActionBehaviourMappingInterface::class.java) { resolver ->
-                            mock()
-                        }
-
                         container.register(
                             Scope.Singleton,
                             Scheduler::class.java,
@@ -61,6 +58,22 @@ class RenderingIntegrationTest : Spek({
                             Scope.Singleton,
                             MeasurementService::class.java
                         ) { _: Resolver -> mock() }
+
+                        container.register(
+                            Scope.Singleton,
+                            Router::class.java
+                        ) { _ -> mock() }
+
+                        container.register(
+                            Scope.Singleton,
+                            String::class.java,
+                            "deepLinkScheme"
+                        ) { _ -> "rv-inbox "}
+
+                        container.register(
+                            Scope.Singleton,
+                            Context::class.java
+                        ) { _ -> mock() }
                     }
                 }
             )

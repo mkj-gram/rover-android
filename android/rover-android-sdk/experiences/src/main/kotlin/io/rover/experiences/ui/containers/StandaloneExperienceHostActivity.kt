@@ -1,7 +1,6 @@
 package io.rover.experiences.ui.containers
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -9,23 +8,19 @@ import android.os.Parcelable
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
-import io.rover.rover.R
-import io.rover.rover.Rover
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.streams.androidLifecycleDispose
-import io.rover.rover.core.streams.subscribe
-import io.rover.rover.platform.asAndroidUri
 import io.rover.experiences.ui.ExperienceView
 import io.rover.experiences.ui.ExperienceViewModel
 import io.rover.experiences.ui.ExperienceViewModelInterface
 import io.rover.experiences.ui.navigation.ExperienceExternalNavigationEvent
-import io.rover.rover.core.operations.ActionBehaviour
+import io.rover.rover.R
+import io.rover.rover.Rover
+import io.rover.rover.core.logging.log
+import io.rover.rover.core.routing.Router
+import io.rover.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
+import io.rover.rover.core.streams.androidLifecycleDispose
+import io.rover.rover.core.streams.subscribe
 import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.ViewModelBinding
 import io.rover.rover.platform.whenNotNull
-import java.io.IOException
-import java.io.InputStream
-import java.net.HttpURLConnection
 
 /**
  * This can display a Rover experience in an Activity, self-contained.
@@ -52,32 +47,26 @@ open class StandaloneExperienceHostActivity : AppCompatActivity() {
      * to do some other sort of external behaviour in your app, such as open a native login screen.
      */
     protected open fun dispatchExternalNavigationEvent(externalNavigationEvent: ExperienceExternalNavigationEvent) {
-        // TODO: refactor the following into a separate class that takes the host activity as an argument.
+        // TODO: factor this out into a separate object.
         when (externalNavigationEvent) {
             is ExperienceExternalNavigationEvent.Exit -> {
                 finish()
             }
-            is ExperienceExternalNavigationEvent.Action -> {
-                when(externalNavigationEvent.behaviour) {
-                    is ActionBehaviour.IntentAction -> {
-                        try {
-                            ContextCompat.startActivity(
-                                this,
-                                externalNavigationEvent.behaviour.intent,
-                                null
-                            )
-                        } catch (e: ActivityNotFoundException) {
-                            log.w("No way to handle action behaviour ${externalNavigationEvent.behaviour}.  Perhaps app is missing an intent filter for a deep link?")
-                        }
-                    }
-                    is ActionBehaviour.HeadlessAction -> {
-                        log.w("Executing headless action behaviour in the experience activity.  It will work, but there may be no visible feedback to the user.")
-                        externalNavigationEvent.behaviour.exec()
-                    }
-                    is ActionBehaviour.Intrinsic -> {
-                        log.w("An ActionBehaviour.Intrinsic arrived in the experience activity.  This should have been handled deeper in the stack.")
-                    }
-                }
+            is ExperienceExternalNavigationEvent.OpenUri -> {
+                ContextCompat.startActivity(
+                    this,
+                    Rover.sharedInstance.resolveSingletonOrFail(Router::class.java).route(externalNavigationEvent.uri, false),
+                    null
+                )
+            }
+            is ExperienceExternalNavigationEvent.PresentWebsite -> {
+                ContextCompat.startActivity(
+                    this,
+                    Rover.sharedInstance.resolveSingletonOrFail(EmbeddedWebBrowserDisplayInterface::class.java).intentForViewingWebsiteViaEmbeddedBrowser(
+                        externalNavigationEvent.url.toString()
+                    ),
+                    null
+                )
             }
             is ExperienceExternalNavigationEvent.Custom -> {
                 log.w("You have emitted a Custom event: $externalNavigationEvent, but did not handle it in your subclass implementation of StandaloneExperienceHostActivity.dispatchExternalNavigationEvent()")

@@ -23,6 +23,35 @@
             android:theme="@style/AppTheme.NoActionBar"
         />
 
+        <activity android:name="io.rover.experiences.ui.TransientLinkLaunchActivity">
+            <!-- for deep links -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="rv-inbox" />
+            </intent-filter>
+
+            <!-- for http universal links/app links -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" android:host="rover.rover.io" />
+            </intent-filter>
+
+            <!-- for https universal links/app links -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https" android:host="rover.rover.io" />
+            </intent-filter>
+        </activity>
+
         <service android:name="io.rover.app.inbox.fcm.FirebaseMessageReceiver">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>

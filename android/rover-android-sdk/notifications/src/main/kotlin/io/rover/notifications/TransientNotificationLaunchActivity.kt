@@ -39,35 +39,24 @@ class TransientNotificationLaunchActivity: AppCompatActivity() {
 
         // this will also do the side-effect of issuing the Notification Opened event, which
         // is the whole reason for this activity existing.
-        val intentStack = notificationOpen.intentStackForOpeningNotificationFromNotificationsDrawer(notificationJson)
+        val intent = notificationOpen.intentForOpeningNotificationFromJson(notificationJson)
 
-
-        // if an activity cannot be resolved for any of the intents in the stack, a nasty bug will
-        // happen that will surprise the developer with an exception that their main to-level
-        // activity cannot be resolved from the manifest. this is completely misleading, so as
-        // follows is some error handling code to identify this case and present a much more helpful
-        // message.
-        val intentToActivityInfo = intentStack.associate { intent ->
-            Pair(intent, intent.resolveActivityInfo(this.packageManager, PackageManager.GET_SHARED_LIBRARY_FILES))
-        }
-        val unstartableIntents = intentToActivityInfo.entries.filter { it.value == null }
-
-        if(unstartableIntents.isNotEmpty()) {
+        if(intent.resolveActivityInfo(this.packageManager, PackageManager.GET_SHARED_LIBRARY_FILES) == null) {
             log.e(
-                "No activity could be found to handle an intent in the intent stack produced for a notification.\nThis could be because the deep link slug you set on NotificationsAssembler does not match what is set in your Rover account, or that an Activity is missing from your manifest.\n\n" +
-                "List of unmappable intents follows:\n" +
-                    unstartableIntents.joinToString("\n") { (intent, _) ->
-                        " -> $intent"
-                    } + "\n"
+                "No activity could be found to handle the Intent needed to start the notification.\n" +
+                    "This could be because the deep link scheme slug you set on NotificationsAssembler does not match what is set in your Rover account, or that an Activity is missing from your manifest.\n\n" +
+                    "Intent was: $intent"
             )
             finish()
             return
         }
 
-        ContextCompat.startActivities(
+        ContextCompat.startActivity(
             this,
-            intentStack.toTypedArray()
+            intent,
+            null
         )
+
         finish()
     }
 

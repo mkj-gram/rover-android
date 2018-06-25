@@ -4,11 +4,10 @@ import android.app.Activity
 import android.os.Parcelable
 import android.view.WindowManager
 import io.rover.experiences.ui.blocks.concerns.layout.BlockViewModel
-import io.rover.rover.core.ui.concerns.BindableViewModel
 import io.rover.experiences.ui.layout.screen.ScreenViewModel
-import io.rover.experiences.ui.toolbar.ExperienceToolbarViewModelInterface
 import io.rover.experiences.ui.layout.screen.ScreenViewModelInterface
-import io.rover.rover.core.operations.ActionBehaviour
+import io.rover.experiences.ui.toolbar.ExperienceToolbarViewModelInterface
+import io.rover.rover.core.ui.concerns.BindableViewModel
 import org.reactivestreams.Publisher
 import java.net.URI
 
@@ -96,7 +95,9 @@ sealed class ExperienceExternalNavigationEvent {
      *  to the internal Rover ExperienceNavigationViewModel, whatever it happens to be in the
      *  surrounding app.
      */
-    data class Action(val behaviour: ActionBehaviour) : ExperienceExternalNavigationEvent()
+    data class OpenUri(val uri: URI) : ExperienceExternalNavigationEvent()
+
+    data class PresentWebsite(val url: URI): ExperienceExternalNavigationEvent()
 
     /**
      * Containing view context (hosting the Experience) should pop itself ([Activity.finish], etc.)

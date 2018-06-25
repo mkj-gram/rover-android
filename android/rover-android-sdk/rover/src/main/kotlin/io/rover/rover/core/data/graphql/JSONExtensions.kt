@@ -69,6 +69,9 @@ fun JSONObject.safeGetString(name: String): String {
 
 fun JSONObject.safeGetUri(name: String): URI {
     val field = this.safeGetString(name)
+//    if(field == "") {
+//        throw JSONException("Invalid URI.  Must not be an empty string.")
+//    }
     return try {
         URI(field)
     } catch (e: URISyntaxException) {

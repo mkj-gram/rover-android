@@ -77,7 +77,7 @@ class ExperiencesApplication: Application() {
             CoreAssembler(
                 "",
                 this,
-                "inbox"
+                "experiences"
             ),
             AccountAssembler(
                 this,

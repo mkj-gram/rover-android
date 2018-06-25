@@ -23,8 +23,9 @@ class StateManagerService(
 ): StateManagerServiceInterface {
     private val deviceIdentifer = deviceIdentification.installationIdentifier
 
-    override fun updatesForQueryFragment(queryFragment: String): Publisher<NetworkResult<JSONObject>> {
+    override fun updatesForQueryFragment(queryFragment: String, neededPersistedFragments: List<String>): Publisher<NetworkResult<JSONObject>> {
         queryFragments.add(queryFragment)
+        this.neededPersistedFragments.addAll(neededPersistedFragments)
 
         // TODO: consider caching and re-emitting latest device state to all new subscribers.
         return updates
@@ -37,12 +38,13 @@ class StateManagerService(
     }
 
     private val queryFragments: MutableSet<String> = mutableSetOf()
+    private val neededPersistedFragments: MutableSet<String> = mutableSetOf()
 
     private val actionSubject =  PublishSubject<Unit>()
 
     private val updates = actionSubject.flatMap {
         { callback: CallbackReceiver<NetworkResult<JSONObject>> -> graphQlApiService.operation(
-            DeviceStateNetworkRequest(deviceIdentifer, queryFragments),
+            DeviceStateNetworkRequest(deviceIdentifer, queryFragments, neededPersistedFragments.toList()),
             callback
         )
         }.asPublisher()
@@ -67,7 +69,8 @@ class StateManagerService(
 
 private class DeviceStateNetworkRequest(
     private val deviceIdentifier: String,
-    private val queryFragments: Set<String>
+    private val queryFragments: Set<String>,
+    override val fragments: List<String>
 ): GraphQlRequest<JSONObject> {
     override val operationName: String? = "StateRefresh"
 

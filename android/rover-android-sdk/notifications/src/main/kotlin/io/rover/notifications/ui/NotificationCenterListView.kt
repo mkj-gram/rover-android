@@ -133,7 +133,6 @@ open class NotificationCenterListView : CoordinatorLayout {
                             Snackbar.make(this, R.string.generic_problem, Snackbar.LENGTH_LONG).show()
                         }
                         is NotificationCenterListViewModelInterface.Event.Navigate -> {
-                            log.v("Navigating to action: ${event.notification.action}")
                             val host = (notificationCenterHost
                                 ?: throw RuntimeException("Please set notificationCenterHost on NotificationCenterListView.  Otherwise, navigation cannot work."))
 
@@ -144,6 +143,7 @@ open class NotificationCenterListView : CoordinatorLayout {
                             val intent = notificationOpen.intentForOpeningNotificationDirectly(event.notification)
                             if (intent != null) {
                                 try {
+                                    log.v("Invoking tap behaviour for notification: ${event.notification.tapBehavior}")
                                     host.provideActivity.startActivity(
                                         intent
                                     )

@@ -50,15 +50,10 @@ data class DeviceContext(
     val screenHeight: Int?,
 
     /**
-     * All of the Rover libraries currently added to the app, where keys are their identifiers
-     * and versions are their version names.  The name "Frameworks" is iOS-inspired.
-     *
-     * Known identifiers at time of writing:
-     *
-     * io.rover.rover -> the core library itself
-     * etc.
+     * The version of the SDK.
      */
-    val frameworks: Map<String, String>,
+    val sdkVersion: String?,
+
     val timeZone: String?,
 
     /**
@@ -77,7 +72,7 @@ data class DeviceContext(
                 null, null, null, null, null, null,
                 null, null,null, null, null,null, null, null,
                 null, null, null, null, null, null,
-                null, null, null, hashMapOf(), null, false, hashMapOf()
+                null, null, null, null, null, false, hashMapOf()
             )
         }
     }
