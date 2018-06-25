@@ -50,4 +50,9 @@ Pod::Spec.new do |s|
     bs.dependency 'Rover/RoverData'
     bs.frameworks = 'CoreBluetooth'
   end
+
+  s.subspec 'RoverDebug' do |ds|
+    ds.source_files = 'Sources/Debug/**/*.swift'
+    ds.dependency 'Rover/RoverData'
+  end
 end

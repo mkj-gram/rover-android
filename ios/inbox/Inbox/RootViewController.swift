@@ -8,6 +8,7 @@
 
 import Auth
 import RoverBluetooth
+import RoverDebug
 import RoverExperiences
 import RoverLocation
 import RoverNotifications
@@ -123,7 +124,8 @@ class RootViewController: UIViewController {
             ExperiencesAssembler(),
             NotificationsAssembler(appGroup: "group.io.rover.inbox"),
             LocationAssembler(),
-            BluetoothAssembler()
+            BluetoothAssembler(),
+            DebugAssembler()
         ])
     }
 }

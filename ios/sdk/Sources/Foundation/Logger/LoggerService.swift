@@ -8,8 +8,22 @@
 
 import Foundation
 
-struct LoggerService: Logger {
+class LoggerService: Logger {
     let threshold: LogLevel
+    
+    var observers = ObserverSet<(String, LogLevel)>()
+    
+    init(threshold: LogLevel) {
+        self.threshold = threshold
+    }
+    
+    func addObserver(block: @escaping (String, LogLevel) -> Void) -> NSObjectProtocol {
+        return observers.add(block: block)
+    }
+    
+    func removeObserver(_ token: NSObjectProtocol) {
+        observers.remove(token: token)
+    }
     
     @discardableResult func debug(_ message: String) -> String? {
         return log(message: message, level: .debug)
@@ -48,6 +62,7 @@ struct LoggerService: Logger {
         let padding = String(repeating: " ", count: 10 - levelDescription.count)
         let output = "Rover     \(levelDescription)\(padding)\(message)"
         print(output)
+        observers.notify(parameters: (message, level))
         return output
     }
 }
