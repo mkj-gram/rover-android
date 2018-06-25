@@ -466,7 +466,7 @@ const renderListButtons = (
     }
     let icon
     if (isScheduledCampaign(campaign)) {
-        campaign.scheduledDeliveryStatus !== 'UNKNOWN'
+        campaign.scheduledDeliveryStatus === 'SCHEDULED'
             ? (icon = (
                   <GearIcon
                       fill={charcoal}
