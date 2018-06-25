@@ -88,6 +88,11 @@ interface NotificationOpenInterface {
      * Returns null if no intent is appropriate.
      */
     fun intentForOpeningNotificationDirectly(notification: Notification): Intent?
+
+    /**
+     * Should be called when the application is opened soon after a notification is received.
+     */
+    fun appOpenedAfterReceivingNotification(notificationId: String)
 }
 
 interface InfluenceTrackerServiceInterface {

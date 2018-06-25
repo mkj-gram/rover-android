@@ -5,9 +5,6 @@ import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import io.rover.notifications.domain.Notification
-import io.rover.rover.core.data.domain.AttributeValue
-import io.rover.rover.core.events.EventQueueServiceInterface
-import io.rover.rover.core.events.domain.Event
 import io.rover.rover.core.logging.log
 import io.rover.rover.platform.LocalStorage
 import io.rover.rover.platform.whenNotNull
@@ -15,7 +12,7 @@ import io.rover.rover.platform.whenNotNull
 class InfluenceTrackerService(
     private val application: Application,
     localStorage: LocalStorage,
-    private val eventQueueService: EventQueueServiceInterface,
+    private val notificationOpen: NotificationOpenInterface,
     private val influenceThresholdSeconds: Int = 60
 ): InfluenceTrackerServiceInterface {
     private val store = localStorage.getKeyValueStorageFor("influenced-opens")
@@ -78,15 +75,8 @@ class InfluenceTrackerService(
 
                         if(seenWithinThreshold == true && capturedLastSeenNotificationId != null) {
                             log.v("App open influenced by a notification detected.")
-                            eventQueueService.trackEvent(
-                                Event(
-                                    "Influenced Open",
-                                    hashMapOf(
-                                        Pair("notificationID", AttributeValue.String(capturedLastSeenNotificationId))
-                                    )
-                                ),
-                                "rover"
-                            )
+
+                            notificationOpen.appOpenedAfterReceivingNotification(capturedLastSeenNotificationId)
 
                             lastSeenNotificationAt = null
                             lastSeenNotificationId = null

@@ -34,11 +34,7 @@ open class NotificationOpen(
     }
 
     private fun intentForNotification(notification: Notification): Intent {
-        issueNotificationOpenedEvent(
-            notification,
-            NotificationSource.Push
 
-        )
 
         return when(notification.tapBehavior) {
             is Notification.TapBehavior.OpenApp -> topLevelNavigation.openAppIntent()
@@ -56,6 +52,11 @@ open class NotificationOpen(
         // side-effect: issue open event.
         val notification = Notification.decodeJson(JSONObject(notificationJson), dateFormatting)
 
+        issueNotificationOpenedEvent(
+            notification.id,
+            NotificationSource.Push
+        )
+
         return intentForNotification(notification)
     }
 
@@ -65,15 +66,20 @@ open class NotificationOpen(
 
         // Not appropriate to re-open the app when opening notification directly, do nothing.
 
+        issueNotificationOpenedEvent(
+            notification.id,
+            NotificationSource.NotificationCenter
+        )
+
         return intentForNotification(notification)
     }
 
-    protected fun issueNotificationOpenedEvent(notification: Notification, source: NotificationSource) {
+    protected fun issueNotificationOpenedEvent(notificationId: String, source: NotificationSource) {
         eventsService.trackEvent(
             Event(
                 "Notification Opened",
                 hashMapOf(
-                    Pair("notificationID", AttributeValue.String(notification.id)),
+                    Pair("notificationID", AttributeValue.String(notificationId)),
                     Pair("source", AttributeValue.String(source.wireValue))
                 )
             ),
@@ -81,7 +87,16 @@ open class NotificationOpen(
         )
     }
 
+    override fun appOpenedAfterReceivingNotification(notificationId: String) {
+        issueNotificationOpenedEvent(
+            notificationId,
+            NotificationSource.InfluencedOpen
+        )
+    }
+
     enum class NotificationSource(val wireValue: String) {
-        NotificationCenter("notificationCenter"), Push("push")
+        NotificationCenter("notificationCenter"),
+        Push("pushNotification"),
+        InfluencedOpen("influencedOpen")
     }
 }

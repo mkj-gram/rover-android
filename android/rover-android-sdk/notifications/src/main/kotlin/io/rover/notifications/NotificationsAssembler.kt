@@ -124,7 +124,7 @@ class NotificationsAssembler @JvmOverloads constructor(
             InfluenceTrackerService(
                 resolver.resolveSingletonOrFail(Application::class.java),
                 resolver.resolveSingletonOrFail(LocalStorage::class.java),
-                resolver.resolveSingletonOrFail(EventQueueServiceInterface::class.java)
+                resolver.resolveSingletonOrFail(NotificationOpenInterface::class.java)
             )
         }
 
