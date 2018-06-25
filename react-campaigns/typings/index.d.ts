@@ -202,6 +202,7 @@ type AppState = {
     notification: NotificationState
     notificationDelivery: NotificationDeliveryState
     overview: OverviewModalState
+    phonePreview: PhonePreviewState
     wizardModal: WizardModal
 }
 
@@ -210,6 +211,11 @@ type AudienceState = StringMap<number>
 type PopoverState = {
     readonly activePopover: string
     readonly isPopoverModalFormOpen: string
+}
+
+type PhonePreviewState = {
+    readonly activePhonePreview: string
+    readonly isPhonePreviewClosing: boolean
 }
 
 type ErrorState = StringMap<string | boolean>

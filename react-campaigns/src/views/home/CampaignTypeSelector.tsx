@@ -207,7 +207,7 @@ const CampaignTypeSelector: React.SFC<
                 </div>
                 <div
                     style={{
-                        height: 111, //280
+                        height: 111, // 280
                         width: 384,
                         flexDirection: 'column',
                         paddingLeft: 16,

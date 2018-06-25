@@ -5,6 +5,7 @@ import { connect, Dispatch } from 'react-redux'
 
 import {
     closePopoverModalForm,
+    updateActivePhonePreview,
     updateActivePopover,
     updateEditableCampaign
 } from '../../../actions'
@@ -20,6 +21,7 @@ import {
     aquamarine,
     Button,
     ChangeIcon,
+    EyeIcon,
     graphite,
     PopoverContainer,
     PopoverSearch,
@@ -34,6 +36,8 @@ import SelectableList from '../../utils/SelectableList'
 import MobilePopover from '../components/MobilePopover'
 import Row from '../components/Row'
 import MediaQuery from 'react-responsive'
+import PreviewPortal from '../components/PreviewPortal'
+import MessageAndMediaIcon from './MessageAndMedia/MessageAndMediaIcon'
 
 const grid =
     // tslint:disable-next-line:max-line-length
@@ -57,6 +61,7 @@ export interface ExperienceSelectorStateProps {
 
 export interface ExperienceSelectorDispatchProps {
     closePopoverModalForm: () => void
+    updateActivePhonePreview: (preview: string) => void
     updateActivePopover: (field: string) => void
     updateEditableCampaign: (id: string) => void
 }
@@ -106,7 +111,7 @@ class ExperienceSelector extends React.Component<
     }
 
     renderExperiencePreview() {
-        const { editableCampaign, experiences } = this.props
+        const { device, editableCampaign, experiences } = this.props
         const { experienceId } = editableCampaign
         const experience = experiences.filter(
             ({ id }) => id === experienceId
@@ -114,56 +119,71 @@ class ExperienceSelector extends React.Component<
 
         const style: React.CSSProperties = {
             position: 'absolute',
-            top: 96,
+            top: device !== 'Desktop' ? 0 : 96,
             zIndex: 11,
-            left: 24,
+            left: device !== 'Desktop' ? 0 : 24,
             height: 568,
             width: 320
         }
-
-        const emptyBackground = (
-            <div
-                style={{
-                    ...style,
-                    backgroundImage: grid,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
-            >
-                <Text
-                    size="medium"
-                    text="Select an experience to preview its contents"
-                    textStyle={{
-                        color: graphite,
-                        textAlign: 'center',
-                        width: 162
-                    }}
-                />
-            </div>
-        )
-
         const simulatorURL = experience
             ? `${experience.simulatorURL}?showStatusBar=true`
             : undefined
 
-        const preview =
-            experienceId && simulatorURL ? (
+        const preview = (
+            <React.Fragment>
+                <div style={{ ...style, backgroundColor: 'white' }}>
+                    <MessageAndMediaIcon />
+                </div>
+                <div
+                    style={{
+                        ...style,
+                        backgroundImage: grid,
+                        display: 'flex',
+                        justifyContent: 'space-around',
+                        alignItems: 'center'
+                    }}
+                >
+                    <Text
+                        size="medium"
+                        text="Select an experience to preview its contents"
+                        textStyle={{
+                            color: graphite,
+                            textAlign: 'center',
+                            width: 162
+                        }}
+                    />
+                </div>
                 <iframe
                     id="experience-preview"
                     src={simulatorURL}
                     style={style}
                 />
-            ) : (
-                emptyBackground
+            </React.Fragment>
+        )
+
+        if (device === 'Desktop') {
+            return (
+                <MediaQuery minWidth={1140}>
+                    {ReactDOM.createPortal(
+                        preview,
+                        document.getElementById('phone-bezel')
+                    )}
+                </MediaQuery>
             )
+        }
+
         return (
-            <MediaQuery minWidth={1140}>
-                {ReactDOM.createPortal(
-                    preview,
-                    document.getElementById('phone-bezel')
-                )}
-            </MediaQuery>
+            <div
+                style={{
+                    borderRadius: 8,
+                    overflow: 'hidden',
+                    position: 'relative'
+                }}
+            >
+                <PreviewPortal device={device} title="Experience Preview">
+                    {preview}
+                </PreviewPortal>
+            </div>
         )
     }
 
@@ -325,7 +345,7 @@ class ExperienceSelector extends React.Component<
                         key="timezone-selector"
                     />
                 ) : experienceId !== '' ? (
-                    <ChangeIcon fill={titanium} />
+                    <ChangeIcon fill={titanium} style={{ marginLeft: 16 }} />
                 ) : (
                     <PlusIcon fill={titanium} />
                 )}
@@ -371,8 +391,13 @@ class ExperienceSelector extends React.Component<
     }
 
     render() {
-        const { device, updateActivePopover } = this.props
-        const { Fragment } = React
+        const {
+            device,
+            editableCampaign,
+            updateActivePhonePreview,
+            updateActivePopover
+        } = this.props
+        const { experienceId } = editableCampaign
         return (
             <Row
                 onClick={() =>
@@ -380,16 +405,33 @@ class ExperienceSelector extends React.Component<
                 }
             >
                 {this.renderLabel()}
-                <Fragment>
+                <div
+                    style={{
+                        height: '100%',
+                        width: 64,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end'
+                    }}
+                >
+                    {device !== 'Desktop' &&
+                        experienceId !== '' && (
+                            <EyeIcon
+                                fill={aquamarine}
+                                onClick={e => {
+                                    e.stopPropagation()
+                                    e.preventDefault()
+                                    updateActivePhonePreview(
+                                        'Experience Preview'
+                                    )
+                                }}
+                            />
+                        )}
+                    {this.renderExperiencePreview()}
                     {device === 'Mobile'
                         ? this.renderMobilePopover()
                         : this.renderPopover()}
-                </Fragment>
-                <Fragment>
-                    {device === 'Desktop'
-                        ? this.renderExperiencePreview()
-                        : null}
-                </Fragment>
+                </div>
             </Row>
         )
     }
@@ -408,6 +450,8 @@ const mapDispatchToProps = (
 ): ExperienceSelectorDispatchProps => {
     return {
         closePopoverModalForm: () => dispatch(closePopoverModalForm()),
+        updateActivePhonePreview: (preview: string) =>
+            dispatch(updateActivePhonePreview(preview)),
         updateActivePopover: (activePopover: string) =>
             dispatch(updateActivePopover(activePopover)),
         updateEditableCampaign: (id: string) =>

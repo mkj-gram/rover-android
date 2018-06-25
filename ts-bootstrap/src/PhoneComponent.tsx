@@ -132,7 +132,8 @@ const PhoneComponent: React.SFC<PhoneComponentProps> = ({
                         border: '1px solid transparent',
                         overflow: 'hidden',
                         height: 568,
-                        width: 320
+                        width: 320,
+                        position: 'fixed'
                     }}
                 >
                     {children}

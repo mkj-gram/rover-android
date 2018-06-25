@@ -342,12 +342,14 @@ class SegmentSelector extends React.Component<
         const { segmentIds } = editableCampaign
         const { Fragment } = React
         return device !== 'Mobile' ? (
-            <div style={{ overflowY: 'scroll' }}>
-                {this.renderAudienceList()}
+            <div>
+                <div style={{ overflowY: 'scroll' }}>
+                    {this.renderAudienceList()}
+                </div>
                 <PopoverContainer
                     id="segment-selector-popover"
                     popoverProps={{
-                        placement: 'right',
+                        placement: 'right-end',
                         device: device,
                         navBarProperties: {
                             buttonLeft: 'Cancel',

@@ -10,6 +10,7 @@ import home, * as homeSelector from './home'
 import notification, * as notificationSelector from './notification'
 import notificationDelivery, * as notificationDeliverySelector from './notificationDelivery'
 import overview, * as overviewSelector from './overview'
+import phonePreview, * as phonePreviewSelector from './phonePreview'
 import wizardModal, * as wizardModalSelector from './wizardModal'
 
 export default combineReducers({
@@ -20,6 +21,7 @@ export default combineReducers({
     home,
     notification,
     notificationDelivery,
+    phonePreview,
     overview,
     wizardModal
 })
@@ -98,6 +100,13 @@ export const getShouldShowPhonePreview = (state: AppState) =>
 
 export const getIsAudienceSizeUpdating = (state: AppState) =>
     formSelector.getIsAudienceSizeUpdating(state.form)
+
+// Phone Preview
+export const getIsPhonePreviewActive = (state: AppState, preview: string) =>
+    phonePreviewSelector.getIsPhonePreviewActive(state.phonePreview, preview)
+
+export const getIsPhonePreviewClosing = (state: AppState) =>
+    phonePreviewSelector.getIsPhonePreviewClosing(state.phonePreview)
 
 // Wizard
 export const getCurrentWizard = (state: AppState) =>

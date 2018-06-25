@@ -12,7 +12,7 @@ import * as testDevicesActions from './testDevices'
 import * as overviewActions from './overview'
 import * as H from 'history'
 
-import { Action, Dispatch, ActionCreator } from 'redux'
+import { Action, AnyAction, Dispatch, ActionCreator } from 'redux'
 import { ThunkAction } from 'redux-thunk'
 import { getEditableCampaign } from '../reducers'
 
@@ -249,6 +249,17 @@ export const closeTapBehaviorWebsitePresentation: ActionCreator<
         // tslint:disable-next-line:align
     }, 500)
 }
+
+// Phone Preview
+export const updateActivePhonePreview: ActionCreator<
+    ThunkAction<void, State, void>
+> = (preview: string) => (dispatch: Dispatch<State>): AnyAction =>
+    dispatch({ type: 'UPDATE_ACTIVE_PHONE_PREVIEW', preview })
+
+export const startClosingPhonePreview: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): AnyAction =>
+    dispatch({ type: 'START_CLOSING_PHONE_PREVIEW' })
 
 // Popover Modal
 export const updateActivePopover: ActionCreator<
