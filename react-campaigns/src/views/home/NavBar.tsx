@@ -20,6 +20,7 @@ import {
 import CampaignTypeSelector from './CampaignTypeSelector'
 import NewCampaignPopover from './NewCampaignPopover'
 import GridIconPopover from './GridIconPopover'
+import UserIconPopover from './UserIconPopover'
 
 export interface Props {
     media: Media
@@ -41,7 +42,8 @@ const renderLeftContent = (media: Media) => {
     if (media === 'Desktop') {
         return <div style={{ width: 56 }} />
     }
-    return <UserIcon fill={charcoal} />
+
+    return <UserIconPopover device={media} />
 }
 
 const renderRightContent = (
@@ -59,13 +61,7 @@ const renderRightContent = (
                 }}
             >
                 <GridIconPopover device={media} />
-
-                <UserIcon
-                    fill={charcoal}
-                    height={media === 'Desktop' ? '20' : '24'}
-                    width={media === 'Desktop' ? '20' : '24'}
-                    viewBox="0 0 24 24"
-                />
+                <UserIconPopover device={media} />
             </div>
         )
     }

@@ -152,6 +152,7 @@ type State = {
     readonly modal: StringMap<string | boolean>
     readonly segments: SegmentsState
     readonly testDevices: TestDeviceState
+    readonly user: User
 }
 
 type TestDeviceState = {
@@ -278,4 +279,10 @@ type Experience = {
     id: string
     name: string
     simulatorURL: string
+}
+
+type User = {
+    userName: string
+    userEmail: string
+    accountName: string
 }

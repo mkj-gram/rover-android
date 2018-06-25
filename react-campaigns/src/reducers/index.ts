@@ -9,6 +9,7 @@ import editableUIState, * as editableUIStateSelector from './editableUIState'
 import experiences, * as experiencesSelector from './experiences'
 import segments, * as segmentsSelector from './segments'
 import testDevices, * as testDevicesSelector from './testDevices'
+import user, * as userSelector from './user'
 
 export default combineReducers({
     app,
@@ -17,7 +18,8 @@ export default combineReducers({
     editableUIState,
     experiences,
     segments,
-    testDevices
+    testDevices,
+    user
 })
 
 // Error
@@ -185,3 +187,6 @@ export const getExperiences = (state: State) =>
 
 export const getExperience = (state: State, id: string) =>
     experiencesSelector.getExperience(state.experiences, id)
+
+// User Account
+export const getUser = (state: State) => userSelector.getUser(state.user)

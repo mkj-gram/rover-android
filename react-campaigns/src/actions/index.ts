@@ -8,6 +8,7 @@ import * as notificationActions from './notification'
 import * as segmentsActions from './segments'
 import * as sendTestActions from './sendTest'
 import * as testDevicesActions from './testDevices'
+import * as userActions from './user'
 
 import * as overviewActions from './overview'
 import * as H from 'history'
@@ -15,6 +16,9 @@ import * as H from 'history'
 import { Action, AnyAction, Dispatch, ActionCreator } from 'redux'
 import { ThunkAction } from 'redux-thunk'
 import { getEditableCampaign } from '../reducers'
+
+// User Account
+export const fetchUser = () => userActions.fetchUser()
 
 // Overview Modal
 export const handleSendTestModalDisplay = (on?: boolean) =>
