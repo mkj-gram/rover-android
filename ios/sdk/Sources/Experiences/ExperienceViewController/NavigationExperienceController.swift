@@ -10,70 +10,67 @@ import UIKit
 
 open class NavigationExperienceController: UINavigationController {
     public let experience: Experience
-    public let eventQueue: EventQueue?
+    public let eventQueue: EventQueue
     public let sessionController: SessionController
     
-    public init(rootViewController: UIViewController, experience: Experience, eventQueue: EventQueue?, sessionController: SessionController) {
+    public init(rootViewController: UIViewController, experience: Experience, eventQueue: EventQueue, sessionController: SessionController) {
         self.experience = experience
         self.eventQueue = eventQueue
         self.sessionController = sessionController
         
         super.init(nibName: nil, bundle: nil)
         viewControllers = [rootViewController]
-        
-        sessionController.delegate = self
     }
     
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    lazy var sessionIdentifier: String = {
+        var identifier = "experience-\(experience.id.rawValue)"
+        
+        if let campaignID = experience.campaignID {
+            identifier = "\(identifier)-campaign-\(campaignID.rawValue)"
+        }
+        
+        return identifier
+    }()
+    
     override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        sessionController.startTracking()
-    }
-    
-    override open func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        sessionController.stopTracking()
-    }
-    
-    override open var childViewControllerForStatusBarStyle: UIViewController? {
-        return self.topViewController
-    }
-}
-
-// MARK: SessionControllerDelegate
-
-extension NavigationExperienceController: SessionControllerDelegate {
-    private func sessionEvent(named name: String, sessionID: UUID) -> EventInfo {
-        var attributes: Attributes = [
-            "sessionID": sessionID.uuidString,
-            "experienceID": experience.id.rawValue
-        ]
+        
+        var attributes: Attributes = ["experienceID": experience.id.rawValue]
         
         if let campaignID = experience.campaignID {
             attributes["campaignID"] = campaignID.rawValue
         }
         
-        return EventInfo(name: name, namespace: "rover", attributes: attributes)
+        let event = EventInfo(name: "Experience Presented", namespace: "rover", attributes: attributes)
+        eventQueue.addEvent(event)
+        
+        sessionController.registerSession(identifier: sessionIdentifier) { [attributes] duration in
+            var attributes = attributes
+            attributes["duration"] = duration
+            return EventInfo(name: "Experience Viewed", namespace: "rover", attributes: attributes)
+        }
     }
     
-    public func sessionController(_ sessionController: SessionController, didStartSession sessionID: UUID) {
-        guard let eventQueue = eventQueue else {
-            return
+    override open func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        var attributes: Attributes = ["experienceID": experience.id.rawValue]
+        
+        if let campaignID = experience.campaignID {
+            attributes["campaignID"] = campaignID.rawValue
         }
         
-        let event = sessionEvent(named: "Experience Presented", sessionID: sessionID)
+        let event = EventInfo(name: "Experience Dismissed", namespace: "rover", attributes: attributes)
         eventQueue.addEvent(event)
+        
+        sessionController.unregisterSession(identifier: sessionIdentifier)
     }
     
-    public func sessionController(_ sessionController: SessionController, didEndSession sessionID: UUID) {
-        guard let eventQueue = eventQueue else {
-            return
-        }
-        
-        let event = sessionEvent(named: "Experience Dismissed", sessionID: sessionID)
-        eventQueue.addEvent(event)
+    override open var childViewControllerForStatusBarStyle: UIViewController? {
+        return self.topViewController
     }
 }

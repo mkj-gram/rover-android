@@ -15,7 +15,7 @@ open class ScreenViewController: UICollectionViewController, UICollectionViewDat
     public let screen: Screen
     
     public let dispatcher: Dispatcher
-    public let eventQueue: EventQueue?
+    public let eventQueue: EventQueue
     public let imageStore: ImageStore
     public let sessionController: SessionController
     
@@ -31,7 +31,7 @@ open class ScreenViewController: UICollectionViewController, UICollectionViewDat
         }
     }
     
-    public init(collectionViewLayout: UICollectionViewLayout, experience: Experience, screen: Screen, dispatcher: Dispatcher, eventQueue: EventQueue?, imageStore: ImageStore, sessionController: SessionController, viewControllerProvider: @escaping (Experience, Screen) -> UIViewController, presentWebsiteActionProvider: @escaping (URL) -> Action) {
+    public init(collectionViewLayout: UICollectionViewLayout, experience: Experience, screen: Screen, dispatcher: Dispatcher, eventQueue: EventQueue, imageStore: ImageStore, sessionController: SessionController, viewControllerProvider: @escaping (Experience, Screen) -> UIViewController, presentWebsiteActionProvider: @escaping (URL) -> Action) {
         self.experience = experience
         self.screen = screen
         self.dispatcher = dispatcher
@@ -43,8 +43,6 @@ open class ScreenViewController: UICollectionViewController, UICollectionViewDat
         
         super.init(collectionViewLayout: collectionViewLayout)
         collectionView?.prefetchDataSource = self
-        
-        sessionController.delegate = self
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -69,14 +67,54 @@ open class ScreenViewController: UICollectionViewController, UICollectionViewDat
         configureNavigationBar()
     }
     
+    lazy var sessionIdentifier: String = {
+        var identifier = "experience-\(experience.id.rawValue)-screen-\(screen.id.rawValue)"
+        
+        if let campaignID = experience.campaignID {
+            identifier = "\(identifier)-campaign-\(campaignID.rawValue)"
+        }
+        
+        return identifier
+    }()
+    
     override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        sessionController.startTracking()
+        
+        var attributes: Attributes = [
+            "experienceID": experience.id.rawValue,
+            "screenID": screen.id.rawValue
+        ]
+        
+        if let campaignID = experience.campaignID {
+            attributes["campaignID"] = campaignID.rawValue
+        }
+        
+        let event = EventInfo(name: "Screen Presented", namespace: "rover", attributes: attributes)
+        eventQueue.addEvent(event)
+        
+        sessionController.registerSession(identifier: sessionIdentifier) { [attributes] duration in
+            var attributes = attributes
+            attributes["duration"] = duration
+            return EventInfo(name: "Screen Viewed", namespace: "rover", attributes: attributes)
+        }
     }
     
     override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        sessionController.stopTracking()
+        
+        var attributes: Attributes = [
+            "experienceID": experience.id.rawValue,
+            "screenID": screen.id.rawValue
+        ]
+        
+        if let campaignID = experience.campaignID {
+            attributes["campaignID"] = campaignID.rawValue
+        }
+        
+        let event = EventInfo(name: "Screen Dismissed", namespace: "rover", attributes: attributes)
+        eventQueue.addEvent(event)
+        
+        sessionController.unregisterSession(identifier: sessionIdentifier)
     }
     
     @objc open func close() {
@@ -364,47 +402,7 @@ open class ScreenViewController: UICollectionViewController, UICollectionViewDat
             dispatcher.dispatch(action, completionHandler: nil)
         }
         
-        guard let eventQueue = eventQueue else {
-            return
-        }
-        
         let event = EventInfo(name: "Block Tapped", namespace: "rover", attributes: attributes)
-        eventQueue.addEvent(event)
-    }
-}
-
-// MARK: SessionControllerDelegate
-
-extension ScreenViewController: SessionControllerDelegate {
-    private func sessionEvent(named name: String, sessionID: UUID) -> EventInfo {
-        var attributes: Attributes = [
-            "sessionID": sessionID.uuidString,
-            "experienceID": experience.id.rawValue,
-            "screenID": screen.id.rawValue
-        ]
-        
-        if let campaignID = experience.campaignID {
-            attributes["campaignID"] = campaignID.rawValue
-        }
-        
-        return EventInfo(name: name, namespace: "rover", attributes: attributes)
-    }
-    
-    public func sessionController(_ sessionController: SessionController, didStartSession sessionID: UUID) {
-        guard let eventQueue = eventQueue else {
-            return
-        }
-        
-        let event = sessionEvent(named: "Screen Presented", sessionID: sessionID)
-        eventQueue.addEvent(event)
-    }
-    
-    public func sessionController(_ sessionController: SessionController, didEndSession sessionID: UUID) {
-        guard let eventQueue = eventQueue else {
-            return
-        }
-        
-        let event = sessionEvent(named: "Screen Dismissed", sessionID: sessionID)
         eventQueue.addEvent(event)
     }
 }

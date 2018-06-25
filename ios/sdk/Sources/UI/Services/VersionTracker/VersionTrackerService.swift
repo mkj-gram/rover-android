@@ -1,52 +1,26 @@
 //
-//  ApplicationMonitorService.swift
+//  VersionTrackerService.swift
 //  RoverUI
 //
-//  Created by Sean Rucker on 2018-06-12.
+//  Created by Sean Rucker on 2018-06-21.
 //  Copyright © 2018 Rover Labs Inc. All rights reserved.
 //
 
 import Foundation
 
-class ApplicationMonitorService: ApplicationMonitor {
+class VersionTrackerService: VersionTracker {
     let bundle: Bundle
     let eventQueue: EventQueue
     let logger: Logger
-    let sessionController: SessionController
     let userDefaults: UserDefaults
     
-    var isSessionTrackingEnabled: Bool = false {
-        didSet {
-            if isSessionTrackingEnabled {
-                sessionController.delegate = self
-                sessionController.startTracking()
-            } else {
-                sessionController.stopTracking()
-                sessionController.delegate = nil
-            }
-        }
-    }
-    
-    var isVersionTrackingEnabled: Bool = false {
-        didSet {
-            if isVersionTrackingEnabled {
-                checkAppVersion()
-            }
-        }
-    }
-    
-    init(bundle: Bundle, eventQueue: EventQueue, logger: Logger, sessionController: SessionController, userDefaults: UserDefaults) {
+    init(bundle: Bundle, eventQueue: EventQueue, logger: Logger, userDefaults: UserDefaults) {
         self.bundle = bundle
         self.eventQueue = eventQueue
         self.logger = logger
-        self.sessionController = sessionController
         self.userDefaults = userDefaults
     }
-}
-
-// MARK: Version Tracking
-
-extension ApplicationMonitorService {
+    
     func checkAppVersion() {
         guard let info = bundle.infoDictionary else {
             logger.error("Failed to check app version – missing bundle info")
@@ -112,20 +86,3 @@ extension ApplicationMonitorService {
         eventQueue.addEvent(event)
     }
 }
-
-// MARK: SessionControllerDelegate
-
-extension ApplicationMonitorService: SessionControllerDelegate {
-    func sessionController(_ sessionController: SessionController, didStartSession sessionID: UUID) {
-        let attributes: Attributes = ["sessionID": sessionID.uuidString]
-        let event = EventInfo(name: "App Opened", namespace: "rover", attributes: attributes)
-        eventQueue.addEvent(event)
-    }
-    
-    func sessionController(_ sessionController: SessionController, didEndSession sessionID: UUID) {
-        let attributes: Attributes = ["sessionID": sessionID.uuidString]
-        let event = EventInfo(name: "App Closed", namespace: "rover", attributes: attributes)
-        eventQueue.addEvent(event)
-    }
-}
-

@@ -70,8 +70,6 @@ open class NotificationCenterViewController: UIViewController {
                 self?.tableView.reloadData()
             }
         }
-        
-        sessionController.delegate = self
     }
     
     required public init?(coder aDecoder: NSCoder) {
@@ -104,7 +102,14 @@ open class NotificationCenterViewController: UIViewController {
     
     override open func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        sessionController.startTracking()
+        
+        let event = EventInfo(name: "Notification Center Presented", namespace: "rover")
+        eventQueue.addEvent(event)
+        
+        sessionController.registerSession(identifier: "notificationCenter") { duration in
+            let attributes: Attributes = ["duration": duration]
+            return EventInfo(name: "Notification Center Viewed", namespace: "rover", attributes: attributes)
+        }
         
         // Clear badge number any time the notification center is viewed, regardless of the number of unread messages
         UIApplication.shared.applicationIconBadgeNumber = 0
@@ -112,7 +117,11 @@ open class NotificationCenterViewController: UIViewController {
     
     override open func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        sessionController.stopTracking()
+        
+        let event = EventInfo(name: "Notification Center Dismissed", namespace: "rover")
+        eventQueue.addEvent(event)
+        
+        sessionController.unregisterSession(identifier: "notificationCenter")
     }
     
     // MARK: Layout
@@ -386,26 +395,4 @@ public enum NotificationSource: String {
     case pushNotification
     case notificationCenter
     case influencedOpen
-}
-
-// MARK: SessionControllerDelegate
-
-extension NotificationCenterViewController: SessionControllerDelegate {
-    private func sessionEvent(named name: String, sessionID: UUID) -> EventInfo {
-        let attributes: Attributes = [
-            "sessionID": sessionID.uuidString
-        ]
-        
-        return EventInfo(name: name, namespace: "rover", attributes: attributes)
-    }
-    
-    public func sessionController(_ sessionController: SessionController, didStartSession sessionID: UUID) {
-        let event = sessionEvent(named: "Notification Center Presented", sessionID: sessionID)
-        eventQueue.addEvent(event)
-    }
-    
-    public func sessionController(_ sessionController: SessionController, didEndSession sessionID: UUID) {
-        let event = sessionEvent(named: "Notification Center Dismissed", sessionID: sessionID)
-        eventQueue.addEvent(event)
-    }
 }

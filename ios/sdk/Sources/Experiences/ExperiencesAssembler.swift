@@ -63,7 +63,7 @@ public struct ExperiencesAssembler: Assembler {
         
         container.register(UIViewController.self, name: "experience", scope: .transient) { (resolver, experience: Experience) in
             let screenViewController = resolver.resolve(UIViewController.self, name: "screen", arguments: experience, experience.homeScreen)!
-            let eventQueue = resolver.resolve(EventQueue.self)
+            let eventQueue = resolver.resolve(EventQueue.self)!
             let sessionController = resolver.resolve(SessionController.self)!
             return NavigationExperienceController(rootViewController: screenViewController, experience: experience, eventQueue: eventQueue, sessionController: sessionController)
         }
@@ -76,7 +76,7 @@ public struct ExperiencesAssembler: Assembler {
                 experience: experience,
                 screen: screen,
                 dispatcher: resolver.resolve(Dispatcher.self)!,
-                eventQueue: resolver.resolve(EventQueue.self),
+                eventQueue: resolver.resolve(EventQueue.self)!,
                 imageStore: resolver.resolve(ImageStore.self)!,
                 sessionController: resolver.resolve(SessionController.self)!,
                 viewControllerProvider: { (experience, screen) in

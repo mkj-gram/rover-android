@@ -8,87 +8,77 @@
 
 import UIKit
 
-class SessionControllerService {
+class SessionControllerService: SessionController {
+    let eventQueue: EventQueue
     let keepAliveTime: Int
     
-    weak var delegate: SessionControllerDelegate?
+    struct SessionEntry {
+        let session: Session
+        
+        var isUnregistered = false
+        
+        init(session: Session) {
+            self.session = session
+        }
+    }
     
-    var sessionID = UUID()
-    var lastSessionEndedAt: Date?
+    var sessions = [String: SessionEntry]()
     
-    var applicationDidBecomeActiveToken: NSObjectProtocol?
-    var applicationWillResignActiveToken: NSObjectProtocol?
+    var applicationDidBecomeActiveToken: NSObjectProtocol!
+    var applicationWillResignActiveToken: NSObjectProtocol!
     
-    init(keepAliveTime: Int) {
+    init(eventQueue: EventQueue, keepAliveTime: Int) {
+        self.eventQueue = eventQueue
         self.keepAliveTime = keepAliveTime
-    }
-}
-
-// MARK: SessionController
-
-extension SessionControllerService: SessionController {
-    func startTracking() {
-        if UIApplication.shared.applicationState == .active {
-            startSession()
+        
+        applicationDidBecomeActiveToken = NotificationCenter.default.addObserver(forName: .UIApplicationDidBecomeActive, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.sessions.forEach {
+                $0.value.session.start()
+            }
         }
         
-        addApplicationObservers()
-    }
-    
-    func stopTracking() {
-        endSession()
-        removeApplicationObservers()
-    }
-}
-
-// MARK: Session Management
-
-extension SessionControllerService {
-    func startSession() {
-        sessionID = refreshSessionID()
-        delegate?.sessionController(self, didStartSession: sessionID)
-    }
-    
-    func refreshSessionID() -> UUID {
-        guard let lastSessionEndedAt = lastSessionEndedAt else {
-            return UUID()
-        }
-        
-        let now = Date().timeIntervalSince1970
-        if now - lastSessionEndedAt.timeIntervalSince1970 > TimeInterval(keepAliveTime) {
-            return UUID()
-        }
-        
-        return sessionID
-    }
-    
-    func endSession() {
-        lastSessionEndedAt = Date()
-        delegate?.sessionController(self, didEndSession: sessionID)
-    }
-}
-
-
-// MARK: Application Observers
-
-extension SessionControllerService {
-    func addApplicationObservers() {
-        applicationDidBecomeActiveToken = NotificationCenter.default.addObserver(forName: .UIApplicationDidBecomeActive, object: nil, queue: nil) { _ in
-            self.startSession()
-        }
-        
-        applicationWillResignActiveToken = NotificationCenter.default.addObserver(forName: .UIApplicationWillResignActive, object: nil, queue: nil) { _ in
-            self.endSession()
+        applicationWillResignActiveToken = NotificationCenter.default.addObserver(forName: .UIApplicationWillResignActive, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.sessions.forEach {
+                $0.value.session.end()
+            }
         }
     }
     
-    func removeApplicationObservers() {
-        if let applicationDidBecomeActiveToken = applicationDidBecomeActiveToken {
-            NotificationCenter.default.removeObserver(applicationDidBecomeActiveToken)
+    deinit {
+        NotificationCenter.default.removeObserver(applicationDidBecomeActiveToken)
+        NotificationCenter.default.removeObserver(applicationWillResignActiveToken)
+    }
+    
+    func registerSession(identifier: String, completionHandler: @escaping (Double) -> EventInfo) {
+        if var entry = sessions[identifier] {
+            entry.session.start()
+            
+            if entry.isUnregistered {
+                entry.isUnregistered = false
+                sessions[identifier] = entry
+            }
+            
+            return
         }
         
-        if let applicationWillResignActiveToken = applicationWillResignActiveToken {
-            NotificationCenter.default.removeObserver(applicationWillResignActiveToken)
+        let session = Session(keepAliveTime: keepAliveTime) { [weak self] result in
+            let event = completionHandler(result.duration)
+            self?.eventQueue.addEvent(event)
+            
+            if let entry = self?.sessions[identifier], entry.isUnregistered {
+                self?.sessions[identifier] = nil
+            }
+        }
+        
+        session.start()
+        sessions[identifier] = SessionEntry(session: session)
+    }
+    
+    func unregisterSession(identifier: String) {
+        if var entry = sessions[identifier] {
+            entry.isUnregistered = true
+            sessions[identifier] = entry
+            entry.session.end()
         }
     }
 }

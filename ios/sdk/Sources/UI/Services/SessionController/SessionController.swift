@@ -7,8 +7,6 @@
 //
 
 public protocol SessionController: class {
-    var delegate: SessionControllerDelegate? { get set }
-    
-    func startTracking()
-    func stopTracking()
+    func registerSession(identifier: String, completionHandler: @escaping (Double) -> EventInfo)
+    func unregisterSession(identifier: String)
 }

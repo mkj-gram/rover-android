@@ -14,15 +14,15 @@ public struct UIAssembler {
     
     public var sessionKeepAliveTime: Int
     
-    public var isApplicationSessionTrackingEnabled: Bool
-    public var isApplicationVersionTrackingEnabled: Bool
+    public var isLifeCycleTrackingEnabled: Bool
+    public var isVersionTrackingEnabled: Bool
     
-    public init(associatedDomains: [String] = [], urlSchemes: [String] = [], sessionKeepAliveTime: Int = 30, isApplicationSessionTrackingEnabled: Bool = true, isApplicationVersionTrackingEnabled: Bool = true) {
+    public init(associatedDomains: [String] = [], urlSchemes: [String] = [], sessionKeepAliveTime: Int = 30, isLifeCycleTrackingEnabled: Bool = true, isVersionTrackingEnabled: Bool = true) {
         self.associatedDomains = associatedDomains
         self.urlSchemes = urlSchemes
         self.sessionKeepAliveTime = sessionKeepAliveTime
-        self.isApplicationSessionTrackingEnabled = isApplicationSessionTrackingEnabled
-        self.isApplicationVersionTrackingEnabled = isApplicationVersionTrackingEnabled
+        self.isLifeCycleTrackingEnabled = isLifeCycleTrackingEnabled
+        self.isVersionTrackingEnabled = isVersionTrackingEnabled
     }
 }
 
@@ -51,15 +51,6 @@ extension UIAssembler: Assembler {
             return resolver.resolve(Action.self, name: "presentView", arguments: viewControllerToPresent)!
         }
         
-        // MARK: ApplicationMonitor
-        
-        container.register(ApplicationMonitor.self) { resolver in
-            let eventQueue = resolver.resolve(EventQueue.self)!
-            let logger = resolver.resolve(Logger.self)!
-            let sessionController = resolver.resolve(SessionController.self)!
-            return ApplicationMonitorService(bundle: Bundle.main, eventQueue: eventQueue, logger: logger, sessionController: sessionController, userDefaults: UserDefaults.standard)
-        }
-        
         // MARK: ImageStore
         
         container.register(ImageStore.self) { resolver in
@@ -68,12 +59,12 @@ extension UIAssembler: Assembler {
             return ImageStoreService(logger: logger, session: session)
         }
         
-        // MARK: RouteHandler (website)
+        // MARK: LifeCycleTracker
         
-        container.register(RouteHandler.self, name: "website") { resolver in
-            return WebsiteRouteHandler(actionProvider: { url in
-                return resolver.resolve(Action.self, name: "presentWebsite", arguments: url)!
-            })
+        container.register(LifeCycleTracker.self) { resolver in
+            let eventQueue = resolver.resolve(EventQueue.self)!
+            let sessionController = resolver.resolve(SessionController.self)!
+            return LifeCycleTrackerService(eventQueue: eventQueue, sessionController: sessionController)
         }
         
         // MARK: Router
@@ -85,8 +76,9 @@ extension UIAssembler: Assembler {
         
         // MARK: SessionController
         
-        container.register(SessionController.self, scope: .transient) { [sessionKeepAliveTime] _ in
-            return SessionControllerService(keepAliveTime: sessionKeepAliveTime)
+        container.register(SessionController.self) { [sessionKeepAliveTime] resolver in
+            let eventQueue = resolver.resolve(EventQueue.self)!
+            return SessionControllerService(eventQueue: eventQueue, keepAliveTime: sessionKeepAliveTime)
         }
         
         // MARK: UIViewController (website)
@@ -94,15 +86,23 @@ extension UIAssembler: Assembler {
         container.register(UIViewController.self, name: "website", scope: .transient) { (resolver, url: URL) in
             return SFSafariViewController(url: url)
         }
+        
+        // MARK: VersionTracker
+        
+        container.register(VersionTracker.self) { resolver in
+            let eventQueue = resolver.resolve(EventQueue.self)!
+            let logger = resolver.resolve(Logger.self)!
+            return VersionTrackerService(bundle: Bundle.main, eventQueue: eventQueue, logger: logger, userDefaults: UserDefaults.standard)
+        }
     }
     
     public func containerDidAssemble(resolver: Resolver) {
-        var applicationMonitor = resolver.resolve(ApplicationMonitor.self)!
-        applicationMonitor.isSessionTrackingEnabled = isApplicationSessionTrackingEnabled
-        applicationMonitor.isVersionTrackingEnabled = isApplicationVersionTrackingEnabled
+        if isVersionTrackingEnabled {
+            resolver.resolve(VersionTracker.self)!.checkAppVersion()
+        }
         
-        let handler = resolver.resolve(RouteHandler.self, name: "website")!
-        let router = resolver.resolve(Router.self)!
-        router.addHandler(handler)
+        if isLifeCycleTrackingEnabled {
+            resolver.resolve(LifeCycleTracker.self)!.enable()
+        }
     }
 }
