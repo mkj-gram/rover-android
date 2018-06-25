@@ -1,12 +1,12 @@
 
 INSERT INTO accounts
-(id, name, created_at, updated_at) VALUES
- (1,'firstAcct','2017-05-04 16:26:25.445494','2017-05-04 16:26:25.445494')
-,(2,'myAccont' ,'2017-05-04 16:26:25.445494','2017-05-04 16:26:25.445494')
-,(20,'account20' ,'2017-05-04 16:26:25.445494','2017-05-04 16:26:25.445494')
+(id, name, account_name, created_at, updated_at) VALUES
+ (1,'firstAcct', 'account-1','2017-05-04 16:26:25.445494','2017-05-04 16:26:25.445494')
+,(2,'myAccont' , 'account-2', '2017-05-04 16:26:25.445494','2017-05-04 16:26:25.445494')
+,(20,'account20','account-20', '2017-05-04 16:26:25.445494','2017-05-04 16:26:25.445494')
 ;
 
-INSERT INTO users 
+INSERT INTO users
 (id, account_id, name, email, password_digest, permission_scopes, created_at, updated_at) VALUES
  (1,1,'user1' ,'user1@example.com','$2a$10$0tUJdIURcBTXV0KaVGexw.TBUUc8GRjuhjWsxXybIQaoQLVn/ksBa', '{}', '2017-05-04 16:26:25.445494','2017-05-04 16:26:25.445494')
 ,(2,1,'user2' ,'user2@example.com','$2a$10$0tUJdIURcBTXV0KaVGexw.TBUUc8GRjuhjWsxXybIQaoQLVn/ksBa', '{}', '2017-05-04 17:26:25.445494','2017-05-04 17:26:25.445494')

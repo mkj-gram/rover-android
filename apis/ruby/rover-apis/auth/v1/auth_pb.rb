@@ -17,6 +17,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.auth.v1.Account" do
     optional :id, :int32, 1
     optional :name, :string, 2
+    optional :account_name, :string, 5
     optional :updated_at, :message, 3, "google.protobuf.Timestamp"
     optional :created_at, :message, 4, "google.protobuf.Timestamp"
   end
@@ -42,6 +43,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.auth.v1.CreateAccountRequest" do
     optional :name, :string, 1
+    optional :account_name, :string, 2
   end
   add_message "rover.auth.v1.UpdateAccountRequest" do
     optional :account_id, :int32, 1
@@ -97,6 +99,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.auth.v1.AuthContext" do
     optional :account_id, :int32, 1
+    optional :account_name, :string, 4
     optional :user_id, :int32, 2
     repeated :permission_scopes, :string, 3
   end

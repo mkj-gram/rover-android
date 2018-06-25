@@ -11,12 +11,12 @@ func (d *DB) GetAccount(ctx context.Context, r *auth.GetAccountRequest) (*auth.A
 	var acct = new(auth.Account)
 	err := d.db.QueryRowContext(ctx, `
 		SELECT
-			id, name, created_at, updated_at
+			id, name, account_name, created_at, updated_at
 			FROM accounts
 			WHERE id = $1
 			LIMIT 1
 		`, r.GetAccountId(),
-	).Scan(&acct.Id, &acct.Name, &acct.CreatedAt, &acct.UpdatedAt)
+	).Scan(&acct.Id, &acct.Name, &acct.AccountName, &acct.CreatedAt, &acct.UpdatedAt)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "Scan")
@@ -28,10 +28,10 @@ func (d *DB) GetAccount(ctx context.Context, r *auth.GetAccountRequest) (*auth.A
 func (d *DB) CreateAccount(ctx context.Context, acct *auth.Account) (*auth.Account, error) {
 	err := d.db.QueryRowContext(ctx, `
 		INSERT INTO accounts
-			(name, created_at, updated_at)
-			VALUES($1, $2, $3)
+			(name, account_name, created_at, updated_at)
+			VALUES($1, $2, $3, $4)
 			RETURNING id
-	`, acct.GetName(), acct.GetCreatedAt(), acct.GetUpdatedAt(),
+	`, acct.GetName(), acct.GetAccountName(), acct.GetCreatedAt(), acct.GetUpdatedAt(),
 	).Scan(&acct.Id)
 
 	if err != nil {
@@ -44,7 +44,9 @@ func (d *DB) CreateAccount(ctx context.Context, acct *auth.Account) (*auth.Accou
 func (d *DB) UpdateAccount(ctx context.Context, acct *auth.Account) (*auth.Account, error) {
 	err := d.db.QueryRowContext(ctx, `
 		UPDATE accounts
-			SET name = $2, updated_at = $3
+			SET 
+				 name = $2
+				,updated_at = $3
 			WHERE id = $1
 			RETURNING id, created_at
 	`, acct.GetId(), acct.GetName(), acct.GetUpdatedAt(),
@@ -61,7 +63,7 @@ func (d *DB) ListAccounts(ctx context.Context) ([]*auth.Account, error) {
 
 	rows, err := d.db.QueryContext(ctx, `
 		SELECT
-			id, name, created_at, updated_at
+			id, name, account_name, created_at, updated_at
 			FROM accounts
 			ORDER BY id DESC`)
 
@@ -73,16 +75,19 @@ func (d *DB) ListAccounts(ctx context.Context) ([]*auth.Account, error) {
 	var accts []*auth.Account
 
 	for rows.Next() {
-		acct := &auth.Account{}
+		var acct auth.Account
+
 		err := rows.Scan(
 			&acct.Id,
 			&acct.Name,
+			&acct.AccountName,
 			&acct.CreatedAt,
 			&acct.UpdatedAt)
+
 		if err != nil {
 			return nil, errors.Wrap(err, "Scan")
 		}
-		accts = append(accts, acct)
+		accts = append(accts, &acct)
 	}
 
 	return accts, nil

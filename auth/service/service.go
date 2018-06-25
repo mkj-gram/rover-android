@@ -78,9 +78,10 @@ func (svr *Server) CreateAccount(ctx context.Context, r *auth.CreateAccountReque
 		ts, _ = timestamp.TimestampProto(now)
 
 		acct = &auth.Account{
-			Name:      r.GetName(),
-			CreatedAt: ts,
-			UpdatedAt: ts,
+			Name:        r.GetName(),
+			AccountName: r.GetAccountName(),
+			CreatedAt:   ts,
+			UpdatedAt:   ts,
 		}
 	)
 
@@ -451,12 +452,18 @@ func (svr *Server) AuthenticateUserSession(ctx context.Context, r *auth.Authenti
 	sess.ExpiresAt, _ = timestamp.TimestampProto(now.Add(SessionDuration))
 	sess.LastSeen_IP = r.GetLastSeen_IP()
 
-	if _, err = svr.DB.UpdateUserSession(ctx, sess); err != nil {
+	if _, err := svr.DB.UpdateUserSession(ctx, sess); err != nil {
 		return nil, grpc.Errorf(codes.Unknown, "db.UpdateUserSession: user_id=%d: %s", usr.Id, err)
+	}
+
+	acct, err := svr.getAccount(ctx, usr.GetAccountId())
+	if err != nil {
+		return nil, err
 	}
 
 	return &auth.AuthContext{
 		AccountId:        usr.AccountId,
+		AccountName:      acct.GetAccountName(),
 		UserId:           usr.Id,
 		PermissionScopes: usr.PermissionScopes,
 	}, nil
@@ -473,9 +480,28 @@ func (svr *Server) AuthenticateToken(ctx context.Context, r *auth.AuthenticateRe
 		return nil, grpc.Errorf(codes.Unknown, "db.FindTokenByKey: %s", err)
 	}
 
+	acct, err := svr.getAccount(ctx, tok.GetAccountId())
+	if err != nil {
+		return nil, err
+	}
+
 	return &auth.AuthContext{
 		AccountId:        tok.AccountId,
+		AccountName:      acct.AccountName,
 		UserId:           0,
 		PermissionScopes: tok.PermissionScopes,
 	}, nil
+}
+
+func (svr *Server) getAccount(ctx context.Context, accountId int32) (*auth.Account, error) {
+	var acct, err = svr.DB.GetAccount(ctx, &auth.GetAccountRequest{AccountId: accountId})
+
+	if err != nil {
+		if errors.Cause(err) == sql.ErrNoRows {
+			return nil, grpc.Errorf(codes.NotFound, "db.GetAccount: id=%d: not found", accountId)
+		}
+		return nil, grpc.Errorf(codes.Unknown, "db.GetAccount: id=%d: %v", accountId, err)
+	}
+
+	return acct, nil
 }

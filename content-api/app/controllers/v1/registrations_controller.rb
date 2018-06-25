@@ -48,8 +48,12 @@ class V1::RegistrationsController < V1::ApplicationController
   private
 
   def svc_create_user(usr_params)
+
+    title = usr_params[:account_title]
+    subdomain = Account.unique_domain(Account.sanitize_domain(title))
+
     @user = User.new(usr_params)
-    @acct = Account.new(title: usr_params[:account_title])
+    @acct = Account.new(title: title, subdomain: subdomain)
 
     if !@user.valid?
       json = { errors: V1::RegistrationErrorSerializer.serialize(@user.errors) }
@@ -65,7 +69,8 @@ class V1::RegistrationsController < V1::ApplicationController
 
     # TODO: perform account & user creation in transaction in authsvc
     acct = auth.create_account(api::CreateAccountRequest.new(
-      name: usr_params[:account_title],
+      name: title,
+      account_name: subdomain,
     ))
 
     usr = auth.create_user(api::CreateUserRequest.new(

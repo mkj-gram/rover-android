@@ -79,6 +79,7 @@ func dbConnect(t testing.TB, dsn string) (*postgres.DB, func() error) {
 }
 
 func ts(t *testing.T, ti time.Time) *timestamp.Timestamp {
+	t.Helper()
 	ts, err := timestamp.TimestampProto(ti)
 	if err != nil {
 		t.Fatal("timestamp:", err)
@@ -88,6 +89,7 @@ func ts(t *testing.T, ti time.Time) *timestamp.Timestamp {
 }
 
 func execSQL(t *testing.T, db *sql.DB, sql string) {
+	t.Helper()
 	_, err := db.Exec(sql)
 	if err != nil {
 		if pqerr, ok := err.(*pq.Error); ok {
@@ -98,6 +100,8 @@ func execSQL(t *testing.T, db *sql.DB, sql string) {
 }
 
 func readFile(t *testing.T, path string) []byte {
+	t.Helper()
+
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		t.Fatal("readFile:", err)
@@ -171,34 +175,61 @@ func testAuthsvc_CreateAccount(t *testing.T) {
 		args    args
 		want    *auth.Account
 		wantErr error
-	}{{
+	}{
+		{
 
-		name: "creating an account",
+			name: "creating an account",
 
-		args: args{context.Background(),
-			&auth.CreateAccountRequest{
-				Name: "Account2",
+			args: args{context.Background(),
+				&auth.CreateAccountRequest{
+					Name:        "Account22",
+					AccountName: "account-22",
+				},
+			},
+
+			want: &auth.Account{
+				Id:          1001,
+				Name:        "Account22",
+				AccountName: "account-22",
+
+				CreatedAt: ts(t, createdAt),
+				UpdatedAt: ts(t, createdAt),
 			},
 		},
 
-		want: &auth.Account{
-			Id:        1001,
-			Name:      "Account2",
-			CreatedAt: ts(t, createdAt),
-			UpdatedAt: ts(t, createdAt),
+		{
+			name:    "error: creating an account with a duplicate name, case insensitive",
+			wantErr: grpc.Errorf(codes.Unknown, `db.CreateAccount: Scan: pq: duplicate key value violates unique constraint "unique_account_name"`),
+
+			args: args{context.Background(),
+				&auth.CreateAccountRequest{
+					Name:        "accOuNT22",
+					AccountName: "account-22",
+				},
+			},
 		},
-	},
-	// {
-	// NOTE: duplicate accounts names are allowed
-	// 	name:    "creating an account with a duplicate name, case insensitive",
-	// 	wantErr: grpc.Errorf(codes.Unknown, `db.CreateAccount: Scan: pq: duplicate key value violates unique constraint "accounts_name_lower_key"`),
-	//
-	// 	args: args{context.Background(),
-	// 		&auth.CreateAccountRequest{
-	// 			Name: "accOuNT2",
-	// 		},
-	// 	},
-	// },
+
+		{
+			// NOTE: duplicate account names are allowed
+			name:    "creating an account with a duplicate name, case insensitive",
+			wantErr: nil,
+
+			args: args{context.Background(),
+				&auth.CreateAccountRequest{
+					Name:        "accOuNT22",
+					AccountName: "account-2_1",
+				},
+			},
+
+			want: &auth.Account{
+				Id:          1003,
+				Name:        "accOuNT22",
+				AccountName: "account-2_1",
+
+				CreatedAt: ts(t, createdAt),
+				UpdatedAt: ts(t, createdAt),
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -240,33 +271,35 @@ func testAuthsvc_CreateAccount_DefaultTokens(t *testing.T) {
 
 		args: args{context.Background(),
 			&auth.CreateAccountRequest{
-				Name: "someaccount",
+				Name:        "someaccount",
+				AccountName: "someaccount-1",
 			},
 		},
 
 		want: &auth.Account{
-			Id:        1002,
-			Name:      "someaccount",
-			CreatedAt: ts(t, createdAt),
-			UpdatedAt: ts(t, createdAt),
+			Id:          1004,
+			Name:        "someaccount",
+			AccountName: "someaccount-1",
+			CreatedAt:   ts(t, createdAt),
+			UpdatedAt:   ts(t, createdAt),
 		},
 		wantTokens: []*auth.Token{
 			&auth.Token{
-				AccountId:        1002,
+				AccountId:        1004,
 				Key:              "10037c4d7bbb0407d1e2c64981855ad8681d0d86",
 				PermissionScopes: []string{"sdk"},
 				CreatedAt:        ts(t, createdAt),
 				UpdatedAt:        ts(t, createdAt),
 			},
 			&auth.Token{
-				AccountId:        1002,
+				AccountId:        1004,
 				Key:              "52fdfc072182654f163f5f0f9a621d729566c74d",
 				PermissionScopes: []string{"web"},
 				CreatedAt:        ts(t, createdAt),
 				UpdatedAt:        ts(t, createdAt),
 			},
 			&auth.Token{
-				AccountId:        1002,
+				AccountId:        1004,
 				Key:              "d1e91e00167939cb6694d2c422acd208a0072939",
 				PermissionScopes: []string{"server"},
 				CreatedAt:        ts(t, createdAt),
@@ -429,10 +462,11 @@ func testAuthsvc_GetAccount(t *testing.T) {
 			},
 		},
 		want: &auth.Account{
-			Id:        1,
-			Name:      "firstAcct",
-			CreatedAt: ts(t, createdAt),
-			UpdatedAt: ts(t, createdAt),
+			Id:          1,
+			Name:        "firstAcct",
+			AccountName: "account-1",
+			CreatedAt:   ts(t, createdAt),
+			UpdatedAt:   ts(t, createdAt),
 		},
 	}}
 
@@ -636,10 +670,11 @@ func testAuthsvc_GetUserInfo(t *testing.T) {
 
 		want: &auth.GetUserInfoResponse{
 			Account: &auth.Account{
-				CreatedAt: ts(t, createdAt),
-				UpdatedAt: ts(t, createdAt),
-				Id:        20,
-				Name:      "account20",
+				CreatedAt:   ts(t, createdAt),
+				UpdatedAt:   ts(t, createdAt),
+				Id:          20,
+				Name:        "account20",
+				AccountName: "account-20",
 			},
 			User: &auth.User{
 				CreatedAt: ts(t, otherTime),
@@ -1251,6 +1286,7 @@ func testAuthsvc_AuthenticateUserSession(t *testing.T) {
 			want: &auth.AuthContext{
 				AccountId:        1,
 				UserId:           1,
+				AccountName:      "account-1",
 				PermissionScopes: []string{},
 			},
 
@@ -1339,6 +1375,7 @@ func testAuthsvc_AuthenticateToken(t *testing.T) {
 			want: &auth.AuthContext{
 				AccountId:        1,
 				UserId:           0,
+				AccountName:      "account-1",
 				PermissionScopes: []string{"web"},
 			},
 

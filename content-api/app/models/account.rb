@@ -11,8 +11,6 @@ class Account < ActiveRecord::Base
 
     validates :subdomain, presence: true, subdomain: true
 
-    before_validation :generate_subdomain, on: :create
-
     before_create :generate_share_key
     after_create :create_active_tags_index
     after_create :create_active_configuration_uuids_index
@@ -143,18 +141,18 @@ class Account < ActiveRecord::Base
         ActiveIBeaconConfigurationUuid.create(account_id: self.id)
     end
 
-    def generate_subdomain
-        if self.subdomain.nil?
-            domain = (self.title || SecureRandom.hex).downcase.lstrip.gsub(/[^a-z0-9\-\s]*/i, "").gsub(/\s+/,"-").chomp("-")
-            domain[0] = "" if domain[0] == '-'
-            current_count = 1
+    def self.sanitize_domain(name)
+      (name || SecureRandom.hex).to_s.downcase.lstrip.gsub(/[^a-z0-9\-\s]*/i, "").gsub(/\s+/,"-").gsub(/^-+|\-+$/, "")
+    end
 
-            self.subdomain = loop do
-                break domain unless Account.exists?(subdomain: domain)
-                domain = domain + "#{current_count}"
-                current_count += 1
-            end 
-        end
+    def self.unique_domain(name)
+      current_count = 1
+      domain = name
+      loop do
+        break domain unless Account.exists?(subdomain: domain)
+        domain = name + "_#{current_count}"
+        current_count += 1
+      end
     end
 
     def generate_share_key

@@ -498,6 +498,7 @@ proto.rover.auth.v1.Account.toObject = function(includeInstance, msg) {
   var f, obj = {
     id: jspb.Message.getFieldWithDefault(msg, 1, 0),
     name: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    accountName: jspb.Message.getFieldWithDefault(msg, 5, ""),
     updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
   };
@@ -543,6 +544,10 @@ proto.rover.auth.v1.Account.deserializeBinaryFromReader = function(msg, reader) 
     case 2:
       var value = /** @type {string} */ (reader.readString());
       msg.setName(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAccountName(value);
       break;
     case 3:
       var value = new google_protobuf_timestamp_pb.Timestamp;
@@ -596,6 +601,13 @@ proto.rover.auth.v1.Account.serializeBinaryToWriter = function(message, writer) 
       f
     );
   }
+  f = message.getAccountName();
+  if (f.length > 0) {
+    writer.writeString(
+      5,
+      f
+    );
+  }
   f = message.getUpdatedAt();
   if (f != null) {
     writer.writeMessage(
@@ -642,6 +654,21 @@ proto.rover.auth.v1.Account.prototype.getName = function() {
 /** @param {string} value */
 proto.rover.auth.v1.Account.prototype.setName = function(value) {
   jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional string account_name = 5;
+ * @return {string}
+ */
+proto.rover.auth.v1.Account.prototype.getAccountName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 5, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.auth.v1.Account.prototype.setAccountName = function(value) {
+  jspb.Message.setField(this, 5, value);
 };
 
 
@@ -1576,7 +1603,8 @@ proto.rover.auth.v1.CreateAccountRequest.prototype.toObject = function(opt_inclu
  */
 proto.rover.auth.v1.CreateAccountRequest.toObject = function(includeInstance, msg) {
   var f, obj = {
-    name: jspb.Message.getFieldWithDefault(msg, 1, "")
+    name: jspb.Message.getFieldWithDefault(msg, 1, ""),
+    accountName: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -1617,6 +1645,10 @@ proto.rover.auth.v1.CreateAccountRequest.deserializeBinaryFromReader = function(
       var value = /** @type {string} */ (reader.readString());
       msg.setName(value);
       break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAccountName(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1652,6 +1684,13 @@ proto.rover.auth.v1.CreateAccountRequest.serializeBinaryToWriter = function(mess
       f
     );
   }
+  f = message.getAccountName();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
+    );
+  }
 };
 
 
@@ -1667,6 +1706,21 @@ proto.rover.auth.v1.CreateAccountRequest.prototype.getName = function() {
 /** @param {string} value */
 proto.rover.auth.v1.CreateAccountRequest.prototype.setName = function(value) {
   jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional string account_name = 2;
+ * @return {string}
+ */
+proto.rover.auth.v1.CreateAccountRequest.prototype.getAccountName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.auth.v1.CreateAccountRequest.prototype.setAccountName = function(value) {
+  jspb.Message.setField(this, 2, value);
 };
 
 
@@ -4003,6 +4057,7 @@ proto.rover.auth.v1.AuthContext.prototype.toObject = function(opt_includeInstanc
 proto.rover.auth.v1.AuthContext.toObject = function(includeInstance, msg) {
   var f, obj = {
     accountId: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    accountName: jspb.Message.getFieldWithDefault(msg, 4, ""),
     userId: jspb.Message.getFieldWithDefault(msg, 2, 0),
     permissionScopesList: jspb.Message.getField(msg, 3)
   };
@@ -4044,6 +4099,10 @@ proto.rover.auth.v1.AuthContext.deserializeBinaryFromReader = function(msg, read
     case 1:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setAccountId(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAccountName(value);
       break;
     case 2:
       var value = /** @type {number} */ (reader.readInt32());
@@ -4088,6 +4147,13 @@ proto.rover.auth.v1.AuthContext.serializeBinaryToWriter = function(message, writ
       f
     );
   }
+  f = message.getAccountName();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
   f = message.getUserId();
   if (f !== 0) {
     writer.writeInt32(
@@ -4117,6 +4183,21 @@ proto.rover.auth.v1.AuthContext.prototype.getAccountId = function() {
 /** @param {number} value */
 proto.rover.auth.v1.AuthContext.prototype.setAccountId = function(value) {
   jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional string account_name = 4;
+ * @return {string}
+ */
+proto.rover.auth.v1.AuthContext.prototype.getAccountName = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.auth.v1.AuthContext.prototype.setAccountName = function(value) {
+  jspb.Message.setField(this, 4, value);
 };
 
 

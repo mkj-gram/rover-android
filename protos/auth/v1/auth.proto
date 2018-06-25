@@ -156,6 +156,7 @@ message Account {
     // The name of the account.
     // For example AirMiles
     string name = 2;
+    string account_name = 5;
 
     google.protobuf.Timestamp updated_at = 3;
     google.protobuf.Timestamp created_at = 4;
@@ -217,8 +218,8 @@ message GetAccountRequest {
 
 message CreateAccountRequest {
     // The name of the account
-    // All other attributes are auto generated
     string name = 1;
+    string account_name = 2;
 }
 
 message UpdateAccountRequest {
@@ -238,7 +239,7 @@ message ListTokensResponse {
 
 
 message ListAccountsRequest {}
-  
+
 message ListAccountsResponse {
     repeated Account accounts = 1;
 }
@@ -311,10 +312,12 @@ message AuthenticateRequest {
 message AuthContext {
     // the Account.id the context is bound to
     int32 account_id = 1;
+    string account_name = 4;
 
     // the User.id the context is bound to
     // optional
     int32 user_id = 2;
+
 
     // string tokens the context is bound to
     repeated string permission_scopes = 3;
