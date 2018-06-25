@@ -391,7 +391,7 @@ func UpdateDeviceLocation(audienceClient audience.AudienceClient, geocoderClient
 			lng = value.NumberValue
 		}
 
-		if value, ok := attributes["accuracy"].Kind.(*structpb.Value_NumberValue); ok {
+		if value, ok := attributes["horizontalAccuracy"].Kind.(*structpb.Value_NumberValue); ok {
 			accuracy = value.NumberValue
 		}
 

@@ -40,9 +40,9 @@ func TestRoot(t *testing.T) {
 				Name:        "Location Updated",
 				Attributes: &structpb.Struct{
 					Fields: map[string]*structpb.Value{
-						"latitude":  structpb.Number(44),
-						"longitude": structpb.Number(-84),
-						"accuracy":  structpb.Number(500),
+						"latitude":           structpb.Number(44),
+						"longitude":          structpb.Number(-84),
+						"horizontalAccuracy": structpb.Number(500),
 					},
 				},
 				Device: &event.DeviceContext{

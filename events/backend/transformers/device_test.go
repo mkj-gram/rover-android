@@ -827,9 +827,9 @@ func TestUpdateDeviceLocation(t *testing.T) {
 				Name:        "Location Updated",
 				Attributes: &structpb.Struct{
 					Fields: map[string]*structpb.Value{
-						"latitude":  structpb.Number(10),
-						"longitude": structpb.Number(-33),
-						"accuracy":  structpb.Number(50),
+						"latitude":           structpb.Number(10),
+						"longitude":          structpb.Number(-33),
+						"horizontalAccuracy": structpb.Number(50),
 					},
 				},
 
@@ -865,9 +865,9 @@ func TestUpdateDeviceLocation(t *testing.T) {
 				Name:        "Location Updated",
 				Attributes: &structpb.Struct{
 					Fields: map[string]*structpb.Value{
-						"latitude":  structpb.Number(43.962168),
-						"longitude": structpb.Number(-78.972495),
-						"accuracy":  structpb.Number(1337),
+						"latitude":           structpb.Number(43.962168),
+						"longitude":          structpb.Number(-78.972495),
+						"horizontalAccuracy": structpb.Number(1337),
 					},
 				},
 
