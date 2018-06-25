@@ -50,22 +50,22 @@ public struct ExperiencesAssembler: Assembler {
         // MARK: UIViewController (experience)
         
         container.register(UIViewController.self, name: "experience", scope: .transient) { (resolver, identifier: ExperienceIdentifier) in
-            let store = resolver.resolve(ExperienceStore.self)!
-            
-            if let experience = store.experience(for: identifier) {
-                return resolver.resolve(UIViewController.self, name: "experience", arguments: experience)!
-            }
-            
-            return ExperienceContainer(identifier: identifier, store: store, viewControllerProvider: { experience in
-                return resolver.resolve(UIViewController.self, name: "experience", arguments: experience)!
-            })
+            return ExperienceContainer(
+                identifier: identifier,
+                store: resolver.resolve(ExperienceStore.self)!,
+                viewControllerProvider: { experience in
+                    return resolver.resolve(UIViewController.self, name: "experience", arguments: experience)!
+                }
+            )
         }
         
         container.register(UIViewController.self, name: "experience", scope: .transient) { (resolver, experience: Experience) in
-            let screenViewController = resolver.resolve(UIViewController.self, name: "screen", arguments: experience, experience.homeScreen)!
-            let eventQueue = resolver.resolve(EventQueue.self)!
-            let sessionController = resolver.resolve(SessionController.self)!
-            return NavigationExperienceController(rootViewController: screenViewController, experience: experience, eventQueue: eventQueue, sessionController: sessionController)
+            return NavigationExperienceController(
+                rootViewController: resolver.resolve(UIViewController.self, name: "screen", arguments: experience, experience.homeScreen)!,
+                experience: experience,
+                eventQueue: resolver.resolve(EventQueue.self)!,
+                sessionController: resolver.resolve(SessionController.self)!
+            )
         }
         
         // MARK: UIViewController (screen)

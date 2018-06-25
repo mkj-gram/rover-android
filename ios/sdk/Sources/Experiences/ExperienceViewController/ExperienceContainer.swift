@@ -88,25 +88,29 @@ open class ExperienceContainer: UIViewController {
             
             // If the user cancels loading, the view controller may have been dismissed and garbage collected before the fetch completes
             
-            guard let experienceContainer = self else {
+            guard let container = self else {
                 return
             }
             
             DispatchQueue.main.async {
-                experienceContainer.stopLoading()
+                container.stopLoading()
                 
                 switch result {
                 case let .error(error, shouldRetry):
-                    experienceContainer.present(error: error, shouldRetry: shouldRetry)
+                    container.present(error: error, shouldRetry: shouldRetry)
                 case let .success(experience):
-                    let viewController = experienceContainer.viewControllerProvider(experience)
-                    experienceContainer.addChildViewController(viewController)
-                    experienceContainer.view.addSubview(viewController.view)
-                    viewController.didMove(toParentViewController: experienceContainer)
-                    experienceContainer.setNeedsStatusBarAppearanceUpdate()
+                    container.didFetchExperience(experience)
                 }
             }
         }
+    }
+    
+    open func didFetchExperience(_ experience: Experience) {
+        let viewController = viewControllerProvider(experience)
+        addChildViewController(viewController)
+        view.addSubview(viewController.view)
+        viewController.didMove(toParentViewController: self)
+        setNeedsStatusBarAppearanceUpdate()
     }
     
     var cancelButtonTimer: Timer?
