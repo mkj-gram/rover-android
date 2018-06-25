@@ -29,7 +29,7 @@ class AndroidPlatformService
       auth_context: auth_context,
 
       title: p.title.to_s,
-      push_credentials_server_key: p.api_key.to_s,
+      push_credentials_server_key: p.messaging_token.to_s,
       push_credentials_sender_id: p.sender_id.to_s,
     ))
 
@@ -50,7 +50,7 @@ class AndroidPlatformService
 
       android_platform_id: platform.id,
 
-      push_credentials_server_key: attrs[:api_key],
+      push_credentials_server_key: attrs[:messaging_token] || attrs[:api_key],
       push_credentials_sender_id: attrs[:sender_id]
     ))
 
@@ -60,6 +60,7 @@ class AndroidPlatformService
   def self.clear_credentials(platform:)
     self.update(platform: platform, attrs: {
       api_key: "",
+      messaging_token: "",
       sender_id: "",
     })
   end
