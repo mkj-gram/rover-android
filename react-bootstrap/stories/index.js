@@ -9,7 +9,6 @@ import {
     RoundedButton,
     text,
     titanium,
-    light,
     steel,
     silver,
     purple,
@@ -41,6 +40,22 @@ storiesOf('Navigator', module).add('to Storybook', () => <PrimaryNavigator />)
 //       />
 //   ))
 
+storiesOf('TextField', module).add('TextField', () => {
+    return (
+        <TextField
+            placeholder=""
+            value={'TESTTEXT'}
+            style={{
+                width: 150,
+                fontSize: 14,
+                focus: { borderColor: silver },
+                borderColor: silver
+            }}
+            onChange={e => console.log(e.target.value)}
+        />
+    )
+})
+
 storiesOf('ModalWithHeader', module).add('ModalWithHeader', () => {
     return (
         <ModalWithHeader
@@ -56,6 +71,47 @@ storiesOf('ModalWithHeader', module).add('ModalWithHeader', () => {
         />
     )
 })
+
+storiesOf('ModalWithHeaderAndTextField', module).add(
+    'ModalWithHeaderAndTextField',
+    () => {
+        return (
+            <ModalWithHeader
+                contentLabel="Test modal"
+                backgroundColor={graphite}
+                isOpen={true}
+                headerContent={<div>test</div>}
+                successFn={() => console.log('success')}
+                successText="Success"
+                cancelFn={() => console.log('cancel')}
+                cancelText="Cancel"
+                primaryColor={purple}
+                children={
+                    <div>
+                        <div
+                            style={{ ...text, color: silver, marginBottom: 20 }}
+                        >
+                            {' '}
+                            Give this segment a name
+                        </div>
+                        <TextField
+                            placeholder=""
+                            value={'TESTTEXT'}
+                            style={{
+                                width: 150,
+                                fontSize: 14,
+                                focus: { borderColor: silver },
+                                color: 'white',
+                                borderColor: silver
+                            }}
+                            onChange={e => console.log(e.target.value)}
+                        />
+                    </div>
+                }
+            />
+        )
+    }
+)
 
 storiesOf('DatePicker', module).add('Datepicker', () => {
     return (
@@ -89,71 +145,81 @@ storiesOf('RoundedButton', module).add('Rounded Button', () => {
     )
 })
 
-
 storiesOf('Pill', module).add('Pill', () => {
-    let height=28
+    let height = 28
     let icon = true
     let text = 'testytest'
-    let backgroundColor=ash
-    let tagIconColor=silver
-    let textColor=titanium
-    let deleteButtonBackground=null
-    let deleteButtonColor=silver
+    let backgroundColor = ash
+    let tagIconColor = silver
+    let textColor = titanium
+    let deleteButtonBackground = null
+    let deleteButtonColor = silver
     //onHighlight
     let onHighlight = false
-    let onHighlightBackgroundColor=straw
-    let onHighlightTagIconColor=ash
-    let onHighlightTextColor=graphite
-    let onHighlightDeleteButtonBackground=null
-    let onHighlightDeleteButtonColor=steel
+    let onHighlightBackgroundColor = straw
+    let onHighlightTagIconColor = ash
+    let onHighlightTextColor = graphite
+    let onHighlightDeleteButtonBackground = null
+    let onHighlightDeleteButtonColor = steel
     //onHover
-    let onHoverDeleteButtonBackground=steel
-    let onHoverDeleteButtonColor='white'
-    let id="tagDeleteButton1"
-    let maxWidth=350
+    let onHoverDeleteButtonBackground = steel
+    let onHoverDeleteButtonColor = 'white'
+    let id = 'tagDeleteButton1'
+    let maxWidth = 350
 
     const getIconFill = () => {
-        return (onHighlight) ? onHighlightTagIconColor : tagIconColor
+        return onHighlight ? onHighlightTagIconColor : tagIconColor
     }
     const getBackgroundColor = () => {
-        return (onHighlight) ? onHighlightBackgroundColor : backgroundColor
+        return onHighlight ? onHighlightBackgroundColor : backgroundColor
     }
 
     const getTextColor = () => {
-        return (onHighlight) ? onHighlightTextColor : textColor
+        return onHighlight ? onHighlightTextColor : textColor
     }
 
     const getDeleteButtonColor = () => {
-        return (onHighlight) ? onHighlightDeleteButtonColor : deleteButtonColor
+        return onHighlight ? onHighlightDeleteButtonColor : deleteButtonColor
     }
 
     const tagIcon = () => {
         return (
-            <div style={{
-                marginLeft: 11,
-                marginRight: 8,
-                width: 12,
-                height: 12
-            }}>
-                {icon && <TagIcon
-                    fill={getIconFill()}
-                    style= {{ pointerEvents: 'none' }}
-                    height= "12px"
-                    width= "12px"
-                />}
-            </div>  
+            <div
+                style={{
+                    marginLeft: 11,
+                    marginRight: 8,
+                    width: 12,
+                    height: 12
+                }}
+            >
+                {icon && (
+                    <TagIcon
+                        fill={getIconFill()}
+                        style={{ pointerEvents: 'none' }}
+                        height="12px"
+                        width="12px"
+                    />
+                )}
+            </div>
         )
     }
 
     const getText = () => {
         return (
-            <div style={{display:'inline-block', ...text, ...light, fontSize: 14, color: getTextColor(),
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
-            minWidth: 0,
-            maxWidth: maxWidth-65 // Needs to have better way
-        }}>
+            <div
+                style={{
+                    display: 'inline-block',
+                    ...text,
+                    ...light,
+                    fontSize: 14,
+                    color: getTextColor(),
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    minWidth: 0,
+                    maxWidth: maxWidth - 65 // Needs to have better way
+                }}
+            >
                 {text}
             </div>
         )
@@ -172,92 +238,91 @@ storiesOf('Pill', module).add('Pill', () => {
     const getDeleteButton = () => {
         return (
             <div
-            id = {id}
-            style={{
-                height: 16,
-                width: 16,
-                marginLeft: 8,
-                marginRight: 6,
-                
-                borderRadius: 23,
-                display: 'flex',
-                flex: 'none',
-                alignItems: 'center',
-                justifyContent: 'center'}}
-               
+                id={id}
+                style={{
+                    height: 16,
+                    width: 16,
+                    marginLeft: 8,
+                    marginRight: 6,
+
+                    borderRadius: 23,
+                    display: 'flex',
+                    flex: 'none',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}
             >
-                <CancelIcon fill={getDeleteButtonColor()} style={{ pointerEvents: 'none' }} />
+                <CancelIcon
+                    fill={getDeleteButtonColor()}
+                    style={{ pointerEvents: 'none' }}
+                />
             </div>
         )
     }
 
     let pill = (
-        
-        <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            height,
-            backgroundColor: getBackgroundColor(),
-            
-            borderRadius: 23,
-            marginRight: 8,
-            marginTop: 4,
-            marginBottom: 4
-        }}
+        <div
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                height,
+                backgroundColor: getBackgroundColor(),
+
+                borderRadius: 23,
+                marginRight: 8,
+                marginTop: 4,
+                marginBottom: 4
+            }}
             onMouseOver={e => handleMouseEventPill(e, 'over')}
             onMouseLeave={e => handleMouseEventPill(e, 'leave')}
         >
-           {tagIcon()}
-           {getText()}
-           {getDeleteButton()}
-        
+            {tagIcon()}
+            {getText()}
+            {getDeleteButton()}
         </div>
     )
-    
+
     return (
         <div>
-        <div style = {{
-            display: 'flex',
-            alignItems: 'flex-start',
-            alignContent: 'flex-start',
-            flexWrap: 'wrap',
-            width: 370,
-            height: 130,
-            boxShadow: '0 3px 20px 0 rgba(0,0,0,0.25)',
-            borderRadius: 3,
-            overflow: 'scroll',
-        }}>
-            {pill}
-            {pill}
-            {pill}
-            {pill}
-            {pill}
-            <TextField
-            placeholder="leroy K"
-            value=''
-            style={{
-                width: 40,
-                fontSize: 14,
-                focus: { borderColor: silver },
-                color: 'white',
-                borderColor: silver
-            }}
-        />
-        </div>
-        
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    alignContent: 'flex-start',
+                    flexWrap: 'wrap',
+                    width: 370,
+                    height: 130,
+                    boxShadow: '0 3px 20px 0 rgba(0,0,0,0.25)',
+                    borderRadius: 3,
+                    overflow: 'scroll'
+                }}
+            >
+                {pill}
+                {pill}
+                {pill}
+                {pill}
+                {pill}
+                <TextField
+                    placeholder="leroy K"
+                    value=""
+                    style={{
+                        width: 40,
+                        fontSize: 14,
+                        focus: { borderColor: silver },
+                        color: 'white',
+                        borderColor: silver
+                    }}
+                />
+            </div>
         </div>
     )
 })
 
 storiesOf('FlashMessage', module).add('Message', () => {
-    return (
-        <FlashMessage messageText="Updating..." />
-    )
+    return <FlashMessage messageText="Updating..." />
 })
 
 storiesOf('TypeAhead', module).add('TextInput', () => {
-    return (
-        <TypeAhead />
-    )
+    return <TypeAhead />
 })

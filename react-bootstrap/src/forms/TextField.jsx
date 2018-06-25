@@ -12,7 +12,8 @@ class TextField extends Component {
         super(props)
 
         this.state = {
-            isFocused: false
+            isFocused: false,
+            currentValue: null
         }
 
         this.onFocus = this.onFocus.bind(this)
@@ -32,21 +33,50 @@ class TextField extends Component {
         this.input.focus()
     }
 
+    onFocus(event) {
+        this.setState({
+            isFocused: true
+        })
+
+        this.props.onFocus(event)
+    }
+
+    onBlur(event) {
+        this.setState({
+            isFocused: false
+        })
+
+        this.props.onBlur(event)
+    }
+
+    onChange(event) {
+        this.setState({
+            isPresent: Boolean(event.target.value),
+            currentValue: event.target.value
+        })
+
+        this.props.onChange(event)
+    }
+
+    getInput() {
+        return this.input
+    }
+
     render() {
         const {
-            label,
-            disabled,
-            style,
             onFocus,
             onBlur,
             onChange,
+            isOpen,
+            label,
+            disabled,
+            style,
             id,
             placeholderStyle,
-            isOpen,
             focusOnMount,
-            ...rest
+            value
         } = this.props
-        const { isFocused, isPresent } = this.state
+        const { isFocused, isPresent, currentValue } = this.state
 
         let {
             container: containerStyle,
@@ -127,7 +157,7 @@ class TextField extends Component {
                     onBlur={this.onBlur}
                     onChange={this.onChange}
                     id={id}
-                    {...rest}
+                    value={currentValue || value}
                 />
             </div>
         )
@@ -142,34 +172,6 @@ class TextField extends Component {
                 {input}
             </div>
         )
-    }
-
-    onFocus(event) {
-        this.setState({
-            isFocused: true
-        })
-
-        this.props.onFocus(event)
-    }
-
-    onBlur(event) {
-        this.setState({
-            isFocused: false
-        })
-
-        this.props.onBlur(event)
-    }
-
-    onChange(event) {
-        this.setState({
-            isPresent: Boolean(event.target.value)
-        })
-
-        this.props.onChange(event)
-    }
-
-    getInput() {
-        return this.input
     }
 }
 
