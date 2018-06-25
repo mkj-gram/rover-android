@@ -58,7 +58,17 @@ link () {
 
   CREATE or REPLACE VIEW src_android_platforms AS
   SELECT *
-    FROM public.dblink ('$SRC_DSN', 'SELECT id, account_id, title, sender_id, api_key, created_at, updated_at from android_platforms')
+    FROM public.dblink ('$SRC_DSN', '
+    SELECT
+      id,
+      account_id,
+      title,
+      sender_id,
+      coalesce(messaging_token, api_key),
+      created_at,
+      updated_at
+      from android_platforms
+    ;')
     AS src_android_platforms(
       id              integer,
       account_id      integer,
@@ -84,7 +94,7 @@ migrate() {
     account_id,
     coalesce(title, ''),
     coalesce(bundle_id, ''),
-    coalesce(certificate_data, ''),
+    replace(certificate_data, E'\n', ''),
     coalesce(certificate_pass, ''),
     certificate_expires_at,
     coalesce(certificate_filename,''),
@@ -92,12 +102,15 @@ migrate() {
     created_at,
     updated_at
     FROM src_ios_platforms
+    where certificate_data is not null
   ;
+
 
   INSERT INTO android_platforms(id, account_id, title, push_credentials_server_key, push_credentials_sender_id, push_credentials_updated_at, created_at, updated_at)
   SELECT id, account_id, coalesce(title, ''), coalesce(push_credentials_token, ''), coalesce(push_credentials_sender_id, ''), updated_at, created_at, updated_at
     FROM src_android_platforms
   ;
+
 
 
   SELECT pg_catalog.setval('ios_platforms_id_seq', (select max(id) from src_ios_platforms), true)
