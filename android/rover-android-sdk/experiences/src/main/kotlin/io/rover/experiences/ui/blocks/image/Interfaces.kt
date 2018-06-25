@@ -1,20 +1,17 @@
 package io.rover.experiences.ui.blocks.image
 
 import android.graphics.Bitmap
-import android.util.DisplayMetrics
-import org.reactivestreams.Publisher
-import io.rover.rover.core.data.http.NetworkTask
 import io.rover.experiences.ui.blocks.concerns.background.BackgroundViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.border.BorderViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.BlockViewModelInterface
-import io.rover.experiences.ui.blocks.concerns.layout.LayoutableViewModel
-import io.rover.rover.core.ui.PixelSize
 import io.rover.experiences.ui.blocks.concerns.layout.CompositeBlockViewModelInterface
+import io.rover.experiences.ui.blocks.concerns.layout.LayoutableViewModel
 import io.rover.experiences.ui.blocks.concerns.layout.Measurable
 import io.rover.rover.core.ui.concerns.BindableView
 import io.rover.rover.core.ui.concerns.BindableViewModel
 import io.rover.rover.core.ui.concerns.MeasuredSize
 import io.rover.rover.core.ui.concerns.PrefetchAfterMeasure
+import org.reactivestreams.Publisher
 
 // ViewImage mixin is binding against ImageBlockViewModelInterface instead of
 // ImageViewModelInterface in order to discover the block's opacity for use in an animation.  This

@@ -28,7 +28,7 @@ import io.rover.rover.platform.SharedPreferencesLocalStorage
  */
 class ExperiencesApplication: Application() {
 
-    // TODO: These will be replaced with proper DI
+    private val roverBaseUrl by lazy { resources.getString(R.string.rover_endpoint) }
 
     val authService by lazy {
         Rover.sharedInstance.resolveSingletonOrFail(
@@ -39,7 +39,8 @@ class ExperiencesApplication: Application() {
     val experienceRepository by lazy {
         ExperienceRepository(
             V1ApiNetworkClient(
-                authService
+                authService,
+                roverBaseUrl
             ),
             Schedulers.io()
         )
@@ -77,14 +78,16 @@ class ExperiencesApplication: Application() {
             CoreAssembler(
                 "",
                 this,
-                "experiences"
+                "experiences",
+                endpoint = "$roverBaseUrl/graphql"
             ),
             AccountAssembler(
                 this,
                 Intent(
                     this,
                     ExperiencesListActivity::class.java
-                )
+                ),
+                roverBaseUrl
             ),
             ExperiencesAssembler()
         )

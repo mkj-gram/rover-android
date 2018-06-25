@@ -13,7 +13,8 @@ import io.rover.rover.platform.SharedPreferencesLocalStorage
 
 class AccountAssembler(
     private val application: Application,
-    private val targetIntent: Intent
+    private val targetIntent: Intent,
+    private val roverEndpoint: String = "https://api.rover.io"
 ): Assembler {
     override fun assemble(container: Container) {
         container.register(
@@ -45,7 +46,8 @@ class AccountAssembler(
                     LocalStorage::class.java,
                     "account"
                 ),
-                Schedulers.io()
+                Schedulers.io(),
+                roverEndpoint
             )
         }
     }

@@ -1,19 +1,9 @@
 package io.rover.account
 
-import android.app.Application
 import com.google.gson.annotations.SerializedName
 import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.rover.experiences.ExperiencesAssembler
-import io.rover.rover.Rover
-import io.rover.rover.core.CoreAssembler
-import io.rover.rover.core.container.Assembler
-import io.rover.rover.core.container.Container
-import io.rover.rover.core.container.Scope
 import io.rover.rover.core.data.AuthenticationContext
-import io.rover.rover.core.data.domain.AttributeValue
-import io.rover.rover.core.events.EventQueueService
-import io.rover.rover.core.events.domain.Event
 import io.rover.rover.platform.LocalStorage
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -25,8 +15,6 @@ import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import timber.log.Timber
-import java.util.Date
-import java.util.UUID
 
 
 /**
@@ -34,9 +22,9 @@ import java.util.UUID
  */
 class AuthService(
     localStorage: LocalStorage,
-    private val scheduler: Scheduler
+    private val scheduler: Scheduler,
+    baseUrl: String = "https://api.rover.io/"
 ): AuthenticationContext {
-    private val baseUrl = "https://api.rover.io/"
 
     private val storage = localStorage.getKeyValueStorageFor("auth_service")
 
@@ -211,20 +199,6 @@ interface RoverAuthenticationClient {
                 @field:SerializedName("sdk-token")
                 val sdkToken: String
             )
-        }
-    }
-}
-
-/**
- * Registers our own custom auth context, overriding the pre-registered one that just uses
- * an account token.
- */
-class CustomAuthContextAssembler(
-    private val authContext: AuthenticationContext
-): Assembler {
-    override fun assemble(container: Container) {
-        container.register(Scope.Singleton, AuthenticationContext::class.java) { _ ->
-            authContext
         }
     }
 }

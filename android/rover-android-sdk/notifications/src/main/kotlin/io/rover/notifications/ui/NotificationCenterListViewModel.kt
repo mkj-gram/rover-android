@@ -1,13 +1,11 @@
 package io.rover.notifications.ui
 
-import android.os.Parcelable
 import io.rover.rover.core.logging.log
 import io.rover.rover.core.streams.PublishSubject
-import io.rover.rover.core.streams.PublisherOperators
+import io.rover.rover.core.streams.Publishers
 import org.reactivestreams.Publisher
 import io.rover.rover.core.streams.doOnNext
 import io.rover.rover.core.streams.doOnRequest
-import io.rover.rover.core.streams.doOnSubscribe
 import io.rover.rover.core.streams.filterNulls
 import io.rover.rover.core.streams.map
 import io.rover.rover.core.streams.share
@@ -49,7 +47,7 @@ class NotificationCenterListViewModel(
     private val actions = PublishSubject<Action>()
 
     private val epic: Publisher<NotificationCenterListViewModelInterface.Event> =
-        PublisherOperators.merge(
+        Publishers.merge(
             actions.share().map { action ->
                 when(action) {
                     is Action.NotificationClicked -> {

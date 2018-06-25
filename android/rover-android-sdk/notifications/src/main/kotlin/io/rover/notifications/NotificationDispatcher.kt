@@ -16,7 +16,7 @@ import io.rover.rover.R
 import io.rover.rover.core.assets.AssetService
 import io.rover.rover.core.data.NetworkResult
 import io.rover.rover.core.logging.log
-import io.rover.rover.core.streams.PublisherOperators
+import io.rover.rover.core.streams.Publishers
 import io.rover.rover.core.streams.Scheduler
 import io.rover.rover.core.streams.doOnNext
 import io.rover.rover.core.streams.map
@@ -68,7 +68,7 @@ class NotificationDispatcher(
     private val defaultChannelId: String? = null
 ) {
     fun ingest(notificationFromAction: io.rover.notifications.domain.Notification) {
-        PublisherOperators.defer {
+        Publishers.defer {
             processNotification(notificationFromAction)
         }.subscribeOn(mainThreadScheduler).subscribe {} // TODO: do not use subscriber like this, it will leak
     }
@@ -138,10 +138,10 @@ class NotificationDispatcher(
                         NetworkResult.Error(error, false)
                     }
             }
-            null -> PublisherOperators.just(null)
+            null -> Publishers.just(null)
             else -> {
                 log.w("Notification attachments of type ${notification.attachment.typeName} not supported on Android.")
-                PublisherOperators.just(null)
+                Publishers.just(null)
             }
         }
 

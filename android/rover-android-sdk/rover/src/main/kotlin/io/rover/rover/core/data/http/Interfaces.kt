@@ -1,24 +1,17 @@
 package io.rover.rover.core.data.http
 
+import org.reactivestreams.Publisher
+
 interface NetworkClient {
     /**
-     * Perform the given HttpRequest and then deliver the result to the given [completionHandler].
+     * Wen subscribed performs the given [HttpRequest] and then yields the result.
      *
-     * Note that [completionHandler] is given an [HttpClientResponse], which includes readable
-     * streams.  Thus, it is called on the background worker thread to allow for client code to
-     * read those streams, safely away from the Android main UI thread.
+     * Note that the subscriber is given an [HttpClientResponse], which includes readable streams.
+     * Thus, it is called on the background worker thread to allow for client code to read those
+     * streams, safely away from the Android main UI thread.
      */
-    fun networkTask(
+    fun request(
         request: HttpRequest,
-        bodyData: String?,
-        completionHandler: (HttpClientResponse) -> Unit
-    ): NetworkTask
-}
-
-/**
- * A cancellable concurrent operation.
- */
-interface NetworkTask {
-    fun cancel()
-    fun resume()
+        bodyData: String?
+    ): Publisher<HttpClientResponse>
 }

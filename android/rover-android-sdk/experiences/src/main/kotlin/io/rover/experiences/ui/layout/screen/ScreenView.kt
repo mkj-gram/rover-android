@@ -11,7 +11,7 @@ import io.rover.experiences.ui.blocks.concerns.background.ViewBackground
 import io.rover.rover.Rover
 import io.rover.rover.core.logging.log
 import io.rover.rover.core.streams.PublishSubject
-import io.rover.rover.core.streams.PublisherOperators
+import io.rover.rover.core.streams.Publishers
 import io.rover.rover.core.streams.distinctUntilChanged
 import io.rover.rover.core.streams.subscribe
 import io.rover.rover.core.ui.concerns.BindableView
@@ -20,7 +20,6 @@ import io.rover.rover.core.ui.concerns.PrefetchAfterMeasure
 import io.rover.rover.core.ui.concerns.ViewModelBinding
 import io.rover.rover.core.ui.concerns.toMeasuredSize
 import io.rover.rover.core.ui.pxAsDp
-import io.rover.rover.platform.whenNotNull
 import org.reactivestreams.Publisher
 
 class ScreenView : RecyclerView, BindableView<ScreenViewModelInterface> {
@@ -45,7 +44,7 @@ class ScreenView : RecyclerView, BindableView<ScreenViewModelInterface> {
             )
         }
 
-        val combined: Publisher<Pair<BindableView.Binding<ScreenViewModelInterface>, MeasuredSize>> = PublisherOperators.combineLatest(
+        val combined: Publisher<Pair<BindableView.Binding<ScreenViewModelInterface>, MeasuredSize>> = Publishers.combineLatest(
             viewModelSubject,
             vtoMeasuredSizeSubject.distinctUntilChanged()
         ) { viewModelBinding: BindableView.Binding<ScreenViewModelInterface>, measured: MeasuredSize ->

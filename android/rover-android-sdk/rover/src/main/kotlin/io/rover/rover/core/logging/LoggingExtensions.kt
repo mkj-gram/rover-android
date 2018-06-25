@@ -130,25 +130,9 @@ class EventQueueLogger(
         nextLogger.e(logTag, message)
         logMessage(
             Event(
-                "Log Message",
+                "Error",
                 hashMapOf(
-                    Pair("tag", AttributeValue.String(logTag)),
-                    Pair("level", AttributeValue.String("e")),
-                    Pair("message", AttributeValue.String(message))
-                )
-            )
-        )
-    }
-
-    override fun w(logTag: String, message: String) {
-        nextLogger.w(logTag, message)
-        logMessage(
-            Event(
-                "Log Message",
-                hashMapOf(
-                    Pair("tag", AttributeValue.String(logTag)),
-                    Pair("level", AttributeValue.String("w")),
-                    Pair("message", AttributeValue.String(message))
+                    Pair("message", AttributeValue.String("$logTag: $message"))
                 )
             )
         )

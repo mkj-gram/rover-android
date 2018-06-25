@@ -8,7 +8,7 @@ import io.rover.rover.core.data.NetworkResult
 import io.rover.notifications.domain.Notification
 import io.rover.notifications.domain.NotificationAttachment
 import io.rover.rover.core.assets.AssetService
-import io.rover.rover.core.streams.PublisherOperators
+import io.rover.rover.core.streams.Publishers
 import io.rover.notifications.ui.concerns.NotificationItemViewModelInterface
 
 class NotificationItemViewModel(
@@ -24,16 +24,16 @@ class NotificationItemViewModel(
 
     override fun requestThumbnailImage(): Publisher<Bitmap> {
         return if(notificationItem.attachment == null || notificationItem.attachment !is NotificationAttachment.Image) {
-            PublisherOperators.empty()
+            Publishers.empty()
         } else {
             assetService.getImageByUrl(notificationItem.attachment.url).flatMap { attachmentResult ->
                 when(attachmentResult) {
                     is NetworkResult.Error -> {
                         log.w("Unable to fetch notification item image: ${attachmentResult.throwable.message}")
-                        PublisherOperators.empty()
+                        Publishers.empty()
                     }
                     is NetworkResult.Success -> {
-                        PublisherOperators.just(attachmentResult.response)
+                        Publishers.just(attachmentResult.response)
                     }
                 }
             }

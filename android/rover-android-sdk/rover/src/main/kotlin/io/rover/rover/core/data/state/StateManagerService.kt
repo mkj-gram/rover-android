@@ -6,15 +6,13 @@ import io.rover.rover.core.data.GraphQlRequest
 import io.rover.rover.core.data.NetworkResult
 import io.rover.rover.core.data.graphql.GraphQlApiServiceInterface
 import io.rover.rover.core.logging.log
-import io.rover.rover.core.streams.CallbackReceiver
 import io.rover.rover.core.streams.PublishSubject
-import org.reactivestreams.Publisher
-import io.rover.rover.core.streams.asPublisher
 import io.rover.rover.core.streams.doOnNext
 import io.rover.rover.core.streams.flatMap
 import io.rover.rover.core.streams.share
 import io.rover.rover.platform.DeviceIdentificationInterface
 import org.json.JSONObject
+import org.reactivestreams.Publisher
 
 class StateManagerService(
     private val deviceIdentification: DeviceIdentificationInterface,
@@ -43,11 +41,10 @@ class StateManagerService(
     private val actionSubject =  PublishSubject<Unit>()
 
     private val updates = actionSubject.flatMap {
-        { callback: CallbackReceiver<NetworkResult<JSONObject>> -> graphQlApiService.operation(
-            DeviceStateNetworkRequest(deviceIdentifer, queryFragments, neededPersistedFragments.toList()),
-            callback
+
+        graphQlApiService.operation(
+            DeviceStateNetworkRequest(deviceIdentifer, queryFragments, neededPersistedFragments.toList())
         )
-        }.asPublisher()
     }.doOnNext { update ->
         if(update is NetworkResult.Error) {
             log.w("Unable to update device state because: ${update}")

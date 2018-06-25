@@ -5,7 +5,7 @@ import io.rover.rover.core.assets.AssetService
 import io.rover.rover.core.container.Assembler
 import io.rover.rover.core.container.ContainerResolver
 import io.rover.rover.core.container.InjectionContainer
-import io.rover.rover.core.data.http.AsyncTaskAndHttpUrlConnectionNetworkClient
+import io.rover.rover.core.data.http.AndroidHttpsUrlConnectionNetworkClient
 import io.rover.rover.core.events.EventQueueServiceInterface
 import io.rover.rover.core.logging.AndroidLogger
 import io.rover.rover.core.logging.EventQueueLogger
@@ -92,7 +92,7 @@ class Rover(
          */
         @JvmStatic
         fun installSaneGlobalHttpCache(applicationContext: Context) {
-            AsyncTaskAndHttpUrlConnectionNetworkClient.installSaneGlobalHttpCache(applicationContext)
+            AndroidHttpsUrlConnectionNetworkClient.installSaneGlobalHttpCache(applicationContext)
         }
 
 //        /**

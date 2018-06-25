@@ -5,7 +5,7 @@ import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 import io.rover.rover.core.logging.log
 import io.rover.rover.core.streams.PublishSubject
-import io.rover.rover.core.streams.PublisherOperators
+import io.rover.rover.core.streams.Publishers
 import org.reactivestreams.Publisher
 import io.rover.rover.core.streams.doOnNext
 import io.rover.rover.core.streams.filter
@@ -21,8 +21,8 @@ class PermissionsNotifier(
     }
 
     override fun notifyForPermission(permissionId: String): Publisher<String> {
-        return PublisherOperators.concat(
-            PublisherOperators.just(
+        return Publishers.concat(
+            Publishers.just(
                 if(ContextCompat.checkSelfPermission(
                     applicationContext,
                     permissionId

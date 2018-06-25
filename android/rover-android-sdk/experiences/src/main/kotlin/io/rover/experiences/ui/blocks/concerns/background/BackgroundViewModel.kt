@@ -33,11 +33,11 @@ class BackgroundViewModel(
     private val measurementsSubject = PublishSubject<MeasuredSize>()
     private var fadeInNeeded = false
 
-    override val backgroundUpdates: Publisher<BackgroundViewModelInterface.BackgroundUpdate> = PublisherOperators.merge(
+    override val backgroundUpdates: Publisher<BackgroundViewModelInterface.BackgroundUpdate> = Publishers.merge(
         prefetchMeasurementsSubject.imageFetchTransform(),
         measurementsSubject
             .flatMap {
-                PublisherOperators.just(it)
+                Publishers.just(it)
                     .imageFetchTransform()
                     .share().apply {
                         // as a side-effect, register a subscriber right away that will monitor for timeouts
@@ -66,7 +66,7 @@ class BackgroundViewModel(
                     measuredSize.height.dpAsPx(measuredSize.density)
                 ),
                 measuredSize.density
-            ) ?: return@flatMap PublisherOperators.empty<BackgroundViewModelInterface.BackgroundUpdate>()
+            ) ?: return@flatMap Publishers.empty<BackgroundViewModelInterface.BackgroundUpdate>()
 
             assetService.imageByUrl(optimizedImage.uri.toURL()).map { bitmap ->
                 BackgroundViewModelInterface.BackgroundUpdate(

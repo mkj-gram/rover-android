@@ -14,7 +14,6 @@ import io.rover.rover.core.container.Container
 import io.rover.rover.core.container.InjectionContainer
 import io.rover.rover.core.container.Resolver
 import io.rover.rover.core.container.Scope
-import io.rover.rover.core.context.ModulesTrackerInterface
 import io.rover.rover.core.data.domain.Background
 import io.rover.rover.core.data.domain.Height
 import io.rover.rover.core.data.domain.HorizontalAlignment
@@ -43,10 +42,6 @@ class ScreenViewModelSpec : Spek({
                         }
 
                         container.register(Scope.Singleton, ImageOptimizationServiceInterface::class.java) { resolver ->
-                            mock()
-                        }
-
-                        container.register(Scope.Singleton, ModulesTrackerInterface::class.java) { resolver ->
                             mock()
                         }
 

@@ -2,11 +2,9 @@ package io.rover.experiences.ui
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.net.Network
 import android.os.Parcelable
 import io.rover.experiences.ui.navigation.ExperienceExternalNavigationEvent
 import io.rover.experiences.ui.navigation.ExperienceNavigationViewModelInterface
-import io.rover.experiences.ui.navigation.NavigateTo
 import io.rover.experiences.ui.toolbar.ExperienceToolbarViewModelInterface
 import io.rover.experiences.ui.toolbar.ToolbarConfiguration
 import io.rover.rover.core.data.NetworkResult
@@ -15,12 +13,20 @@ import io.rover.rover.core.data.domain.Attributes
 import io.rover.rover.core.data.domain.Experience
 import io.rover.rover.core.data.graphql.GraphQlApiServiceInterface
 import io.rover.rover.core.data.graphql.operations.FetchExperienceRequest
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.streams.*
+import io.rover.rover.core.streams.PublishSubject
+import io.rover.rover.core.streams.Publishers
+import io.rover.rover.core.streams.Scheduler
+import io.rover.rover.core.streams.Subject
+import io.rover.rover.core.streams.doOnSubscribe
+import io.rover.rover.core.streams.flatMap
+import io.rover.rover.core.streams.map
+import io.rover.rover.core.streams.observeOn
+import io.rover.rover.core.streams.share
+import io.rover.rover.core.streams.shareAndReplay
+import io.rover.rover.core.streams.subscribe
 import io.rover.rover.core.tracking.SessionTrackerInterface
 import kotlinx.android.parcel.Parcelize
 import org.reactivestreams.Publisher
-import kotlin.math.exp
 
 class ExperienceViewModel(
     private val experienceRequest: ExperienceRequest,
@@ -68,12 +74,12 @@ class ExperienceViewModel(
     private val actions = actionSource.share()
 
     private fun fetchExperience(): Publisher<out NetworkResult<Experience>> =
-        ({ callback: CallbackReceiver<NetworkResult<Experience>> -> graphQlApiService.fetchExperienceTask(
+        graphQlApiService.fetchExperience(
             when(experienceRequest) {
                 is ExperienceRequest.ByCampaignUrl -> FetchExperienceRequest.ExperienceQueryIdentifier.ByUniversalLink(experienceRequest.url)
                 is ExperienceRequest.ByCampaignId -> FetchExperienceRequest.ExperienceQueryIdentifier.ByCampaignId(experienceRequest.campaignId)
                 is ExperienceRequest.ById -> FetchExperienceRequest.ExperienceQueryIdentifier.ById(experienceRequest.experienceId)
-            }, callback) }).asPublisher().observeOn(mainThreadScheduler)
+            }).observeOn(mainThreadScheduler)
 
     /**
      * Hold on to a reference to the navigation view model so that it can contribute to the Android
@@ -104,7 +110,7 @@ class ExperienceViewModel(
                             toolBarSubject.onNext(
                                 object : ExperienceToolbarViewModelInterface {
                                     override val toolbarEvents: Publisher<ExperienceToolbarViewModelInterface.Event>
-                                        get() = PublisherOperators.empty()
+                                        get() = Publishers.empty()
 
                                     override val configuration: ToolbarConfiguration get() = ToolbarConfiguration(
                                         true,

@@ -25,6 +25,9 @@ import timber.log.Timber
 
 
 class InboxApplication : Application() {
+
+    private val roverBaseUrl by lazy { resources.getString(R.string.rover_endpoint) }
+
     val authService by lazy {
         Rover.sharedInstance.resolveSingletonOrFail(
             AuthenticationContext::class.java
@@ -63,7 +66,8 @@ class InboxApplication : Application() {
             CoreAssembler(
                 "",
                 this,
-                "inbox"
+                "inbox",
+                endpoint = "$roverBaseUrl/graphql"
             ),
             NotificationsAssembler(
                 this,
@@ -78,7 +82,8 @@ class InboxApplication : Application() {
                 Intent(
                     this,
                     MainActivity::class.java
-                )
+                ),
+                roverBaseUrl
             )
         )
 

@@ -5,37 +5,27 @@ import io.rover.rover.core.data.NetworkResult
 import io.rover.rover.core.data.domain.EventSnapshot
 import io.rover.rover.core.data.domain.Experience
 import io.rover.rover.core.data.graphql.operations.FetchExperienceRequest
-import io.rover.rover.core.data.http.NetworkTask
+import org.reactivestreams.Publisher
 
 interface GraphQlApiServiceInterface {
     /**
-     * Retrieve the experience.
-     *
-     * @param completionHandler callback will be called with a result.
+     * Retrieves the experience when subscribed and yields it to the subscriber.
      */
-    fun fetchExperienceTask(
-        query: FetchExperienceRequest.ExperienceQueryIdentifier,
-        completionHandler: ((NetworkResult<Experience>) -> Unit)
-    ): NetworkTask
+    fun fetchExperience(
+        query: FetchExperienceRequest.ExperienceQueryIdentifier
+    ): Publisher<NetworkResult<Experience>>
 
     /**
-     * Retrieve the device state.
-     *
-     * @param completionHandler
+     * Performs the given [GraphQlRequest] when subscribed and yields the result to the subscriber.
      */
     fun <TEntity> operation(
-        request: GraphQlRequest<TEntity>,
-        completionHandler: ((NetworkResult<TEntity>) -> Unit)?
-    ): NetworkTask
+        request: GraphQlRequest<TEntity>
+    ): Publisher<NetworkResult<TEntity>>
 
     /**
-     * Submit analytics events.
-     *
-     * @param completionHandler callback will be called with a result.
+     * Submit analytics events when subscribed, yielding the results to the subscriber.
      */
-    fun sendEventsTask(
-        events: List<EventSnapshot>,
-        completionHandler: ((NetworkResult<String>) -> Unit)
-    ): NetworkTask
+    fun submitEvents(
+        events: List<EventSnapshot>
+    ): Publisher<NetworkResult<String>>
 }
-

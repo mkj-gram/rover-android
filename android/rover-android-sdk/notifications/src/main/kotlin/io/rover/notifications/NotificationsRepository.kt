@@ -41,7 +41,7 @@ class NotificationsRepository(
     // subscriber model after all, in which consumers would provide their query fragment at
     // registration time, removing the afterAssembly() callback wire-up.
 
-    override fun updates(): Publisher<NotificationsRepositoryInterface.Emission.Update> = PublisherOperators.concat(
+    override fun updates(): Publisher<NotificationsRepositoryInterface.Emission.Update> = Publishers.concat(
         currentNotificationsOnDisk().filterNulls().map { existingNotifications ->
             NotificationsRepositoryInterface.Emission.Update(existingNotifications)
         },
@@ -71,8 +71,8 @@ class NotificationsRepository(
     private val actions = PublishSubject<Action>()
 
     private fun currentNotificationsOnDisk(): Publisher<List<Notification>?> {
-        return PublisherOperators.defer {
-            PublisherOperators.just(
+        return Publishers.defer {
+            Publishers.just(
                     try {
                         keyValueStorage[STORE_KEY].whenNotNull { jsonString ->
                             JSONArray(jsonString).getObjectIterable().map { notificationJson ->
@@ -112,10 +112,10 @@ class NotificationsRepository(
     // allowed if they are pure.
 
     private fun replaceLocalStorage(notifications: List<Notification>): Publisher<out List<Notification>> {
-        return PublisherOperators.defer {
+        return Publishers.defer {
             log.v("Updating local storage with ${notifications.size} notifications.")
             keyValueStorage[STORE_KEY] = JSONArray(notifications.map { it.encodeJson(dateFormatting) }).toString()
-            PublisherOperators.just(notifications)
+            Publishers.just(notifications)
         }.subscribeOn(ioExecutor)
     }
 
@@ -135,9 +135,9 @@ class NotificationsRepository(
     ).flatMap { networkResult ->
         when(networkResult) {
             is NetworkResult.Error -> {
-                PublisherOperators.concat(
-                    PublisherOperators.just(NotificationsRepositoryInterface.Emission.Event.Refreshing(false)),
-                    PublisherOperators.just(NotificationsRepositoryInterface.Emission.Event.FetchFailure(networkResult.throwable.message ?: "Unknown")),
+                Publishers.concat(
+                    Publishers.just(NotificationsRepositoryInterface.Emission.Event.Refreshing(false)),
+                    Publishers.just(NotificationsRepositoryInterface.Emission.Event.FetchFailure(networkResult.throwable.message ?: "Unknown")),
                     this.currentNotificationsOnDisk().map {
                         // just yield the current notifications on disk, if any.
                         NotificationsRepositoryInterface.Emission.Update(it ?: emptyList())
@@ -147,8 +147,8 @@ class NotificationsRepository(
             is NetworkResult.Success -> {
                 try {
                     val newNotifications = decodeNotificationsPayload(networkResult.response)
-                    PublisherOperators.concat(
-                        PublisherOperators.just(
+                    Publishers.concat(
+                        Publishers.just(
                             NotificationsRepositoryInterface.Emission.Event.Refreshing(false)
                         ),
                         mergeWithLocalStorage(newNotifications)
@@ -160,9 +160,9 @@ class NotificationsRepository(
                             }
                     )
                 } catch (jsonError: JSONException) {
-                    PublisherOperators.concat(
-                        PublisherOperators.just(NotificationsRepositoryInterface.Emission.Event.Refreshing(false)),
-                        PublisherOperators.just(NotificationsRepositoryInterface.Emission.Event.FetchFailure(jsonError.message ?: "Unknown"))
+                    Publishers.concat(
+                        Publishers.just(NotificationsRepositoryInterface.Emission.Event.Refreshing(false)),
+                        Publishers.just(NotificationsRepositoryInterface.Emission.Event.FetchFailure(jsonError.message ?: "Unknown"))
                     )
                 }
             }
@@ -170,12 +170,12 @@ class NotificationsRepository(
     }
 
     private val epic: Publisher<NotificationsRepositoryInterface.Emission> =
-        PublisherOperators.merge(
+        Publishers.merge(
             actions.flatMap { action ->
                 when (action) {
                     is Action.Refresh -> {
-                        PublisherOperators.concat(
-                            PublisherOperators.just(NotificationsRepositoryInterface.Emission.Event.Refreshing(true))
+                        Publishers.concat(
+                            Publishers.just(NotificationsRepositoryInterface.Emission.Event.Refreshing(true))
                                 .doOnComplete {
                                     log.v("Triggering Device State Manager refresh.")
                                     stateManagerService.triggerRefresh()
@@ -211,7 +211,7 @@ class NotificationsRepository(
         return currentNotificationsOnDisk().flatMap { onDisk ->
             if(onDisk == null) {
                 log.w("No notifications currently stored on disk.  Cannot mark notification as deleted.")
-                return@flatMap PublisherOperators.empty<List<Notification>>()
+                return@flatMap Publishers.empty<List<Notification>>()
             }
 
             val alreadyDeleted = onDisk.find { it.id == notification.id }?.isDeleted ?: false
@@ -246,7 +246,7 @@ class NotificationsRepository(
         return currentNotificationsOnDisk().flatMap { onDisk ->
             if(onDisk == null) {
                 log.w("No notifications currently stored on disk.  Cannot mark notification as read.")
-                return@flatMap PublisherOperators.empty<List<Notification>>()
+                return@flatMap Publishers.empty<List<Notification>>()
             }
 
             val alreadyRead = onDisk.find { it.id == notification.id }?.isRead ?: false

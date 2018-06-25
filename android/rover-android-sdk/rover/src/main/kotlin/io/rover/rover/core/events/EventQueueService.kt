@@ -5,7 +5,6 @@ import android.app.Application
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import io.rover.rover.core.logging.log
 import io.rover.rover.core.data.NetworkResult
 import io.rover.rover.core.data.domain.DeviceContext
 import io.rover.rover.core.data.domain.EventSnapshot
@@ -14,6 +13,8 @@ import io.rover.rover.core.data.graphql.getObjectIterable
 import io.rover.rover.core.data.graphql.operations.data.asJson
 import io.rover.rover.core.data.graphql.operations.data.decodeJson
 import io.rover.rover.core.events.domain.Event
+import io.rover.rover.core.logging.log
+import io.rover.rover.core.streams.subscribe
 import io.rover.rover.platform.DateFormattingInterface
 import io.rover.rover.platform.LocalStorage
 import org.json.JSONArray
@@ -132,7 +133,7 @@ class EventQueueService(
 
             isFlushingEvents = true
 
-            graphQlApiService.sendEventsTask(events) { networkResult ->
+            graphQlApiService.submitEvents(events).subscribe { networkResult ->
                 when(networkResult) {
                     is NetworkResult.Error -> {
                         log.i("Error delivering ${events.count()} events to the Rover API: ${networkResult.throwable.message}")
@@ -149,7 +150,7 @@ class EventQueueService(
                     }
                 }
                 isFlushingEvents = false
-            }.resume()
+            }
         }
     }
 

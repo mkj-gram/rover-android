@@ -2,9 +2,8 @@ package io.rover.rover.core.assets
 
 import android.net.http.HttpResponseCache
 import io.rover.rover.core.logging.log
-import io.rover.rover.core.data.http.AsyncTaskAndHttpUrlConnectionNetworkClient
+import io.rover.rover.core.data.http.AndroidHttpsUrlConnectionNetworkClient
 import org.reactivestreams.Publisher
-import org.reactivestreams.Subscriber
 import org.reactivestreams.Subscription
 import java.io.BufferedInputStream
 import java.io.IOException
@@ -57,7 +56,7 @@ class ImageDownloader (
                             // them in the same LRU cache pool will mean that rotating through just a few
                             // large photos will cause the small payloads to be evicted even though their
                             // contribution to consumption of the cache is tiny.
-                            throw AsyncTaskAndHttpUrlConnectionNetworkClient.missingCacheException()
+                            throw AndroidHttpsUrlConnectionNetworkClient.missingCacheException()
                         }
 
                         connection.apply {

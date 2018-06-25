@@ -19,7 +19,7 @@ import io.rover.rover.core.data.AuthenticationContext
 import io.rover.rover.core.data.ServerKey
 import io.rover.rover.core.data.graphql.GraphQlApiService
 import io.rover.rover.core.data.graphql.GraphQlApiServiceInterface
-import io.rover.rover.core.data.http.AsyncTaskAndHttpUrlConnectionNetworkClient
+import io.rover.rover.core.data.http.AndroidHttpsUrlConnectionNetworkClient
 import io.rover.rover.core.data.http.NetworkClient
 import io.rover.rover.core.data.state.StateManagerService
 import io.rover.rover.core.data.state.StateManagerServiceInterface
@@ -52,6 +52,7 @@ import io.rover.rover.core.routing.website.EmbeddedWebBrowserDisplay
 import io.rover.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
 import io.rover.rover.core.streams.Scheduler
 import io.rover.rover.core.streams.forAndroidMainThread
+import io.rover.rover.core.streams.forExecutor
 import io.rover.rover.core.tracking.ApplicationSessionEmitter
 import io.rover.rover.core.tracking.SessionStore
 import io.rover.rover.core.tracking.SessionStoreInterface
@@ -113,8 +114,10 @@ class CoreAssembler @JvmOverloads constructor(
             "rv-$deepLinkSchemeSlug"
         }
 
-        container.register(Scope.Singleton, NetworkClient::class.java) { _ ->
-            AsyncTaskAndHttpUrlConnectionNetworkClient()
+        container.register(Scope.Singleton, NetworkClient::class.java) { resolver ->
+            AndroidHttpsUrlConnectionNetworkClient(
+                resolver.resolveSingletonOrFail(Scheduler::class.java, "io")
+            )
         }
 
         container.register(Scope.Singleton, DateFormattingInterface::class.java) { _ ->
@@ -127,6 +130,12 @@ class CoreAssembler @JvmOverloads constructor(
 
         container.register(Scope.Singleton, Scheduler::class.java, "main") { _ ->
             Scheduler.forAndroidMainThread()
+        }
+
+        container.register(Scope.Singleton, Scheduler::class.java, "io") { resolver ->
+            Scheduler.forExecutor(
+                resolver.resolveSingletonOrFail(Executor::class.java, "io")
+            )
         }
 
         container.register(Scope.Singleton, LocalStorage::class.java) { _ ->
@@ -163,7 +172,8 @@ class CoreAssembler @JvmOverloads constructor(
         container.register(Scope.Singleton, AssetService::class.java) { resolver ->
             AndroidAssetService(
                 resolver.resolveSingletonOrFail(ImageDownloader::class.java),
-                resolver.resolveSingletonOrFail(Executor::class.java, "io")
+                resolver.resolveSingletonOrFail(Scheduler::class.java, "io"),
+                resolver.resolveSingletonOrFail(Scheduler::class.java, "main")
             )
         }
 

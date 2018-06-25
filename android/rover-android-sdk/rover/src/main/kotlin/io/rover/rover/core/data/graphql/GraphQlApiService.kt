@@ -1,8 +1,6 @@
 package io.rover.rover.core.data.graphql
 
 import android.net.Uri
-import android.os.Handler
-import android.os.Looper
 import io.rover.rover.core.data.APIException
 import io.rover.rover.core.data.AuthenticationContext
 import io.rover.rover.core.data.GraphQlRequest
@@ -16,10 +14,12 @@ import io.rover.rover.core.data.http.HttpClientResponse
 import io.rover.rover.core.data.http.HttpRequest
 import io.rover.rover.core.data.http.HttpVerb
 import io.rover.rover.core.data.http.NetworkClient
-import io.rover.rover.core.data.http.NetworkTask
 import io.rover.rover.core.logging.log
+import io.rover.rover.core.streams.Publishers
+import io.rover.rover.core.streams.map
 import io.rover.rover.platform.DateFormattingInterface
 import org.json.JSONException
+import org.reactivestreams.Publisher
 import java.io.IOException
 import java.net.URL
 
@@ -35,8 +35,6 @@ class GraphQlApiService(
     private val networkClient: NetworkClient,
     private val dateFormatting: DateFormattingInterface
 ): GraphQlApiServiceInterface {
-    private val mainThreadHandler = Handler(Looper.getMainLooper())
-
     private fun urlRequest(mutation: Boolean, queryParams: Map<String, String>): HttpRequest {
         val uri = Uri.parse(endpoint.toString())
         val builder = uri.buildUpon()
@@ -131,11 +129,7 @@ class GraphQlApiService(
             }
         }
 
-    /**
-     * Make a request of the Rover cloud API.  Results are delivered into the provided
-     * [completionHandler] callback, on the main thread.
-     */
-    override fun <TEntity> operation(request: GraphQlRequest<TEntity>, completionHandler: ((NetworkResult<TEntity>) -> Unit)?): NetworkTask {
+    override fun <TEntity> operation(request: GraphQlRequest<TEntity>): Publisher<NetworkResult<TEntity>> {
         // TODO: once we change urlRequest() to use query parameters and GET for non-mutation
         // requests, replace true `below` with `request.mutation`.
         val urlRequest = urlRequest(request.mutation, request.encodeQueryParameters())
@@ -144,65 +138,41 @@ class GraphQlApiService(
         log.v("going to make network request $urlRequest")
 
         return if(authenticationContext.isAvailable()) {
-            networkClient.networkTask(urlRequest, bodyData) { httpClientResponse ->
-                val result = httpResult(request, httpClientResponse)
-                completionHandler?.invoke(result)
+            networkClient.request(urlRequest, bodyData).map { httpClientResponse ->
+                httpResult(request, httpClientResponse)
             }
         } else {
-            object : NetworkTask {
-                override fun cancel() { }
-
-                override fun resume() {
-                    completionHandler?.invoke(
-                        NetworkResult.Error(
-                            Throwable("Rover API authentication not available."),
-                            true
-                        )
-                    )
-                }
-            }
+            Publishers.just(
+                NetworkResult.Error(
+                    Throwable("Rover API authentication not available."),
+                    true
+                )
+            )
         }
     }
 
-    override fun fetchExperienceTask(query: FetchExperienceRequest.ExperienceQueryIdentifier, completionHandler: ((NetworkResult<Experience>) -> Unit)): NetworkTask {
-        val request = FetchExperienceRequest(query)
-        return operation(request) { experienceResult ->
-            mainThreadHandler.post {
-                completionHandler.invoke(experienceResult)
-            }
-        }
-    }
-
-    override fun sendEventsTask(
-        events: List<EventSnapshot>,
-        completionHandler: ((NetworkResult<String>) -> Unit)
-    ): NetworkTask {
-        if(!authenticationContext.isAvailable()) {
-            log.w("Events may not be submitted without a Rover authentication context being configured.")
-
-            return object : NetworkTask {
-                override fun cancel() { /* no-op */}
-
-                override fun resume() {
-                    completionHandler(
-                        NetworkResult.Error(
-                            Exception("Attempt to submit Events without Rover authentication context being configured."),
-                            false
-                        )
-                    )
-                }
-            }
-        }
-
-        val request = SendEventsRequest(
-            dateFormatting,
-            events
+    override fun fetchExperience(query: FetchExperienceRequest.ExperienceQueryIdentifier): Publisher<NetworkResult<Experience>> {
+        return operation(
+            FetchExperienceRequest(query)
         )
+    }
 
-        return operation(request) { uploadResult ->
-            mainThreadHandler.post {
-                completionHandler.invoke(uploadResult)
-            }
+    override fun submitEvents(events: List<EventSnapshot>): Publisher<NetworkResult<String>> {
+        return if(!authenticationContext.isAvailable()) {
+            log.w("Events may not be submitted without a Rover authentication context being configured.")
+            Publishers.just(
+                NetworkResult.Error(
+                    Exception("Attempt to submit Events without Rover authentication context being configured."),
+                    false
+                )
+            )
+        } else {
+            operation(
+                SendEventsRequest(
+                    dateFormatting,
+                    events
+                )
+            )
         }
     }
 }

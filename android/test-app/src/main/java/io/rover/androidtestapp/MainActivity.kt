@@ -13,10 +13,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
-import com.facebook.stetho.urlconnection.ByteArrayRequestEntity
-import com.facebook.stetho.urlconnection.StethoURLConnectionManager
 import io.rover.rover.Rover
-import io.rover.rover.core.data.http.AsyncTaskAndHttpUrlConnectionNetworkClient
 import io.rover.experiences.ui.containers.StandaloneExperienceHostActivity
 import io.rover.notifications.ui.NotificationCenterListView
 import kotlinx.android.synthetic.main.activity_main.demoExperienceView
@@ -24,9 +21,6 @@ import kotlinx.android.synthetic.main.activity_main.demoNotificationCentre
 import kotlinx.android.synthetic.main.activity_main.message
 import kotlinx.android.synthetic.main.activity_main.navigation
 import timber.log.Timber
-import java.io.IOException
-import java.io.InputStream
-import java.net.HttpURLConnection
 
 class MainActivity : AppCompatActivity() {
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->

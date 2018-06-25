@@ -1,12 +1,9 @@
 package io.rover.experiences.ui.blocks.image
 
-import android.graphics.Bitmap
-import android.util.DisplayMetrics
 import io.rover.rover.core.logging.log
 import org.reactivestreams.Publisher
 import io.rover.rover.core.assets.AssetService
 import io.rover.rover.core.assets.ImageOptimizationServiceInterface
-import io.rover.rover.core.data.NetworkResult
 import io.rover.rover.core.data.domain.Block
 import io.rover.rover.core.data.domain.Image
 import io.rover.rover.core.streams.*
@@ -14,7 +11,6 @@ import io.rover.rover.core.ui.PixelSize
 import io.rover.rover.core.ui.RectF
 import io.rover.rover.core.ui.concerns.MeasuredSize
 import io.rover.rover.core.ui.dpAsPx
-import java.net.URL
 import java.util.concurrent.TimeUnit
 
 class ImageViewModel(
@@ -38,11 +34,11 @@ class ImageViewModel(
 
     private var fadeInNeeded = false
 
-    override val imageUpdates: Publisher<ImageViewModelInterface.ImageUpdate> = PublisherOperators.merge(
+    override val imageUpdates: Publisher<ImageViewModelInterface.ImageUpdate> = Publishers.merge(
         prefetchMeasurementsSubject.imageFetchTransform(),
         measurementsSubject
             .flatMap {
-                PublisherOperators.just(it)
+                Publishers.just(it)
                     .imageFetchTransform()
                     .share()
                     .apply {
@@ -63,7 +59,7 @@ class ImageViewModel(
     private fun Publisher<MeasuredSize>.imageFetchTransform(): Publisher<ImageViewModelInterface.ImageUpdate> {
         return flatMap { measuredSize ->
             if(image == null) {
-                PublisherOperators.empty()
+                Publishers.empty()
             } else {
                 val uriWithParameters = imageOptimizationService.optimizeImageBlock(
                     image,
