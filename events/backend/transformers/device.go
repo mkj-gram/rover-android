@@ -18,7 +18,7 @@ import (
 
 const (
 	roverEventNamespace     = "rover"
-	locationUpdateEventName = "Location Update"
+	locationUpdateEventName = "Location Updated"
 )
 
 const (

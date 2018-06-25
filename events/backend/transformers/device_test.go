@@ -763,7 +763,7 @@ func TestUpdateDeviceLocation(t *testing.T) {
 			req: event.Event{
 				AuthContext: &auth.AuthContext{AccountId: 1},
 				Namespace:   "mcdonalds",
-				Name:        "Location Update",
+				Name:        "Location Updated",
 
 				Device: &event.DeviceContext{
 					DeviceIdentifier: "hello",
@@ -776,7 +776,7 @@ func TestUpdateDeviceLocation(t *testing.T) {
 			},
 		},
 		{
-			desc: "skips processing when event name is not Location Update",
+			desc: "skips processing when event name is not Location Updated",
 			ctx: newContext("device", &audience.Device{
 				DeviceId: "hello",
 			}),
@@ -805,7 +805,7 @@ func TestUpdateDeviceLocation(t *testing.T) {
 			req: event.Event{
 				AuthContext: &auth.AuthContext{AccountId: 1},
 				Namespace:   "rover",
-				Name:        "Location Update",
+				Name:        "Location Updated",
 			},
 
 			clientExp: func(c *mock.MockAudienceClient, c2 *gmock.MockGeocoderClient) {
@@ -824,7 +824,7 @@ func TestUpdateDeviceLocation(t *testing.T) {
 
 				AuthContext: &auth.AuthContext{AccountId: 1},
 				Namespace:   "rover",
-				Name:        "Location Update",
+				Name:        "Location Updated",
 				Attributes: &structpb.Struct{
 					Fields: map[string]*structpb.Value{
 						"latitude":  structpb.Number(10),
@@ -862,7 +862,7 @@ func TestUpdateDeviceLocation(t *testing.T) {
 			req: event.Event{
 				AuthContext: &auth.AuthContext{AccountId: 1},
 				Namespace:   "rover",
-				Name:        "Location Update",
+				Name:        "Location Updated",
 				Attributes: &structpb.Struct{
 					Fields: map[string]*structpb.Value{
 						"latitude":  structpb.Number(43.962168),

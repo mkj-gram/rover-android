@@ -37,7 +37,7 @@ func TestRoot(t *testing.T) {
 			req: event.Event{
 				AuthContext: &auth.AuthContext{AccountId: 1},
 				Namespace:   "rover",
-				Name:        "Location Update",
+				Name:        "Location Updated",
 				Attributes: &structpb.Struct{
 					Fields: map[string]*structpb.Value{
 						"latitude":  structpb.Number(44),
