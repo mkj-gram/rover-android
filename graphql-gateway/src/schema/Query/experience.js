@@ -1,8 +1,10 @@
+import RoverApis from '@rover/apis'
+import promisify from '@rover-common/grpc-promisify'
+import { campaignsClient } from '../../grpcClients'; promisify(campaignsClient)
+import { getScheduledNotificationCampaignFromProto } from '../../grpc/campaigns'
 import request from 'request'
 import { URL } from 'url'
-
-import { GraphQLID, GraphQLNonNull, GraphQLString } from 'graphql'
-
+import { GraphQLID, GraphQLString } from 'graphql'
 import Experience from '../Experience'
 
 const experience = {
@@ -18,11 +20,17 @@ const experience = {
             type: GraphQLString
         }
     },
-    resolve: (_, { id: experienceID, campaignID, campaignURL }, { accountToken }) => {
+    resolve: async (_, { id: experienceID, campaignID, campaignURL }, { accountToken, authContext }) => {
         if (experienceID !== null && experienceID !== undefined) {
             return fetchExperience(experienceID, accountToken)
         } else if (campaignID !== null && campaignID !== undefined) {
-            return fetchExperience("57b32c299514ac00271a7425", accountToken).then(experience => ({
+            const request = new RoverApis.campaigns.v1.Models.GetRequest()
+            request.setAuthContext(authContext)
+            request.setCampaignId(parseInt(campaignID))
+            const response = await campaignsClient.get(request)
+            const campaign = response.getCampaign()
+            const { experienceId: experienceID } = getScheduledNotificationCampaignFromProto(campaign.getScheduledNotificationCampaign())
+            return fetchExperience(experienceID, accountToken).then(experience => ({
                 ...experience,
                 campaignID
             }))
