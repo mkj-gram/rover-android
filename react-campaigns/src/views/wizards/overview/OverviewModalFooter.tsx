@@ -254,9 +254,20 @@ const mapDispatchToProps = (dispatch: Dispatch<any>): DispatchProps => {
 }
 
 const mapStatetoProps = (state: State): TestDeviceStateProps => ({
-    scheduledDeliveryProgress: getTypeProgress(state, 'scheduleddelivery'),
-    notificationProgress: getTypeProgress(state, 'notification'),
+    scheduledDeliveryProgress: getTypeProgress(
+        state.editableCampaign,
+        state.editableUIState,
+        'scheduleddelivery'
+    ),
+    notificationProgress: getTypeProgress(
+        state.editableCampaign,
+        state.editableUIState,
+        'notification'
+    ),
     testDevices: getTestDevices(state)
 })
 
-export default connect(mapStatetoProps, mapDispatchToProps)(OverviewModalFooter)
+export default connect(
+    mapStatetoProps,
+    mapDispatchToProps
+)(OverviewModalFooter)

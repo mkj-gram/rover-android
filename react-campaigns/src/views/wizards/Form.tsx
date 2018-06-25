@@ -364,9 +364,14 @@ const mapStateToProps = (
 ): FormStateProps => ({
     editableCampaign: getEditableCampaign(state),
     editableUIState: getEditableUIState(state),
-    getIsStageValid: stage => getIsStageValid(state, stage),
-    getTypeProgress: type => getTypeProgress(state, type),
+    getIsStageValid: stage =>
+        getIsStageValid(state.editableCampaign, state.editableUIState, stage),
+    getTypeProgress: type =>
+        getTypeProgress(state.editableCampaign, state.editableUIState, type),
     showSaveAndClose: getShouldShowSaveAndClose(state)
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Form)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Form)

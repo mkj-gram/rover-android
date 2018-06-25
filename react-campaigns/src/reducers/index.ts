@@ -132,6 +132,9 @@ export const getCampaignFormatDate = (state: Campaign, dateField: string) =>
 
 export const getDuplicateCampaignName = (campaign: Campaign) =>
     campaignsSelector.getDuplicateCampaignName(campaign)
+// Editable UIState
+export const getEditableUIState = (state: State) =>
+    editableUIStateSelector.getEditableUIState(state)
 
 // Editable Campaign
 // Active Popover
@@ -157,16 +160,6 @@ export const getEditableCampaignFormatDate = (
     dateField: string
 ) => editableCampaignSelector.getFormatDate(state, dateField)
 
-// Editable UIState
-export const getEditableUIState = (state: State) =>
-    editableUIStateSelector.getEditableUIState(state)
-
-export const getIsStageValid = (state: State, stage: keyof editableUIState) =>
-    editableUIStateSelector.getIsStageValid(state, stage)
-
-export const getTypeProgress = (state: State, type: UIStateType) =>
-    editableUIStateSelector.getTypeProgress(state, type)
-
 // Segments
 export const getAllSegments = (state: State) =>
     segmentsSelector.getAllSegments(state.segments)
@@ -190,3 +183,126 @@ export const getExperience = (state: State, id: string) =>
 
 // User Account
 export const getUser = (state: State) => userSelector.getUser(state.user)
+// Campaign Progress Calculations
+export const getCampaignTotalProgress = (state: State, id: string) => {
+    const campaign = getCampaign(state, id) as
+        | AutomatedNotificationCampaign
+        | ScheduledCampaign
+    if (campaign.UIState.length === 0) {
+        return 0
+    }
+
+    const uiState = JSON.parse(campaign.UIState) as editableUIState
+    const denominator = Object.keys(uiState).length
+    const numerator = Object.keys(uiState)
+        .filter(
+            (field: keyof editableUIState) =>
+                (uiState[field] as UIStateField).seen
+        )
+        .filter((field: keyof editableUIState) =>
+            getIsStageValid(campaign, uiState, field)
+        ).length
+
+    return Math.round((numerator / denominator) * 100)
+}
+
+export const getTypeProgress = (
+    campaign: AutomatedNotificationCampaign | ScheduledCampaign,
+    uiState: editableUIState,
+    type: UIStateType
+): number => {
+    const fields = Object.keys(uiState).filter(
+        (field: keyof editableUIState) =>
+            (uiState[field] as UIStateField).type === type
+    )
+
+    return (
+        (fields
+            .filter(
+                (field: keyof editableUIState) =>
+                    (uiState[field] as UIStateField).seen
+            )
+            .filter((field: keyof editableUIState) =>
+                getIsStageValid(campaign, uiState, field)
+            ).length *
+            100) /
+        fields.length
+    )
+}
+
+export const getIsStageValid = (
+    campaign: AutomatedNotificationCampaign | ScheduledCampaign,
+    uiState: editableUIState,
+    stage: keyof editableUIState
+): boolean => {
+    switch (stage) {
+        // Notification Settings
+        case 'messageAndMedia':
+            const { notificationBody } = campaign
+            return notificationBody !== ''
+        case 'alertOptions':
+            return (
+                (campaign.notificationAlertOptionPushNotification ||
+                    campaign.notificationAlertOptionNotificationCenter) &&
+                getIsStageValid(campaign, uiState, 'messageAndMedia')
+            )
+        case 'tapBehavior':
+            const {
+                experienceId,
+                notificationTapBehaviorType,
+                notificationTapBehaviorUrl
+            } = campaign
+
+            if (!getIsStageValid(campaign, uiState, 'alertOptions')) {
+                return false
+            }
+
+            switch (notificationTapBehaviorType) {
+                case 'OPEN_APP':
+                    return true
+                case 'OPEN_EXPERIENCE':
+                    return experienceId !== ''
+                case 'OPEN_DEEP_LINK':
+                case 'OPEN_WEBSITE':
+                    return notificationTapBehaviorUrl !== ''
+                default:
+                    return false
+            }
+        case 'advancedSettings':
+            return getIsStageValid(campaign, uiState, 'tapBehavior')
+
+        // Scheduled Delivery Settings
+        case 'dateAndTime':
+            const {
+                scheduledType,
+                scheduledDate,
+                scheduledTime
+            } = campaign as ScheduledCampaign
+            switch (scheduledType) {
+                case 'NOW':
+                    return true
+                case 'SCHEDULED':
+                    return scheduledDate !== null && scheduledTime !== null
+                default:
+                    return false
+            }
+        case 'audience':
+            const { audience } = uiState
+            const { conditionSelected } = audience
+            const { segmentIds } = campaign
+            switch (conditionSelected) {
+                case 'ALL-DEVICES':
+                    return getIsStageValid(campaign, uiState, 'dateAndTime')
+                case 'ALL':
+                case 'ANY':
+                    return (
+                        segmentIds.length > 0 &&
+                        getIsStageValid(campaign, uiState, 'dateAndTime')
+                    )
+                default:
+                    return false
+            }
+        default:
+            return false
+    }
+}

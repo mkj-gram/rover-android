@@ -22,7 +22,11 @@ import {
     silver,
     GlobeIcon
 } from '@rover/ts-bootstrap/dist/src'
-import { getCampaignDisplayTime, getCampaignFormatDate } from '../../reducers'
+import {
+    getCampaignDisplayTime,
+    getCampaignFormatDate,
+    getCampaignTotalProgress
+} from '../../reducers'
 
 import {
     isScheduledCampaign,
@@ -43,6 +47,7 @@ export interface Props {
 export interface CampaignsListProps {
     getDisplayTime: (campaign: Campaign, timeField: string) => string
     getFormatDate: (campaign: Campaign, dateField: string) => Date
+    getTotalProgress: (campaignId: string) => number
 }
 
 const getCampaignIcon = (
@@ -136,7 +141,8 @@ const renderCampaign = (
     media: Media,
     pushToOverview: (campaignId: string) => void,
     getFormatDate: (campaign: Campaign, dateField: string) => Date,
-    getDisplayTime: (campaign: Campaign, timeField: string) => string
+    getDisplayTime: (campaign: Campaign, timeField: string) => string,
+    getTotalProgress: (campaignId: string) => number
 ) => {
     const { campaignId, name, campaignStatus, campaignType } = campaign
     return (
@@ -158,7 +164,8 @@ const renderCampaign = (
                     campaign,
                     media,
                     getFormatDate,
-                    getDisplayTime
+                    getDisplayTime,
+                    getTotalProgress
                 )}
             </div>
             {media !== 'Mobile' &&
@@ -208,7 +215,8 @@ const renderCampaignProgressState = (
     campaign: Campaign,
     media: Media,
     getFormatDate: (campaign: Campaign, dateField: string) => Date,
-    getDisplayTime: (campaign: Campaign, timeField: string) => string
+    getDisplayTime: (campaign: Campaign, timeField: string) => string,
+    getTotalProgress: (campaignId: string) => number
 ) => {
     if (isScheduledCampaign(campaign)) {
         const { scheduledUseLocalDeviceTime, scheduledTimeZone } = campaign
@@ -216,6 +224,7 @@ const renderCampaignProgressState = (
         // tslint:disable-next-line:switch-default
         switch (campaign.scheduledDeliveryStatus) {
             case 'UNKNOWN':
+                const progress = getTotalProgress(campaign.campaignId)
                 return (
                     <div
                         style={{
@@ -226,7 +235,7 @@ const renderCampaignProgressState = (
                         }}
                     >
                         <ProgressBar
-                            progress={50}
+                            progress={progress}
                             style={{
                                 progressStyle: {
                                     backgroundColor: turquoise
@@ -240,7 +249,7 @@ const renderCampaignProgressState = (
                             }}
                         />
                         {media !== 'Mobile' && (
-                            <Text size="small" text={`${50}% complete`} />
+                            <Text size="small" text={`${progress}% complete`} />
                         )}
                     </div>
                 )
@@ -311,26 +320,6 @@ const renderCampaignProgressState = (
                             color={yellow}
                             text="IN PROGRESS"
                             style={{ marginRight: 8 }}
-                        />
-                    </div>
-                )
-            case 'INPROGRESS':
-                return (
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'baseline'
-                        }}
-                    >
-                        <Badge
-                            color={yellow}
-                            text="IN PROGRESS"
-                            style={{ marginRight: 8 }}
-                        />
-                        <Text
-                            label={true}
-                            size="small"
-                            text="Jan 8, 2018 at 11:00 AM"
                         />
                     </div>
                 )
@@ -569,7 +558,8 @@ const CampaignsList: React.SFC<Props & CampaignsListProps> = ({
     campaignType,
     campaignStatus,
     getFormatDate,
-    getDisplayTime
+    getDisplayTime,
+    getTotalProgress
 }) => {
     const baseStyle: React.CSSProperties = {
         width: '100%',
@@ -628,7 +618,8 @@ const CampaignsList: React.SFC<Props & CampaignsListProps> = ({
                             media,
                             pushToOverview,
                             getFormatDate,
-                            getDisplayTime
+                            getDisplayTime,
+                            getTotalProgress
                         )}
                     </div>
                 ))}
@@ -640,7 +631,9 @@ const mapStateToProps = (state: State): CampaignsListProps => ({
     getDisplayTime: (campaign: Campaign, timeField: string) =>
         getCampaignDisplayTime(campaign, timeField),
     getFormatDate: (campaign: Campaign, dateField: string) =>
-        getCampaignFormatDate(campaign, dateField)
+        getCampaignFormatDate(campaign, dateField),
+    getTotalProgress: (campaignId: string) =>
+        getCampaignTotalProgress(state, campaignId)
 })
 
 export default connect(

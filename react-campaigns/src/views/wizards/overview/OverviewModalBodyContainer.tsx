@@ -85,8 +85,16 @@ const OverviewModalBodyContainer: React.SFC<
 
 const mapStateToProps = (state: State): StateProps => ({
     currentWizard: getCurrentWizard(state),
-    notificationProgress: getTypeProgress(state, 'notification'),
-    scheduledDeliveryProgress: getTypeProgress(state, 'scheduleddelivery')
+    notificationProgress: getTypeProgress(
+        state.editableCampaign,
+        state.editableUIState,
+        'notification'
+    ),
+    scheduledDeliveryProgress: getTypeProgress(
+        state.editableCampaign,
+        state.editableUIState,
+        'scheduleddelivery'
+    )
 })
 
 // tslint:disable-next-line:no-any
