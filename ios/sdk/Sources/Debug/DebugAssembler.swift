@@ -9,11 +9,7 @@
 import UIKit
 
 public struct DebugAssembler: Assembler {
-    public var isErrorTrackingEnabled: Bool
-    
-    public init(isErrorTrackingEnabled: Bool = true) {
-        self.isErrorTrackingEnabled = isErrorTrackingEnabled
-    }
+    public init() { }
     
     public func assemble(container: Container) {
         
@@ -32,15 +28,6 @@ public struct DebugAssembler: Assembler {
         container.register(ContextProvider.self, name: "debug") { resolver in
             return DebugContextProvider(
                 testDeviceManager: resolver.resolve(TestDeviceManager.self)!
-            )
-        }
-        
-        // MARK: ErrorTracker
-        
-        container.register(ErrorTracker.self) { resolver in
-            return ErrorTrackerService(
-                eventQueue: resolver.resolve(EventQueue.self)!,
-                logger: resolver.resolve(Logger.self)!
             )
         }
         
@@ -74,10 +61,6 @@ public struct DebugAssembler: Assembler {
     }
     
     public func containerDidAssemble(resolver: Resolver) {
-        if isErrorTrackingEnabled {
-            resolver.resolve(ErrorTracker.self)!.enable()
-        }
-        
         let handler = resolver.resolve(RouteHandler.self, name: "settings")!
         resolver.resolve(Router.self)!.addHandler(handler)
     }
