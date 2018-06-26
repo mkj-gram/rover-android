@@ -1,73 +1,49 @@
+import { User } from '@firebase/auth-types'
 import * as React from 'react'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import { AnyAction } from 'redux'
+import { ThunkDispatch } from 'redux-thunk'
+import { State } from '../../typings'
+import { authenticate, resetLogin } from '../actions'
 import firebase, { ui } from '../Firebase'
+import { getIsUnauthorized, getUser } from '../reducers'
 import FirebaseAuth from './FirebaseAuth'
 
 const oauthClientID = process.env.AUTH_CLIENT_ID
 
-interface LoginState {
-    loading: boolean
+interface LoginStateProps {
     unauthorizedLogin: boolean
-    user: firebase.User
+    user: User
+}
+interface DispatchProps {
+    authenticate: (user: User) => void
+    resetLogin: () => void
 }
 
-class Login extends React.Component<{}, LoginState> {
-    state: LoginState = {
-        loading: true,
-        unauthorizedLogin: false,
-        user: null
+type LoginPageProps = LoginStateProps & DispatchProps
+
+class Login extends React.PureComponent<LoginPageProps, {}> {
+    constructor(props: LoginPageProps) {
+        super(props)
     }
 
     componentDidMount() {
         firebase.auth().onAuthStateChanged(user => {
-            if (user && user.email.includes('@rover.io')) {
-                return this.setState({ loading: false, user })
-            }
-            if (user && !user.email.includes('@rover.io')) {
-                firebase.auth().currentUser.delete()
-                return this.setState({
-                    loading: false,
-                    unauthorizedLogin: true,
-                    user: null
-                })
-            }
-            return this.setState({
-                loading: false,
-                user: null
-            })
+            this.props.authenticate(user)
         })
     }
 
-    // deleteAccount -- for testing/current purposes
-    deleteAccount = () => {
-        firebase
-            .auth()
-            .currentUser.delete()
-            .catch(error => {
-                if (error.code === 'auth/requires-recent-login') {
-                    // User's credential is too old. Needs to sign in again.
-                    firebase
-                        .auth()
-                        .signOut()
-                        .then(() => {
-                            // The timeout allows the message to be displayed after the UI has
-                            // changed to the signed out state.
-                            setTimeout(() => {
-                                alert(
-                                    'Please sign in again to delete your account.'
-                                )
-                            }, 1)
-                        })
-                }
-            })
+    resetLogin = () => {
+        this.props.resetLogin()
     }
 
-    resetLogin = () => {
-        this.setState({ loading: false, unauthorizedLogin: false, user: null })
+    logout = () => {
+        firebase.auth().signOut()
     }
 
     render() {
-        const { loading, unauthorizedLogin, user } = this.state
-
+        const { unauthorizedLogin, user } = this.props
         return (
             <div
                 style={{
@@ -84,9 +60,7 @@ class Login extends React.Component<{}, LoginState> {
                 >
                     <h2>Admin Dashboard</h2>
                 </div>
-                {loading ? (
-                    <div id="loading">Loading...</div>
-                ) : user && !unauthorizedLogin ? (
+                {user && !unauthorizedLogin ? (
                     <div>
                         <div
                             style={{
@@ -124,16 +98,7 @@ class Login extends React.Component<{}, LoginState> {
                             <div>{user.email}</div>
                         </div>
                         <p>
-                            <button
-                                onClick={() => {
-                                    firebase.auth().signOut()
-                                }}
-                            >
-                                Sign Out
-                            </button>
-                            <button onClick={this.deleteAccount}>
-                                Delete account
-                            </button>
+                            <button onClick={this.logout}>Sign Out</button>
                         </p>
                     </div>
                 ) : unauthorizedLogin ? (
@@ -152,4 +117,23 @@ class Login extends React.Component<{}, LoginState> {
     }
 }
 
-export default Login
+// tslint:disable-next-line:no-any
+const mapDispatchToProps = (
+    dispatch: ThunkDispatch<State, void, AnyAction>
+): DispatchProps => ({
+    authenticate: (user: User) => {
+        dispatch(authenticate(user))
+    },
+    resetLogin: () => dispatch(resetLogin())
+})
+
+const mapStateToProps = (state: State): LoginStateProps => ({
+    unauthorizedLogin: getIsUnauthorized(state),
+    user: getUser(state)
+})
+
+export default withRouter(connect(
+    mapStateToProps,
+    mapDispatchToProps
+    // tslint:disable-next-line:no-any
+)(Login) as any)

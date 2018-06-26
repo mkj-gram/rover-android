@@ -9,7 +9,7 @@ module.exports = {
     output: {
         filename: '[name].[hash].js',
         path: path.resolve(__dirname, 'dist/admin'),
-        publicPath: '/admin/'
+        publicPath: '/'
     },
     resolve: {
         extensions: ['.tsx', '.js', '.ts']
@@ -54,38 +54,51 @@ module.exports = {
                               '1025209954364-pgmntrdfq5526cq2slgsa4ao82a3qtls.apps.googleusercontent.com'
                           ),
 
-                FIREBASE_CONFIG:
+                FIREBASE_CONFIG_APIKEY:
                     process.env.NODE_ENV === 'development' ||
                     process.env.NODE_ENV === undefined
-                        ? JSON.stringify({
-                              apiKey: 'AIzaSyCmqfZ71UUPtFqNf-7pteYV9mf_WgMdLOk',
-                              authDomain: 'rover-admin-staging.firebaseapp.com',
-                              databaseURL:
-                                  'https://rover-admin-staging.firebaseio.com',
-                              projectId: 'rover-admin-staging',
-                              storageBucket: 'rover-admin-staging.appspot.com',
-                              messagingSenderId: '368601128815'
-                          })
-                        : JSON.stringify({
-                              apiKey: 'AIzaSyCNy8ZZbgNOuyiXqnVtk8JfljQ5hOuM_MY',
-                              authDomain:
-                                  'rover-admin-production.firebaseapp.com',
-                              databaseURL:
-                                  'https://rover-admin-production.firebaseio.com',
-                              projectId: 'rover-admin-production',
-                              storageBucket:
-                                  'rover-admin-production.appspot.com',
-                              messagingSenderId: '1026237313662'
-                          })
+                        ? JSON.stringify('AIzaSyCmqfZ71UUPtFqNf-7pteYV9mf_WgMdLOk'
+                          )
+                        : JSON.stringify('AIzaSyCNy8ZZbgNOuyiXqnVtk8JfljQ5hOuM_MY'),
+
+                FIREBASE_CONFIG_AUTHDOMAIN:
+                    process.env.NODE_ENV === 'development' ||
+                    process.env.NODE_ENV === undefined
+                        ? JSON.stringify('rover-admin-staging.firebaseapp.com')
+                        : JSON.stringify('rover-admin-production.firebaseapp.com'),
+
+                FIREBASE_CONFIG_DATABASEURL:
+                    process.env.NODE_ENV === 'development' ||
+                    process.env.NODE_ENV === undefined
+                        ? JSON.stringify('https://rover-admin-staging.firebaseio.com')
+                        : JSON.stringify('https://rover-admin-production.firebaseio.com'),
+
+                FIREBASE_CONFIG_PROJECTID:
+                    process.env.NODE_ENV === 'development' ||
+                    process.env.NODE_ENV === undefined
+                        ? JSON.stringify('rover-admin-staging')
+                        : JSON.stringify('rover-admin-production'),
+
+                FIREBASE_CONFIG_STORAGEBUCKET:
+                    process.env.NODE_ENV === 'development' ||
+                    process.env.NODE_ENV === undefined
+                        ? JSON.stringify('rover-admin-staging.appspot.com')
+                        : JSON.stringify('rover-admin-production.appspot.com'),
+
+                FIREBASE_CONFIG_MESSAGINGSENDERID:
+                    process.env.NODE_ENV === 'development' ||
+                    process.env.NODE_ENV === undefined
+                        ? JSON.stringify('368601128815')
+                        : JSON.stringify('1026237313662')
             }
         }),
         new UglifyJSPlugin()
     ],
     devServer: {
         historyApiFallback: {
-            rewrites: [{ from: /\/admin\//, to: '/admin/index.html' }]
+            rewrites: [{ from: /\/admin\//, to: '/index.html' }]
         },
-        publicPath: '/admin/',
+        publicPath: '/',
         contentBase: '/',
         useLocalIp: true
     },

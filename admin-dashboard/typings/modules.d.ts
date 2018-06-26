@@ -1,6 +1,11 @@
 // https://github.com/firebase/firebaseui-web/issues/114
 declare module 'firebaseui' {
-    import firebase from 'firebase'
+    import {
+        FirebaseAuth,
+        User,
+        AuthCredential,
+        UserCredential
+    } from '@firebase/auth-types'
 
     interface IConfig {
         callbacks?: ICallbacks
@@ -14,12 +19,12 @@ declare module 'firebaseui' {
     }
     interface ICallbacks {
         signInSuccess?: (
-            currentUser: firebase.User,
-            credential?: firebase.auth.AuthCredential,
+            currentUser: User,
+            credential?: AuthCredential,
             redirectUrl?: string
         ) => boolean
         signInSuccessWithAuthResult?: (
-            authResult: firebase.auth.UserCredential,
+            authResult: UserCredential,
             redirectUrl?: string
         ) => boolean
         uiShown?: () => void
@@ -37,7 +42,7 @@ declare module 'firebaseui' {
             NONE
         }
         class AuthUI {
-            constructor(auth: firebase.auth.Auth)
+            constructor(auth: FirebaseAuth)
             start: (containerCSSselector: string, config: IConfig) => void
             reset: () => void
         }

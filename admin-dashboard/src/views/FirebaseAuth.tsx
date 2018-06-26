@@ -1,7 +1,9 @@
-import * as React from 'react'
-import firebase from 'firebase'
+import { UserCredential } from '@firebase/auth-types'
+import firebase from 'firebase/app'
+import 'firebase/auth'
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
+import * as React from 'react'
 
 const CONTAINER_ID = 'firebaseui_container'
 
@@ -20,10 +22,10 @@ class FirebaseAuth extends React.Component<FirebaseAuthProps, {}> {
         this.uiConfig = {
             callbacks: {
                 signInSuccessWithAuthResult: (
-                    authResult: firebase.auth.UserCredential,
+                    authResult: UserCredential,
                     redirectUrl?: string
                 ) => {
-                    // Dont redirect
+                    // Don't want redirect
                     return false
                 }
             },

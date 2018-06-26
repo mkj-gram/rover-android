@@ -1,16 +1,13 @@
 import firebase from 'firebase'
 
 type State = {
-    readonly app: AppState
+    readonly authentication: AuthState
 }
 
-type AppState = {
+type AuthState = {
+    isLoggedin: boolean
+    isUnauthorizedUser: boolean
     user: firebase.User
-    login: LoginState
-}
-
-type LoginState = {
-    isLoading: boolean
 }
 
 interface StringMap<T> {
