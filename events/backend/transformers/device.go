@@ -486,6 +486,59 @@ func UpdateDeviceName(client audience.AudienceClient) pipeline.Handler {
 	})
 }
 
+func UpdateDeviceTestStatus(client audience.AudienceClient) pipeline.Handler {
+	return pipeline.HandlerFunc(func(ctx pipeline.Context, e *event.Event) error {
+
+		if e.GetDevice() == nil {
+			return nil
+		}
+
+		var (
+			device *audience.Device
+			dctx   = e.GetDevice()
+			ok     bool
+		)
+
+		if device, ok = ctx.Value(deviceContextKey).(*audience.Device); !ok {
+			return nil
+		}
+
+		if device == nil || dctx == nil {
+			return nil
+		}
+
+		if dctx.GetIsTestDevice() == nil {
+			return nil
+		}
+
+		if device.IsTestDevice == dctx.GetIsTestDevice().GetValue() {
+			return nil
+		}
+
+		_, err := client.UpdateDeviceTestProperty(ctx, &audience.UpdateDeviceTestPropertyRequest{
+			AuthContext:  e.GetAuthContext(),
+			DeviceId:     device.GetDeviceId(),
+			IsTestDevice: dctx.GetIsTestDevice().GetValue(),
+		})
+
+		if err != nil {
+			if st, ok := status.FromError(err); ok {
+				switch st.Code() {
+				case codes.Canceled, codes.Unknown, codes.DeadlineExceeded, codes.ResourceExhausted, codes.Aborted, codes.Internal, codes.DataLoss:
+					return pipeline.NewRetryableError(errors.Wrap(err, "UpdateDeviceTestStatus"))
+				default:
+					return errors.Wrap(err, "UpdateDeviceTestStatus")
+				}
+			}
+			return nil
+		}
+
+		device.IsTestDevice = dctx.GetIsTestDevice().GetValue()
+
+		return nil
+	})
+}
+
 func versionForAudience(v *rover_protobuf.Version) *audience.Version {
 	if v == nil {
 		return nil

@@ -126,7 +126,8 @@ describe('Client', function() {
 					screenWidth: 480,
 					screenHeight: 720,
 					sdkVersion: "2.0.0",
-					timeZone: "America/Toronto"
+					timeZone: "America/Toronto",
+					isTestDevice: true,
 				}
 			}
 
@@ -183,7 +184,8 @@ describe('Client', function() {
 							screenWidth: 480,
 							screenHeight: 720,
 							sdkVersion: "2.0.0",
-							timeZone: 'America/Toronto' 
+							timeZone: 'America/Toronto',
+							isTestDevice: true 
 						} 
 					}
 
@@ -219,6 +221,7 @@ describe('Client', function() {
 							screenHeight: dctx.getScreenHeight(),
 							sdkVersion: dctx.getSdkVersion().toStringValue(),
 							timeZone: dctx.getTimeZone(),
+							isTestDevice: dctx.getIsTestDevice().getValue()
 						}
 					}
 

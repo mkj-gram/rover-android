@@ -130,6 +130,12 @@
 		DBF31B3120E1722A005D7C34 /* DebugAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF31B2F20E17216005D7C34 /* DebugAssembler.swift */; };
 		DBF31B3720E17316005D7C34 /* ErrorTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF31B3320E17260005D7C34 /* ErrorTracker.swift */; };
 		DBF31B3820E17316005D7C34 /* ErrorTrackerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF31B3520E17268005D7C34 /* ErrorTrackerService.swift */; };
+		DBF31B3F20E1775D005D7C34 /* TestDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF31B3D20E17755005D7C34 /* TestDeviceManager.swift */; };
+		DBF31B4220E17CD9005D7C34 /* TestDeviceManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF31B4020E17CD1005D7C34 /* TestDeviceManagerService.swift */; };
+		DBF31B4620E17D59005D7C34 /* DebugContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF31B4420E17D44005D7C34 /* DebugContextProvider.swift */; };
+		DBF31B4A20E193C5005D7C34 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF31B4820E193BA005D7C34 /* SettingsViewController.swift */; };
+		DBF31B4E20E19696005D7C34 /* RoverUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD5A20B33EC0002F226C /* RoverUI.framework */; };
+		DBF31B4F20E196BB005D7C34 /* SettingsRouteHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF31B4C20E19678005D7C34 /* SettingsRouteHandler.swift */; };
 		DBF49DDD203DE00F00B54652 /* RoverFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */; };
 		DBF49DE2203DE00F00B54652 /* RoverFoundationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DE1203DE00F00B54652 /* RoverFoundationTests.swift */; };
 		DBF49DF6203DE18500B54652 /* FoundationAssembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DF3203DE18500B54652 /* FoundationAssembler.swift */; };
@@ -396,6 +402,11 @@
 		DBF31B2F20E17216005D7C34 /* DebugAssembler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugAssembler.swift; sourceTree = "<group>"; };
 		DBF31B3320E17260005D7C34 /* ErrorTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorTracker.swift; sourceTree = "<group>"; };
 		DBF31B3520E17268005D7C34 /* ErrorTrackerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorTrackerService.swift; sourceTree = "<group>"; };
+		DBF31B3D20E17755005D7C34 /* TestDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDeviceManager.swift; sourceTree = "<group>"; };
+		DBF31B4020E17CD1005D7C34 /* TestDeviceManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestDeviceManagerService.swift; sourceTree = "<group>"; };
+		DBF31B4420E17D44005D7C34 /* DebugContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugContextProvider.swift; sourceTree = "<group>"; };
+		DBF31B4820E193BA005D7C34 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		DBF31B4C20E19678005D7C34 /* SettingsRouteHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRouteHandler.swift; sourceTree = "<group>"; };
 		DBF49DD3203DE00F00B54652 /* RoverFoundation.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RoverFoundation.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBF49DD7203DE00F00B54652 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DBF49DDC203DE00F00B54652 /* RoverFoundationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RoverFoundationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -589,6 +600,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBF31B4E20E19696005D7C34 /* RoverUI.framework in Frameworks */,
 				DBF31B2D20E171C8005D7C34 /* RoverData.framework in Frameworks */,
 				DBF31B2E20E171C8005D7C34 /* RoverFoundation.framework in Frameworks */,
 			);
@@ -1048,7 +1060,10 @@
 		DBF31B1720E17176005D7C34 /* Debug */ = {
 			isa = PBXGroup;
 			children = (
-				DBF31B3220E17255005D7C34 /* ErrorTracker */,
+				DBF31B4320E17D36005D7C34 /* ContextProviders */,
+				DBF31B4B20E1966B005D7C34 /* RouteHandlers */,
+				DBF31B5020E196D5005D7C34 /* Services */,
+				DBF31B5120E196EA005D7C34 /* UI */,
 				DBF31B2F20E17216005D7C34 /* DebugAssembler.swift */,
 				DBF31B1820E17176005D7C34 /* RoverDebug.h */,
 				DBF31B1920E17176005D7C34 /* Info.plist */,
@@ -1072,6 +1087,56 @@
 				DBF31B3520E17268005D7C34 /* ErrorTrackerService.swift */,
 			);
 			path = ErrorTracker;
+			sourceTree = "<group>";
+		};
+		DBF31B3C20E1773D005D7C34 /* TestDeviceManager */ = {
+			isa = PBXGroup;
+			children = (
+				DBF31B3D20E17755005D7C34 /* TestDeviceManager.swift */,
+				DBF31B4020E17CD1005D7C34 /* TestDeviceManagerService.swift */,
+			);
+			path = TestDeviceManager;
+			sourceTree = "<group>";
+		};
+		DBF31B4320E17D36005D7C34 /* ContextProviders */ = {
+			isa = PBXGroup;
+			children = (
+				DBF31B4420E17D44005D7C34 /* DebugContextProvider.swift */,
+			);
+			path = ContextProviders;
+			sourceTree = "<group>";
+		};
+		DBF31B4720E193A3005D7C34 /* SettingsViewController */ = {
+			isa = PBXGroup;
+			children = (
+				DBF31B4820E193BA005D7C34 /* SettingsViewController.swift */,
+			);
+			path = SettingsViewController;
+			sourceTree = "<group>";
+		};
+		DBF31B4B20E1966B005D7C34 /* RouteHandlers */ = {
+			isa = PBXGroup;
+			children = (
+				DBF31B4C20E19678005D7C34 /* SettingsRouteHandler.swift */,
+			);
+			path = RouteHandlers;
+			sourceTree = "<group>";
+		};
+		DBF31B5020E196D5005D7C34 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				DBF31B3220E17255005D7C34 /* ErrorTracker */,
+				DBF31B3C20E1773D005D7C34 /* TestDeviceManager */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		DBF31B5120E196EA005D7C34 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				DBF31B4720E193A3005D7C34 /* SettingsViewController */,
+			);
+			path = UI;
 			sourceTree = "<group>";
 		};
 		DBF49DC9203DE00F00B54652 = {
@@ -2268,8 +2333,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBF31B4620E17D59005D7C34 /* DebugContextProvider.swift in Sources */,
+				DBF31B4A20E193C5005D7C34 /* SettingsViewController.swift in Sources */,
 				DBF31B3120E1722A005D7C34 /* DebugAssembler.swift in Sources */,
+				DBF31B4F20E196BB005D7C34 /* SettingsRouteHandler.swift in Sources */,
+				DBF31B3F20E1775D005D7C34 /* TestDeviceManager.swift in Sources */,
 				DBF31B3720E17316005D7C34 /* ErrorTracker.swift in Sources */,
+				DBF31B4220E17CD9005D7C34 /* TestDeviceManagerService.swift in Sources */,
 				DBF31B3820E17316005D7C34 /* ErrorTrackerService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

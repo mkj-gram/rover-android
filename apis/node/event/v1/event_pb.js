@@ -96,7 +96,8 @@ proto.rover.event.v1.DeviceContext.toObject = function(includeInstance, msg) {
     sdkVersion: (f = msg.getSdkVersion()) && protobuf_version_pb.Version.toObject(includeInstance, f),
     deviceName: jspb.Message.getFieldWithDefault(msg, 30, ""),
     advertisingId: jspb.Message.getFieldWithDefault(msg, 31, ""),
-    isBluetoothEnabled: (f = msg.getIsBluetoothEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f)
+    isBluetoothEnabled: (f = msg.getIsBluetoothEnabled()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f),
+    isTestDevice: (f = msg.getIsTestDevice()) && protobuf_wrappers_pb.BoolValue.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -268,6 +269,11 @@ proto.rover.event.v1.DeviceContext.deserializeBinaryFromReader = function(msg, r
       var value = new protobuf_wrappers_pb.BoolValue;
       reader.readMessage(value,protobuf_wrappers_pb.BoolValue.deserializeBinaryFromReader);
       msg.setIsBluetoothEnabled(value);
+      break;
+    case 33:
+      var value = new protobuf_wrappers_pb.BoolValue;
+      reader.readMessage(value,protobuf_wrappers_pb.BoolValue.deserializeBinaryFromReader);
+      msg.setIsTestDevice(value);
       break;
     default:
       reader.skipField();
@@ -525,6 +531,14 @@ proto.rover.event.v1.DeviceContext.serializeBinaryToWriter = function(message, w
   if (f != null) {
     writer.writeMessage(
       32,
+      f,
+      protobuf_wrappers_pb.BoolValue.serializeBinaryToWriter
+    );
+  }
+  f = message.getIsTestDevice();
+  if (f != null) {
+    writer.writeMessage(
+      33,
       f,
       protobuf_wrappers_pb.BoolValue.serializeBinaryToWriter
     );
@@ -1129,6 +1143,36 @@ proto.rover.event.v1.DeviceContext.prototype.clearIsBluetoothEnabled = function(
  */
 proto.rover.event.v1.DeviceContext.prototype.hasIsBluetoothEnabled = function() {
   return jspb.Message.getField(this, 32) != null;
+};
+
+
+/**
+ * optional rover.protobuf.BoolValue is_test_device = 33;
+ * @return {?proto.rover.protobuf.BoolValue}
+ */
+proto.rover.event.v1.DeviceContext.prototype.getIsTestDevice = function() {
+  return /** @type{?proto.rover.protobuf.BoolValue} */ (
+    jspb.Message.getWrapperField(this, protobuf_wrappers_pb.BoolValue, 33));
+};
+
+
+/** @param {?proto.rover.protobuf.BoolValue|undefined} value */
+proto.rover.event.v1.DeviceContext.prototype.setIsTestDevice = function(value) {
+  jspb.Message.setWrapperField(this, 33, value);
+};
+
+
+proto.rover.event.v1.DeviceContext.prototype.clearIsTestDevice = function() {
+  this.setIsTestDevice(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.event.v1.DeviceContext.prototype.hasIsTestDevice = function() {
+  return jspb.Message.getField(this, 33) != null;
 };
 
 

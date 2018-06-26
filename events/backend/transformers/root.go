@@ -13,7 +13,8 @@ func Root(audienceClient audience.AudienceClient, geocoderClient geocoder.Geocod
 		Then(UpdateDeviceWithContext(audienceClient, deviceModelNameMapper)).
 		Then(UpdateDeviceCustomAttributes(audienceClient)).
 		Then(UpdateDeviceLocation(audienceClient, geocoderClient)).
-		Then(UpdateDeviceName(audienceClient))
+		Then(UpdateDeviceName(audienceClient)).
+		Then(UpdateDeviceTestStatus(audienceClient))
 
 	return deviceInputChain
 }

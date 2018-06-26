@@ -164,6 +164,26 @@ func NewAudienceClientMiddleware(cache *ccache.Cache, profileRefreshTime time.Du
 			}
 
 			return nil
+		case *audience.UpdateDeviceTestPropertyRequest:
+			err := invoker(ctx, method, req, reply, cc, opts...)
+			key := getDeviceCacheKey(r.GetAuthContext().GetAccountId(), r.GetDeviceId())
+			if err != nil {
+				// to be safe we just invalidate the cache
+				cache.Delete(key)
+				return err
+			}
+
+			item := cache.Get(key)
+			if item == nil {
+				return nil
+			}
+
+			if device, ok := item.Value().(*audience.Device); ok {
+				device.IsTestDevice = r.GetIsTestDevice()
+				device.UpdatedAt = TimeNow()
+			}
+
+			return nil
 
 		case *audience.UpdateDeviceGeofenceMonitoringRequest:
 			// invalidate everything for simplicity

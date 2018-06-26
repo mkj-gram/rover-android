@@ -53,6 +53,9 @@ const DeviceContext = new GraphQLInputObjectType({
         isLocationServicesEnabled: {
             type: GraphQLBoolean
         },
+        isTestDevice: {
+            type: GraphQLBoolean
+        },
         isWifiEnabled: {
             type: GraphQLBoolean
         },

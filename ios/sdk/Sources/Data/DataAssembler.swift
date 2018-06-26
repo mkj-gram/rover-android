@@ -151,6 +151,7 @@ public struct DataAssembler: Assembler {
             resolver.resolve(ContextProvider.self, name: "app"),
             resolver.resolve(ContextProvider.self, name: "attributes"),
             resolver.resolve(ContextProvider.self, name: "bluetooth"),
+            resolver.resolve(ContextProvider.self, name: "debug"),
             resolver.resolve(ContextProvider.self, name: "device"),
             resolver.resolve(ContextProvider.self, name: "locale"),
             resolver.resolve(ContextProvider.self, name: "location"),

@@ -1019,6 +1019,101 @@ func TestUpdateDeviceName(t *testing.T) {
 	}
 }
 
+func TestUpdateDeviceTestStatus(t *testing.T) {
+	// Unit testing can be run in parallel
+	t.Parallel()
+
+	testcases := []struct {
+		desc string
+		req  event.Event
+		ctx  pipeline.Context
+
+		clientExp func(c *mock.MockAudienceClient)
+		expErr    error
+	}{
+		{
+			desc: "does not update device is test property when context is missing",
+			req: event.Event{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Namespace:   "rover",
+				Name:        "Device Updated",
+			},
+
+			clientExp: func(c *mock.MockAudienceClient) {
+				c.EXPECT().UpdateDeviceTestProperty(gomock.Any(), gomock.Any()).Return(nil, nil).Times(0)
+			},
+		},
+		{
+			desc: "does not update device is test property when request field is nil",
+			ctx: newContext("device", &audience.Device{
+				DeviceId:     "hello",
+				IsTestDevice: true,
+			}),
+
+			req: event.Event{
+				Namespace: "rover",
+				Name:      "Device Updated",
+				Device: &event.DeviceContext{
+					DeviceIdentifier: "hello",
+					IsTestDevice:     nil,
+				},
+			},
+
+			clientExp: func(c *mock.MockAudienceClient) {
+				c.EXPECT().UpdateDeviceTestProperty(gomock.Any(), gomock.Any()).Return(nil, nil).Times(0)
+			},
+		},
+		{
+			desc: "updates the device's is test property",
+			ctx: newContext("device", &audience.Device{
+				DeviceId:     "hello",
+				IsTestDevice: false,
+			}),
+
+			req: event.Event{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Namespace:   "rover",
+				Name:        "Device Updated",
+				Device: &event.DeviceContext{
+					DeviceIdentifier: "hello",
+					IsTestDevice:     wrappers.Bool(true),
+				},
+			},
+
+			clientExp: func(c *mock.MockAudienceClient) {
+				c.EXPECT().UpdateDeviceTestProperty(gomock.Any(), &audience.UpdateDeviceTestPropertyRequest{
+					AuthContext:  &auth.AuthContext{AccountId: 1},
+					DeviceId:     "hello",
+					IsTestDevice: true,
+				}).Return(&audience.UpdateDeviceTestPropertyResponse{}, nil).Times(1)
+			},
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.desc, func(t *testing.T) {
+			var (
+				ctrl   = gomock.NewController(t)
+				client = mock.NewMockAudienceClient(ctrl)
+				tr     = transformers.UpdateDeviceTestStatus(client)
+				ctx    = pipeline.NewContext(context.Background())
+			)
+
+			tc.clientExp(client)
+			if tc.ctx != nil {
+				ctx = tc.ctx
+			}
+
+			var gotErr = tr.Handle(ctx, &tc.req)
+			if diff := rtesting.Diff(nil, nil, tc.expErr, gotErr); diff != nil {
+				t.Fatalf("\nDiff:\n%v", rtesting.Difff(diff))
+			}
+
+			ctrl.Finish()
+		})
+	}
+}
+
 func newContext(key string, value interface{}) pipeline.Context {
 	var ctx = pipeline.NewContext(context.Background())
 	ctx.Set(key, value)
