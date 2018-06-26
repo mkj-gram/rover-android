@@ -220,7 +220,32 @@ const renderCampaignProgressState = (
 ) => {
     if (isScheduledCampaign(campaign)) {
         const { scheduledUseLocalDeviceTime, scheduledTimeZone } = campaign
+        const formatDate = getFormatDate(campaign, 'scheduledDate')
+        const date = formatDate
+            ? formatDate.toLocaleString('en-us', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
+              })
+            : null
 
+        const displayTime = getDisplayTime(campaign, 'scheduledTime')
+
+        const displayTimeZone = scheduledUseLocalDeviceTime ? (
+            <GlobeIcon
+                fill={charcoal}
+                height="12"
+                width="12"
+                viewBox="0 0 24 24"
+                style={{ marginLeft: 8 }}
+            />
+        ) : (
+            <Badge
+                color={charcoal}
+                text={scheduledTimeZone}
+                style={{ marginLeft: 8 }}
+            />
+        )
         // tslint:disable-next-line:switch-default
         switch (campaign.scheduledDeliveryStatus) {
             case 'UNKNOWN':
@@ -254,33 +279,6 @@ const renderCampaignProgressState = (
                     </div>
                 )
             case 'SCHEDULED':
-                const formatDate = getFormatDate(campaign, 'scheduledDate')
-                const date = formatDate
-                    ? formatDate.toLocaleString('en-us', {
-                          month: 'long',
-                          day: 'numeric',
-                          year: 'numeric'
-                      })
-                    : null
-
-                const displayTime = getDisplayTime(campaign, 'scheduledTime')
-
-                const displayTimeZone = scheduledUseLocalDeviceTime ? (
-                    <GlobeIcon
-                        fill={charcoal}
-                        height="12"
-                        width="12"
-                        viewBox="0 0 24 24"
-                        style={{ marginLeft: 8 }}
-                    />
-                ) : (
-                    <Badge
-                        color={charcoal}
-                        text={scheduledTimeZone}
-                        style={{ marginLeft: 8 }}
-                    />
-                )
-
                 return (
                     <div
                         style={{
@@ -336,16 +334,19 @@ const renderCampaignProgressState = (
                             text="SENT"
                             style={{ marginRight: 8 }}
                         />
-                        <Text
-                            label={true}
-                            size="small"
-                            text="Jan 8, 2018 at 11:00 AM"
-                        />
-                        <Badge
-                            color={charcoal}
-                            text="America/Toronto"
-                            style={{ marginLeft: 8 }}
-                        />
+                        {date ? (
+                            <React.Fragment>
+                                <Text
+                                    label={true}
+                                    size="small"
+                                    text={`${date} at ${displayTime}`}
+                                    textStyle={{
+                                        color: steel
+                                    }}
+                                />
+                                {media !== 'Mobile' ? displayTimeZone : null}
+                            </React.Fragment>
+                        ) : null}
                     </div>
                 )
         }
