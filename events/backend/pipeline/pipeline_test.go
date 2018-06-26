@@ -220,17 +220,6 @@ func TestPipeline_process(t *testing.T) {
 				}),
 			},
 		},
-		{
-			desc: "recovers from panics",
-			in:   &kafka.Message{Value: serialize(t, &event.Event{Id: "A", Name: "test"}), Key: []byte("a")},
-
-			handler: HandlerFunc(func(ctx Context, e *event.Event) error {
-				panic("Boom")
-				return nil
-			}),
-
-			expErr: errors.New("failed to process event: Boom"),
-		},
 	}
 
 	for _, tt := range tests {

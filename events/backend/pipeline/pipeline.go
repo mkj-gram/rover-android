@@ -252,15 +252,29 @@ func (p *Pipeline) process(in *kafka.Message) (out *kafka.Message, err error) {
 		key   = in.Key
 		input = event.Event{}
 		start = time.Now()
+
+		scopedLog = p.logger.WithFields(logger.Fields{
+			"topic":     in.TopicPartition.Topic,
+			"partition": in.TopicPartition.Partition,
+			"offset":    in.TopicPartition.Offset,
+		})
 	)
 
 	defer func() {
 		var errKind = "error"
+
 		if r := recover(); r != nil {
 			// transformer has most likely panicked
 			out = nil
-			err = errors.WithStack(errors.Errorf("failed to process event: %v", r))
 			errKind = "panic"
+
+			scopedLog.WithFields(logger.Fields{
+				"stack": errors.Errorf("%+v", errors.WithStack(errors.Errorf("%v"))),
+			}).Error(r)
+
+			defer func() {
+				panic(r)
+			}()
 		}
 
 		labels := []string{
@@ -290,6 +304,12 @@ func (p *Pipeline) process(in *kafka.Message) (out *kafka.Message, err error) {
 	if err = valid(&input); err != nil {
 		return nil, errors.Wrap(err, "validation error")
 	}
+
+	scopedLog.WithFields(logger.Fields{
+		"namespace": input.Namespace,
+		"name":      input.Name,
+		"device":    input.GetDevice().GetDeviceIdentifier(),
+	}).Debug("handling message")
 
 	err = p.Handler.Handle(ctx, &input)
 	if err != nil {
