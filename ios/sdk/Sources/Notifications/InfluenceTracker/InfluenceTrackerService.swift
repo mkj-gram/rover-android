@@ -45,7 +45,8 @@ class InfluenceTrackerService: InfluenceTracker {
         }
         
         struct NotificationReceipt: Decodable {
-            var notificationID: String
+            var notificationID: ID
+            var campaignID: ID
             var receivedAt: Date
         }
         
@@ -66,7 +67,8 @@ class InfluenceTrackerService: InfluenceTracker {
         }
         
         let attributes: Attributes = [
-            "notificationID": lastReceivedNotification.notificationID,
+            "notificationID": lastReceivedNotification.notificationID.rawValue,
+            "campaignID": lastReceivedNotification.campaignID.rawValue,
             "source": NotificationSource.influencedOpen.rawValue
         ]
         

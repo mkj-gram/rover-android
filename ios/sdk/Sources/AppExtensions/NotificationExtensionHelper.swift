@@ -28,11 +28,13 @@ public class NotificationExtensionHelper {
         struct Payload: Decodable {
             struct Rover: Decodable {
                 struct Notification: Decodable {
+                    var id: ID
+                    var campaignID: ID
+                    
                     struct Attachment: Decodable {
                         var url: URL
                     }
                     
-                    var id: String
                     var attachment: Attachment?
                 }
                 
@@ -53,7 +55,7 @@ public class NotificationExtensionHelper {
         }
         
         let notification = payload.rover.notification
-        setLastReceivedNotification(notificationID: notification.id)
+        setLastReceivedNotification(notificationID: notification.id, campaignID: notification.campaignID)
         
         if let attachment = notification.attachment {
             attachMedia(from: attachment.url, to: content)
@@ -61,16 +63,17 @@ public class NotificationExtensionHelper {
     }
     
     /*
-     * When a notification is received, store its ID and the time it was received in UserDefaults. These values are used by the NotificationTrackerService to determine if an influenced open has occured.
+     * When a notification is received, store its ID and the time it was received in UserDefaults. These values are used by the InfluenceTracker to determine if an influenced open has occured.
      */
-    func setLastReceivedNotification(notificationID: String) {
+    func setLastReceivedNotification(notificationID: ID, campaignID: ID) {
         struct NotificationReceipt: Encodable {
-            var notificationID: String
+            var notificationID: ID
+            var campaignID: ID
             var receivedAt: Date
         }
         
         let now = Date()
-        let lastReceivedNotification = NotificationReceipt(notificationID: notificationID, receivedAt: now)
+        let lastReceivedNotification = NotificationReceipt(notificationID: notificationID, campaignID: campaignID, receivedAt: now)
         
         guard let data = try? PropertyListEncoder().encode(lastReceivedNotification) else {
             clearLastReceivedNotification()

@@ -44,6 +44,7 @@ extension Notification {
     func openedEvent(source: NotificationSource) -> EventInfo {
         let attributes: Attributes = [
             "notificationID": id.rawValue,
+            "campaignID": campaignID.rawValue,
             "source": source.rawValue
         ]
         return EventInfo(name: "Notification Opened", namespace: "rover", attributes: attributes)
