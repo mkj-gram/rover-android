@@ -595,7 +595,8 @@ const CampaignsList: React.SFC<Props & CampaignsListProps> = ({
                     campaignId =>
                         campaigns[campaignId].campaignStatus ===
                             statusMap[campaignStatus] ||
-                        campaignStatus === 'all'
+                        (campaignStatus === 'all' &&
+                            campaigns[campaignId].campaignStatus !== 'ARCHIVED')
                 )
                 .filter(
                     campaignId =>
