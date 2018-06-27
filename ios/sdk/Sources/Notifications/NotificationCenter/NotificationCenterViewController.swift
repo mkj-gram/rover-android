@@ -101,7 +101,9 @@ open class NotificationCenterViewController: UIViewController {
         registerReusableViews()
         
         applicationDidBecomeActiveToken = NotificationCenter.default.addObserver(forName: .UIApplicationDidBecomeActive, object: nil, queue: OperationQueue.main) { [weak self] _ in
-            self?.resetApplicationIconBadgeNumber()
+            if self?.viewIfLoaded?.window != nil {
+                self?.resetApplicationIconBadgeNumber()
+            }
         }
     }
     
@@ -127,7 +129,9 @@ open class NotificationCenterViewController: UIViewController {
             return EventInfo(name: "Notification Center Viewed", namespace: "rover", attributes: attributes)
         }
         
-        resetApplicationIconBadgeNumber()
+        if UIApplication.shared.applicationState == .active {
+            resetApplicationIconBadgeNumber()
+        }
     }
     
     override open func viewWillDisappear(_ animated: Bool) {
