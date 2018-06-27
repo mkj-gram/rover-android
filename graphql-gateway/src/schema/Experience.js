@@ -238,12 +238,12 @@ const BlockTapBehavior = new GraphQLUnionType({
     types: () => [GoToScreenBlockTapBehavior, NoneBlockTapBehavior, OpenURLBlockTapBehavior, PresentWebsiteBlockTapBehavior],
     resolveType: data => {
         switch (data['__typename']) {
-            case 'GoToScreenBehavior':
-                return GoToScreenBehavior
+            case 'GoToScreenBlockTapBehavior':
+                return GoToScreenBlockTapBehavior
             case 'NoneBlockTapBehavior':
                 return NoneBlockTapBehavior
-            case 'OpenURLBehavior':
-                return OpenURLBehavior
+            case 'OpenURLBlockTapBehavior':
+                return OpenURLBlockTapBehavior
             case 'PresentWebsiteBlockTapBehavior':
                 return PresentWebsiteBlockTapBehavior
         }
