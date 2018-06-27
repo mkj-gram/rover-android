@@ -138,6 +138,35 @@ message CreateResponse {
   Campaign campaign = 1;
 }
 
+
+message Cursor {
+  oneof take {
+    int32 first = 1;
+    int32 last  = 2;
+  }
+
+  oneof start {
+    string after = 3;
+    string before = 4;
+  }
+
+  message OrderBy {
+    enum Field {
+      ID         = 0;
+      UPDATED_AT = 1;
+    }
+    enum Direction {
+      ASC  = 0;
+      DESC = 1;
+    }
+
+    Field field = 1;
+    Direction direction = 2;
+  }
+
+  OrderBy orderBy = 5;
+}
+
 message ListRequest {
   auth.v1.AuthContext auth_context = 1;
 
@@ -150,9 +179,21 @@ message ListRequest {
   // paging
   int32 page       = 8;
   int32 page_size  = 9;
+
+  // cursor
+  Cursor cursor	= 10;
 }
 message ListResponse {
   repeated Campaign campaigns = 1;
+  // Cursor provider cursor information
+  // in case ListRequest comes with one
+  message Cursor {
+    // tokens contain encoded cursors for the corresponding campaings
+    repeated string tokens = 1;
+    int64 total_count      = 2;
+  }
+
+  Cursor cursor = 2;
 }
 
 message GetRequest {

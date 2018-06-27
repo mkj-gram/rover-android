@@ -94,6 +94,29 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rover.campaigns.v1.CreateResponse" do
     optional :campaign, :message, 1, "rover.campaigns.v1.Campaign"
   end
+  add_message "rover.campaigns.v1.Cursor" do
+    optional :orderBy, :message, 5, "rover.campaigns.v1.Cursor.OrderBy"
+    oneof :take do
+      optional :first, :int32, 1
+      optional :last, :int32, 2
+    end
+    oneof :start do
+      optional :after, :string, 3
+      optional :before, :string, 4
+    end
+  end
+  add_message "rover.campaigns.v1.Cursor.OrderBy" do
+    optional :field, :enum, 1, "rover.campaigns.v1.Cursor.OrderBy.Field"
+    optional :direction, :enum, 2, "rover.campaigns.v1.Cursor.OrderBy.Direction"
+  end
+  add_enum "rover.campaigns.v1.Cursor.OrderBy.Field" do
+    value :ID, 0
+    value :UPDATED_AT, 1
+  end
+  add_enum "rover.campaigns.v1.Cursor.OrderBy.Direction" do
+    value :ASC, 0
+    value :DESC, 1
+  end
   add_message "rover.campaigns.v1.ListRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :campaign_type, :enum, 5, "rover.campaigns.v1.CampaignType.Enum"
@@ -101,9 +124,15 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :keyword, :string, 7
     optional :page, :int32, 8
     optional :page_size, :int32, 9
+    optional :cursor, :message, 10, "rover.campaigns.v1.Cursor"
   end
   add_message "rover.campaigns.v1.ListResponse" do
     repeated :campaigns, :message, 1, "rover.campaigns.v1.Campaign"
+    optional :cursor, :message, 2, "rover.campaigns.v1.ListResponse.Cursor"
+  end
+  add_message "rover.campaigns.v1.ListResponse.Cursor" do
+    repeated :tokens, :string, 1
+    optional :total_count, :int64, 2
   end
   add_message "rover.campaigns.v1.GetRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
@@ -329,8 +358,13 @@ module Rover
       Campaign = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.Campaign").msgclass
       CreateRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CreateRequest").msgclass
       CreateResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.CreateResponse").msgclass
+      Cursor = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.Cursor").msgclass
+      Cursor::OrderBy = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.Cursor.OrderBy").msgclass
+      Cursor::OrderBy::Field = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.Cursor.OrderBy.Field").enummodule
+      Cursor::OrderBy::Direction = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.Cursor.OrderBy.Direction").enummodule
       ListRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ListRequest").msgclass
       ListResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ListResponse").msgclass
+      ListResponse::Cursor = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ListResponse.Cursor").msgclass
       GetRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.GetRequest").msgclass
       GetResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.GetResponse").msgclass
       ArchiveRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.campaigns.v1.ArchiveRequest").msgclass

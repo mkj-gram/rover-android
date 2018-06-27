@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 	"github.com/roverplatform/rover/campaigns"
 )
@@ -29,6 +28,11 @@ type (
 		ScheduledTime *time.Time     `db:"scheduled_time"`
 	}
 
+	ListResult struct {
+		Campaigns  []*campaigns.Campaign
+		TotalCount int64
+	}
+
 	ListParams struct {
 		AccountId      int32
 		CampaignType   string
@@ -39,6 +43,9 @@ type (
 		// paging
 		Page     int32
 		PageSize int32
+
+		// cursor
+		Cursor *campaigns.Cursor
 	}
 )
 
@@ -91,7 +98,7 @@ func (db *campaignsStore) OneById(ctx context.Context, accountId, id int32) (*ca
 	return &c.Campaign, nil
 }
 
-func (db *campaignsStore) List(ctx context.Context, params ListParams) ([]*campaigns.Campaign, error) {
+func (db *campaignsStore) List(ctx context.Context, params ListParams) (*ListResult, error) {
 	var (
 		args = map[string]interface{}{
 			"account_id": params.AccountId,
@@ -103,6 +110,8 @@ func (db *campaignsStore) List(ctx context.Context, params ListParams) ([]*campa
 				WHERE
 					account_id = :account_id
 		`
+
+		result ListResult
 	)
 
 	if params.CampaignStatus != "UNKNOWN" {
@@ -120,22 +129,47 @@ func (db *campaignsStore) List(ctx context.Context, params ListParams) ([]*campa
 		args["search"] = "%" + params.Keyword + "%"
 	}
 
-	q += `
-		ORDER BY
-			created_at desc,
-			id desc
-	`
+	// no cursor? basic pagination then
+	if params.Cursor == nil {
+		q += `
+			order by created_at desc, id desc
+		`
+		var pageSize = Defaults.PageSize
+		q += ` LIMIT :limit`
+		if params.PageSize > 0 {
+			pageSize = params.PageSize
+		}
+		args["limit"] = pageSize
 
-	var pageSize = Defaults.PageSize
-	q += ` LIMIT :limit`
-	if params.PageSize > 0 {
-		pageSize = params.PageSize
-	}
-	args["limit"] = pageSize
+		if params.Page > 0 {
+			q += ` OFFSET :offset`
+			args["offset"] = pageSize * params.Page
+		}
+	} else {
+		var cur = newCursor(params.Cursor)
+		cur.Bind(args)
 
-	if params.Page > 0 {
-		q += ` OFFSET :offset`
-		args["offset"] = pageSize * params.Page
+		var (
+			curQ   = cur.SQL(q)
+			countQ = curQ + ` select count(*) from campaigns_matched`
+		)
+
+		q = curQ + ` select * from campaigns_cursor`
+
+		rows, err := db.db.NamedQueryContext(ctx, countQ, args)
+		if err != nil {
+			return nil, wrapError(err, "db.Query")
+		}
+
+		defer rows.Close()
+
+		if !rows.Next() {
+			return nil, wrapError(sql.ErrNoRows, "cursor: TotalCount: next")
+		}
+
+		if err := rows.Scan(&result.TotalCount); err != nil {
+			return nil, wrapError(err, "cursor: TotalCount: scan")
+		}
 	}
 
 	rows, err := db.db.NamedQueryContext(ctx, q, args)
@@ -159,7 +193,9 @@ func (db *campaignsStore) List(ctx context.Context, params ListParams) ([]*campa
 		cx = append(cx, &c.Campaign)
 	}
 
-	return cx, nil
+	result.Campaigns = cx
+
+	return &result, nil
 }
 
 func (db *campaignsStore) Create(ctx context.Context, accountId int32, name string, campaignType string) (*campaigns.Campaign, error) {
@@ -211,59 +247,6 @@ func (db *campaignsStore) Create(ctx context.Context, accountId int32, name stri
 	}
 
 	return &c.Campaign, nil
-}
-
-func (db *campaignsStore) UpdateStatus(ctx context.Context, accountId, campaignId int32, status string) error {
-	return CampaignUpdateStatus(db.db, ctx, accountId, campaignId, status)
-}
-
-func (tx *campaignsStoreTx) UpdateStatus(ctx context.Context, accountId, campaignId int32, status string) error {
-	return CampaignUpdateStatus(tx.tx, ctx, accountId, campaignId, status)
-}
-
-type namedExecer interface {
-	NamedExecContext(ctx context.Context, query string, arg interface{}) (sql.Result, error)
-}
-
-func CampaignUpdateStatus(dbCtx namedExecer, ctx context.Context, accountId, campaignId int32, status string) error {
-	var (
-		now = TimeNow()
-
-		args = map[string]interface{}{
-			"campaign_status": status,
-			"account_id":      accountId,
-			"campaign_id":     campaignId,
-			"updated_at":      now,
-		}
-
-		// TODO: ensure publishing only drafts
-		q = `
-			UPDATE campaigns
-				SET
-					campaign_status = :campaign_status
-					,updated_at			= :updated_at
-				WHERE
-					account_id = :account_id
-					AND			id = :campaign_id
-					AND	campaign_status != :campaign_status
-			`
-	)
-
-	res, err := dbCtx.NamedExecContext(ctx, q, args)
-	if err != nil {
-		return wrapError(err, "db.Exec")
-	}
-
-	n, err := res.RowsAffected()
-	if err != nil {
-		return wrapError(err, "res.RowsAffected")
-	}
-
-	if n == 0 {
-		return wrapError(sql.ErrNoRows, "db.Update")
-	}
-
-	return nil
 }
 
 func (db *campaignsStore) Rename(ctx context.Context, accountId int32, campaignId int32, name string) error {
@@ -481,269 +464,4 @@ func (db *campaignsStore) Duplicate(ctx context.Context, acctId, campaignId int3
 	}
 
 	return &inserted.Campaign, nil
-}
-
-func (db *campaignsStore) UpdateNotificationSettings(ctx context.Context, req *campaigns.UpdateNotificationSettingsRequest) (*campaigns.Campaign, error) {
-	var (
-		now = TimeNow()
-
-		update = struct {
-			*campaigns.UpdateNotificationSettingsRequest
-			UpdatedAt time.Time `db:"updated_at"`
-		}{
-			UpdateNotificationSettingsRequest: req,
-			UpdatedAt:                         now,
-		}
-
-		q = `
-		UPDATE campaigns
-			SET
-				 updated_at = :updated_at
-
-				,experience_id = :experience_id
-				,ui_state = :ui_state
-
-				,notification_body = :notification_body
-				,notification_title = :notification_title
-				,notification_attachment_url = :notification_attachment_url
-
-				,notification_attachment_type = :notification_attachment_type
-
-				,notification_tap_behavior_type = :notification_tap_behavior_type
-				,notification_tap_behavior_url = :notification_tap_behavior_url
-				,notification_tap_behavior_presentation_type = :notification_tap_behavior_presentation_type
-
-				,notification_ios_content_available = :notification_ios_content_available
-				,notification_ios_mutable_content = :notification_ios_mutable_content
-				,notification_ios_sound = :notification_ios_sound
-				,notification_ios_category_identifier = :notification_ios_category_identifier
-				,notification_ios_thread_identifier = :notification_ios_thread_identifier
-
-				,notification_android_channel_id = :notification_android_channel_id
-				,notification_android_sound = :notification_android_sound
-				,notification_android_tag = :notification_android_tag
-
-				,notification_expiration = :notification_expiration
-
-				,notification_attributes = :notification_attributes
-
-				,notification_alert_option_push_notification = :notification_alert_option_push_notification
-				,notification_alert_option_notification_center = :notification_alert_option_notification_center
-				,notification_alert_option_badge_number = :notification_alert_option_badge_number
-
-			WHERE
-				account_id = :account_id
-				AND id = :campaign_id
-
-		RETURNING *
-	`
-	)
-
-	rows, err := db.db.NamedQueryContext(ctx, q, update)
-	if err != nil {
-		return nil, wrapError(err, "db.Exec")
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		return nil, wrapError(sql.ErrNoRows, "rows.Next")
-	}
-
-	var updated campaign
-	if err := rows.StructScan(&updated); err != nil {
-		return nil, wrapError(err, "rows.StructScan")
-	}
-
-	if err := updated.fromDB(); err != nil {
-		return nil, wrapError(err, "fromDB")
-	}
-
-	return &updated.Campaign, nil
-
-}
-
-func (db *campaignsStore) UpdateAutomatedDeliverySettings(ctx context.Context, req *campaigns.UpdateAutomatedDeliverySettingsRequest) (*campaigns.Campaign, error) {
-	var (
-		now = TimeNow()
-
-		update = struct {
-			*campaigns.UpdateAutomatedDeliverySettingsRequest
-			SegmentIds pq.StringArray `db:"segment_ids"`
-			UpdatedAt  time.Time      `db:"updated_at"`
-		}{
-			UpdateAutomatedDeliverySettingsRequest: req,
-
-			SegmentIds: req.SegmentIds,
-			UpdatedAt:  now,
-		}
-
-		q = `
-			UPDATE campaigns
-			   SET
-				 updated_at = :updated_at
-
-				,ui_state = :ui_state
-
-				,segment_condition = :segment_condition
-				,segment_ids = :segment_ids
-
-				,automated_monday    = :automated_monday
-				,automated_tuesday   = :automated_tuesday
-				,automated_wednesday = :automated_wednesday
-				,automated_thursday  = :automated_thursday
-				,automated_friday    = :automated_friday
-				,automated_saturday  = :automated_saturday
-				,automated_sunday    = :automated_sunday
-
-				,automated_start_date            = :automated_start_date
-				,automated_end_date              = :automated_end_date
-
-				,automated_start_time            = :automated_start_time
-				,automated_end_time              = :automated_end_time
-
-				,automated_time_zone             = :automated_time_zone
-				,automated_use_local_device_time = :automated_use_local_device_time
-
-				,automated_event_name            = :automated_event_name
-				,automated_event_predicates      = :automated_event_predicates
-
-				,automated_frequency_single_use  = :automated_frequency_single_use
-				,automated_frequency_limits      = :automated_frequency_limits
-
-			   WHERE
-				 account_id = :account_id
-				 AND id = :campaign_id
-
-			RETURNING *
-		`
-	)
-
-	rows, err := db.db.NamedQueryContext(ctx, q, update)
-	if err != nil {
-		return nil, wrapError(err, "db.Exec")
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		return nil, wrapError(sql.ErrNoRows, "rows.Next")
-	}
-
-	var updated campaign
-	if err := rows.StructScan(&updated); err != nil {
-		return nil, wrapError(err, "rows.StructScan")
-	}
-
-	if err := updated.fromDB(); err != nil {
-		return nil, wrapError(err, "fromDB")
-	}
-
-	return &updated.Campaign, nil
-}
-
-func (db *campaignsStore) UpdateScheduledDeliverySettings(ctx context.Context, req *campaigns.UpdateScheduledDeliverySettingsRequest) (*campaigns.Campaign, error) {
-	return UpdateScheduledDeliverySettings(db.db, ctx, req)
-}
-
-func (tx *campaignsStoreTx) UpdateScheduledDeliverySettings(ctx context.Context, req *campaigns.UpdateScheduledDeliverySettingsRequest) (*campaigns.Campaign, error) {
-	return UpdateScheduledDeliverySettings(tx.tx, ctx, req)
-}
-
-type namedQuerier interface {
-	NamedQuery(string, interface{}) (*sqlx.Rows, error)
-}
-
-func UpdateScheduledDeliverySettings(dbCtx namedQuerier, ctx context.Context, req *campaigns.UpdateScheduledDeliverySettingsRequest) (*campaigns.Campaign, error) {
-	var (
-		now = TimeNow()
-
-		update = struct {
-			AccountId  int32 `db:"account_id"`
-			CampaignId int32 `db:"campaign_id"`
-
-			SegmentCondition string         `db:"segment_condition"`
-			SegmentIds       pq.StringArray `db:"segment_ids"`
-
-			UiState string `db:"ui_state"`
-
-			ScheduledType string     `db:"scheduled_type"`
-			ScheduledDate *time.Time `db:"scheduled_date"`
-			ScheduledTime *time.Time `db:"scheduled_time"`
-
-			ScheduledTimeZone           string    `db:"scheduled_time_zone"`
-			ScheduledUseLocalDeviceTime bool      `db:"scheduled_use_local_device_time"`
-			UpdatedAt                   time.Time `db:"updated_at"`
-		}{
-			AccountId:        req.AccountId,
-			CampaignId:       req.CampaignId,
-			SegmentCondition: req.SegmentCondition,
-			SegmentIds:       pq.StringArray(req.SegmentIds),
-			UiState:          req.UiState,
-			ScheduledType:    req.ScheduledType,
-			ScheduledDate: func() *time.Time {
-				if req.ScheduledDate == nil {
-					return nil
-				}
-				var (
-					day   = req.ScheduledDate.Day
-					month = req.ScheduledDate.Month
-					year  = req.ScheduledDate.Year
-				)
-				var date = time.Date(int(year), time.Month(month), int(day), 0, 0, 0, 0, time.UTC)
-				return &date
-			}(),
-			ScheduledTime: func() *time.Time {
-				if req.ScheduledTime == nil {
-					return nil
-				}
-				var t = time.Date(0, 0, 0, 0, 0, int(*req.ScheduledTime), 0, time.UTC)
-				return &t
-			}(),
-			ScheduledTimeZone:           req.ScheduledTimeZone,
-			ScheduledUseLocalDeviceTime: req.ScheduledUseLocalDeviceTime,
-			UpdatedAt:                   now,
-		}
-
-		q = `
-			UPDATE campaigns
-				SET
-				 updated_at = :updated_at
-
-				,ui_state = :ui_state
-
-				,segment_ids = :segment_ids
-				,segment_condition = :segment_condition
-
-				,scheduled_type                  = :scheduled_type
-				,scheduled_date					 = :scheduled_date
-				,scheduled_time 				 = :scheduled_time
-				,scheduled_time_zone             = :scheduled_time_zone
-				,scheduled_use_local_device_time = :scheduled_use_local_device_time
-
-				WHERE
-				 account_id = :account_id
-				 AND id = :campaign_id
-			RETURNING *
-		`
-	)
-
-	rows, err := dbCtx.NamedQuery(q, update)
-	if err != nil {
-		return nil, wrapError(err, "db.Exec")
-	}
-	defer rows.Close()
-
-	if !rows.Next() {
-		return nil, wrapError(sql.ErrNoRows, "rows.Next")
-	}
-
-	var updated campaign
-	if err := rows.StructScan(&updated); err != nil {
-		return nil, wrapError(err, "rows.StructScan")
-	}
-
-	if err := updated.fromDB(); err != nil {
-		return nil, wrapError(err, "fromDB")
-	}
-
-	return &updated.Campaign, nil
 }

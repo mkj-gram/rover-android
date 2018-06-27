@@ -127,58 +127,97 @@ func (s *Server) List(ctx context.Context, req *campaignspb.ListRequest) (*campa
 
 	var (
 		params = db.ListParams{
-			AccountId:      req.AuthContext.AccountId,
+			AccountId: req.AuthContext.AccountId,
+
 			CampaignStatus: req.CampaignStatus.String(),
 			CampaignType:   req.CampaignType.String(),
-			Keyword:        req.Keyword,
-			PageSize:       req.PageSize,
-			Page:           req.Page,
+
+			Keyword:  req.Keyword,
+			PageSize: req.PageSize,
+			Page:     req.Page,
+
+			// see below
+			Cursor: nil,
 		}
 	)
 
-	var campaigns, err = s.DB.CampaignsStore().List(ctx, params)
+	if cur := req.Cursor; cur != nil {
+		params.Cursor = cursorFromProto(cur)
+		if err := params.Cursor.Decode(); err != nil {
+			return nil, status.Errorf(codes.InvalidArgument, "cursor.Decode: %v", err)
+		}
+	}
+
+	var list, err = s.DB.CampaignsStore().List(ctx, params)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "db.List: %v", err)
 	}
 
-	var scheduledCampaignIds []int32
-	for i := range campaigns {
-		if !isScheduledType(campaigns[i]) {
-			continue
-		}
-		scheduledCampaignIds = append(scheduledCampaignIds, campaigns[i].CampaignId)
-	}
-
-	if len(scheduledCampaignIds) > 0 {
-		csx, err := s.DB.ScheduledTasksStore().ListDeliveryStatuses(ctx, scheduledCampaignIds)
-		if err != nil {
-			return nil, status.Errorf(ErrorToStatus(err), "ListDeliveryStatuses: %v", err)
-		}
-
-		var deliveryStatusByCampaignId = DeliveryStatusByCampaignId(csx)
-		for i := range campaigns {
-			if !isScheduledType(campaigns[i]) {
-				continue
-			}
-			if s, ok := deliveryStatusByCampaignId[campaigns[i].CampaignId]; ok {
-				campaigns[i].ScheduledDeliveryStatus = s.String()
-			}
-		}
+	if err := s.setDeliveryStatus(ctx, list.Campaigns); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "setDeliveryStatus: %v", err)
 	}
 
 	var protos []*campaignspb.Campaign
-	for i := range campaigns {
+	for i := range list.Campaigns {
 		var proto campaignspb.Campaign
-		if err := CampaignToProto(campaigns[i], &proto); err != nil {
+		if err := CampaignToProto(list.Campaigns[i], &proto); err != nil {
 			return nil, status.Errorf(ErrorToStatus(err), "toProto: %v", err)
 		}
 
 		protos = append(protos, &proto)
 	}
 
+	var cursor *campaignspb.ListResponse_Cursor
+	if cur := params.Cursor; cur != nil {
+		cursor = &campaignspb.ListResponse_Cursor{
+			TotalCount: list.TotalCount,
+			Tokens: func() []string {
+				var tokens = make([]string, len(list.Campaigns))
+				for i := range list.Campaigns {
+					tokens[i] = cur.Encode(list.Campaigns[i])
+				}
+				return tokens
+			}(),
+		}
+	}
+
 	return &campaignspb.ListResponse{
 		Campaigns: protos,
+		Cursor:    cursor,
 	}, nil
+}
+
+func (s *Server) setDeliveryStatus(ctx context.Context, cx []*campaigns.Campaign) error {
+	var (
+
+		scheduledCampaignIds []int32
+	)
+
+	for i := range cx {
+		if !isScheduledType(cx[i]) {
+			continue
+		}
+		scheduledCampaignIds = append(scheduledCampaignIds, cx[i].CampaignId)
+	}
+
+	if len(scheduledCampaignIds) > 0 {
+		csx, err := s.DB.ScheduledTasksStore().ListDeliveryStatuses(ctx, scheduledCampaignIds)
+		if err != nil {
+			return errors.Wrap(err, "ListDeliveryStatuses")
+		}
+
+		var deliveryStatusByCampaignId = DeliveryStatusByCampaignId(csx)
+		for i := range cx {
+			if !isScheduledType(cx[i]) {
+				continue
+			}
+			if s, ok := deliveryStatusByCampaignId[cx[i].CampaignId]; ok {
+				cx[i].ScheduledDeliveryStatus = s.String()
+			}
+		}
+	}
+
+	return nil
 }
 
 func (s *Server) Duplicate(ctx context.Context, req *campaignspb.DuplicateRequest) (*campaignspb.DuplicateResponse, error) {

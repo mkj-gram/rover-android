@@ -23,6 +23,10 @@ goog.exportSymbol('proto.rover.campaigns.v1.CampaignType', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.CampaignType.Enum', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.CreateRequest', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.CreateResponse', null, global);
+goog.exportSymbol('proto.rover.campaigns.v1.Cursor', null, global);
+goog.exportSymbol('proto.rover.campaigns.v1.Cursor.OrderBy', null, global);
+goog.exportSymbol('proto.rover.campaigns.v1.Cursor.OrderBy.Direction', null, global);
+goog.exportSymbol('proto.rover.campaigns.v1.Cursor.OrderBy.Field', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.Date', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.DuplicateRequest', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.DuplicateResponse', null, global);
@@ -30,6 +34,7 @@ goog.exportSymbol('proto.rover.campaigns.v1.GetRequest', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.GetResponse', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.ListRequest', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.ListResponse', null, global);
+goog.exportSymbol('proto.rover.campaigns.v1.ListResponse.Cursor', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.NotificationAttachmentType', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.NotificationAttachmentType.Enum', null, global);
 goog.exportSymbol('proto.rover.campaigns.v1.NotificationTapBehaviorType', null, global);
@@ -2045,6 +2050,552 @@ proto.rover.campaigns.v1.CreateResponse.prototype.hasCampaign = function() {
  * @extends {jspb.Message}
  * @constructor
  */
+proto.rover.campaigns.v1.Cursor = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, proto.rover.campaigns.v1.Cursor.oneofGroups_);
+};
+goog.inherits(proto.rover.campaigns.v1.Cursor, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.campaigns.v1.Cursor.displayName = 'proto.rover.campaigns.v1.Cursor';
+}
+/**
+ * Oneof group definitions for this message. Each group defines the field
+ * numbers belonging to that group. When of these fields' value is set, all
+ * other fields in the group are cleared. During deserialization, if multiple
+ * fields are encountered for a group, only the last value seen will be kept.
+ * @private {!Array<!Array<number>>}
+ * @const
+ */
+proto.rover.campaigns.v1.Cursor.oneofGroups_ = [[1,2],[3,4]];
+
+/**
+ * @enum {number}
+ */
+proto.rover.campaigns.v1.Cursor.TakeCase = {
+  TAKE_NOT_SET: 0,
+  FIRST: 1,
+  LAST: 2
+};
+
+/**
+ * @return {proto.rover.campaigns.v1.Cursor.TakeCase}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.getTakeCase = function() {
+  return /** @type {proto.rover.campaigns.v1.Cursor.TakeCase} */(jspb.Message.computeOneofCase(this, proto.rover.campaigns.v1.Cursor.oneofGroups_[0]));
+};
+
+/**
+ * @enum {number}
+ */
+proto.rover.campaigns.v1.Cursor.StartCase = {
+  START_NOT_SET: 0,
+  AFTER: 3,
+  BEFORE: 4
+};
+
+/**
+ * @return {proto.rover.campaigns.v1.Cursor.StartCase}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.getStartCase = function() {
+  return /** @type {proto.rover.campaigns.v1.Cursor.StartCase} */(jspb.Message.computeOneofCase(this, proto.rover.campaigns.v1.Cursor.oneofGroups_[1]));
+};
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.campaigns.v1.Cursor.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.campaigns.v1.Cursor} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.campaigns.v1.Cursor.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    first: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    last: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    after: jspb.Message.getFieldWithDefault(msg, 3, ""),
+    before: jspb.Message.getFieldWithDefault(msg, 4, ""),
+    orderby: (f = msg.getOrderby()) && proto.rover.campaigns.v1.Cursor.OrderBy.toObject(includeInstance, f)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.campaigns.v1.Cursor}
+ */
+proto.rover.campaigns.v1.Cursor.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.campaigns.v1.Cursor;
+  return proto.rover.campaigns.v1.Cursor.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.campaigns.v1.Cursor} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.campaigns.v1.Cursor}
+ */
+proto.rover.campaigns.v1.Cursor.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setFirst(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setLast(value);
+      break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setAfter(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setBefore(value);
+      break;
+    case 5:
+      var value = new proto.rover.campaigns.v1.Cursor.OrderBy;
+      reader.readMessage(value,proto.rover.campaigns.v1.Cursor.OrderBy.deserializeBinaryFromReader);
+      msg.setOrderby(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.campaigns.v1.Cursor.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.campaigns.v1.Cursor} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.campaigns.v1.Cursor.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = /** @type {number} */ (jspb.Message.getField(message, 1));
+  if (f != null) {
+    writer.writeInt32(
+      1,
+      f
+    );
+  }
+  f = /** @type {number} */ (jspb.Message.getField(message, 2));
+  if (f != null) {
+    writer.writeInt32(
+      2,
+      f
+    );
+  }
+  f = /** @type {string} */ (jspb.Message.getField(message, 3));
+  if (f != null) {
+    writer.writeString(
+      3,
+      f
+    );
+  }
+  f = /** @type {string} */ (jspb.Message.getField(message, 4));
+  if (f != null) {
+    writer.writeString(
+      4,
+      f
+    );
+  }
+  f = message.getOrderby();
+  if (f != null) {
+    writer.writeMessage(
+      5,
+      f,
+      proto.rover.campaigns.v1.Cursor.OrderBy.serializeBinaryToWriter
+    );
+  }
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+};
+goog.inherits(proto.rover.campaigns.v1.Cursor.OrderBy, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.campaigns.v1.Cursor.OrderBy.displayName = 'proto.rover.campaigns.v1.Cursor.OrderBy';
+}
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.campaigns.v1.Cursor.OrderBy.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.campaigns.v1.Cursor.OrderBy} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    field: jspb.Message.getFieldWithDefault(msg, 1, 0),
+    direction: jspb.Message.getFieldWithDefault(msg, 2, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.campaigns.v1.Cursor.OrderBy}
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.campaigns.v1.Cursor.OrderBy;
+  return proto.rover.campaigns.v1.Cursor.OrderBy.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.campaigns.v1.Cursor.OrderBy} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.campaigns.v1.Cursor.OrderBy}
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {!proto.rover.campaigns.v1.Cursor.OrderBy.Field} */ (reader.readEnum());
+      msg.setField(value);
+      break;
+    case 2:
+      var value = /** @type {!proto.rover.campaigns.v1.Cursor.OrderBy.Direction} */ (reader.readEnum());
+      msg.setDirection(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.campaigns.v1.Cursor.OrderBy.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.campaigns.v1.Cursor.OrderBy} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getField();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      1,
+      f
+    );
+  }
+  f = message.getDirection();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      2,
+      f
+    );
+  }
+};
+
+
+/**
+ * @enum {number}
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy.Field = {
+  ID: 0,
+  UPDATED_AT: 1
+};
+
+/**
+ * @enum {number}
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy.Direction = {
+  ASC: 0,
+  DESC: 1
+};
+
+/**
+ * optional Field field = 1;
+ * @return {!proto.rover.campaigns.v1.Cursor.OrderBy.Field}
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy.prototype.getField = function() {
+  return /** @type {!proto.rover.campaigns.v1.Cursor.OrderBy.Field} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {!proto.rover.campaigns.v1.Cursor.OrderBy.Field} value */
+proto.rover.campaigns.v1.Cursor.OrderBy.prototype.setField = function(value) {
+  jspb.Message.setField(this, 1, value);
+};
+
+
+/**
+ * optional Direction direction = 2;
+ * @return {!proto.rover.campaigns.v1.Cursor.OrderBy.Direction}
+ */
+proto.rover.campaigns.v1.Cursor.OrderBy.prototype.getDirection = function() {
+  return /** @type {!proto.rover.campaigns.v1.Cursor.OrderBy.Direction} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {!proto.rover.campaigns.v1.Cursor.OrderBy.Direction} value */
+proto.rover.campaigns.v1.Cursor.OrderBy.prototype.setDirection = function(value) {
+  jspb.Message.setField(this, 2, value);
+};
+
+
+/**
+ * optional int32 first = 1;
+ * @return {number}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.getFirst = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 1, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.campaigns.v1.Cursor.prototype.setFirst = function(value) {
+  jspb.Message.setOneofField(this, 1, proto.rover.campaigns.v1.Cursor.oneofGroups_[0], value);
+};
+
+
+proto.rover.campaigns.v1.Cursor.prototype.clearFirst = function() {
+  jspb.Message.setOneofField(this, 1, proto.rover.campaigns.v1.Cursor.oneofGroups_[0], undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.hasFirst = function() {
+  return jspb.Message.getField(this, 1) != null;
+};
+
+
+/**
+ * optional int32 last = 2;
+ * @return {number}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.getLast = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.campaigns.v1.Cursor.prototype.setLast = function(value) {
+  jspb.Message.setOneofField(this, 2, proto.rover.campaigns.v1.Cursor.oneofGroups_[0], value);
+};
+
+
+proto.rover.campaigns.v1.Cursor.prototype.clearLast = function() {
+  jspb.Message.setOneofField(this, 2, proto.rover.campaigns.v1.Cursor.oneofGroups_[0], undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.hasLast = function() {
+  return jspb.Message.getField(this, 2) != null;
+};
+
+
+/**
+ * optional string after = 3;
+ * @return {string}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.getAfter = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.campaigns.v1.Cursor.prototype.setAfter = function(value) {
+  jspb.Message.setOneofField(this, 3, proto.rover.campaigns.v1.Cursor.oneofGroups_[1], value);
+};
+
+
+proto.rover.campaigns.v1.Cursor.prototype.clearAfter = function() {
+  jspb.Message.setOneofField(this, 3, proto.rover.campaigns.v1.Cursor.oneofGroups_[1], undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.hasAfter = function() {
+  return jspb.Message.getField(this, 3) != null;
+};
+
+
+/**
+ * optional string before = 4;
+ * @return {string}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.getBefore = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/** @param {string} value */
+proto.rover.campaigns.v1.Cursor.prototype.setBefore = function(value) {
+  jspb.Message.setOneofField(this, 4, proto.rover.campaigns.v1.Cursor.oneofGroups_[1], value);
+};
+
+
+proto.rover.campaigns.v1.Cursor.prototype.clearBefore = function() {
+  jspb.Message.setOneofField(this, 4, proto.rover.campaigns.v1.Cursor.oneofGroups_[1], undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.hasBefore = function() {
+  return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * optional OrderBy orderBy = 5;
+ * @return {?proto.rover.campaigns.v1.Cursor.OrderBy}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.getOrderby = function() {
+  return /** @type{?proto.rover.campaigns.v1.Cursor.OrderBy} */ (
+    jspb.Message.getWrapperField(this, proto.rover.campaigns.v1.Cursor.OrderBy, 5));
+};
+
+
+/** @param {?proto.rover.campaigns.v1.Cursor.OrderBy|undefined} value */
+proto.rover.campaigns.v1.Cursor.prototype.setOrderby = function(value) {
+  jspb.Message.setWrapperField(this, 5, value);
+};
+
+
+proto.rover.campaigns.v1.Cursor.prototype.clearOrderby = function() {
+  this.setOrderby(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.campaigns.v1.Cursor.prototype.hasOrderby = function() {
+  return jspb.Message.getField(this, 5) != null;
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
 proto.rover.campaigns.v1.ListRequest = function(opt_data) {
   jspb.Message.initialize(this, opt_data, 0, -1, null, null);
 };
@@ -2085,7 +2636,8 @@ proto.rover.campaigns.v1.ListRequest.toObject = function(includeInstance, msg) {
     campaignStatus: jspb.Message.getFieldWithDefault(msg, 6, 0),
     keyword: jspb.Message.getFieldWithDefault(msg, 7, ""),
     page: jspb.Message.getFieldWithDefault(msg, 8, 0),
-    pageSize: jspb.Message.getFieldWithDefault(msg, 9, 0)
+    pageSize: jspb.Message.getFieldWithDefault(msg, 9, 0),
+    cursor: (f = msg.getCursor()) && proto.rover.campaigns.v1.Cursor.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2146,6 +2698,11 @@ proto.rover.campaigns.v1.ListRequest.deserializeBinaryFromReader = function(msg,
     case 9:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setPageSize(value);
+      break;
+    case 10:
+      var value = new proto.rover.campaigns.v1.Cursor;
+      reader.readMessage(value,proto.rover.campaigns.v1.Cursor.deserializeBinaryFromReader);
+      msg.setCursor(value);
       break;
     default:
       reader.skipField();
@@ -2216,6 +2773,14 @@ proto.rover.campaigns.v1.ListRequest.serializeBinaryToWriter = function(message,
     writer.writeInt32(
       9,
       f
+    );
+  }
+  f = message.getCursor();
+  if (f != null) {
+    writer.writeMessage(
+      10,
+      f,
+      proto.rover.campaigns.v1.Cursor.serializeBinaryToWriter
     );
   }
 };
@@ -2326,6 +2891,36 @@ proto.rover.campaigns.v1.ListRequest.prototype.setPageSize = function(value) {
 };
 
 
+/**
+ * optional Cursor cursor = 10;
+ * @return {?proto.rover.campaigns.v1.Cursor}
+ */
+proto.rover.campaigns.v1.ListRequest.prototype.getCursor = function() {
+  return /** @type{?proto.rover.campaigns.v1.Cursor} */ (
+    jspb.Message.getWrapperField(this, proto.rover.campaigns.v1.Cursor, 10));
+};
+
+
+/** @param {?proto.rover.campaigns.v1.Cursor|undefined} value */
+proto.rover.campaigns.v1.ListRequest.prototype.setCursor = function(value) {
+  jspb.Message.setWrapperField(this, 10, value);
+};
+
+
+proto.rover.campaigns.v1.ListRequest.prototype.clearCursor = function() {
+  this.setCursor(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.campaigns.v1.ListRequest.prototype.hasCursor = function() {
+  return jspb.Message.getField(this, 10) != null;
+};
+
+
 
 /**
  * Generated by JsPbCodeGenerator.
@@ -2380,7 +2975,8 @@ proto.rover.campaigns.v1.ListResponse.prototype.toObject = function(opt_includeI
 proto.rover.campaigns.v1.ListResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     campaignsList: jspb.Message.toObjectList(msg.getCampaignsList(),
-    proto.rover.campaigns.v1.Campaign.toObject, includeInstance)
+    proto.rover.campaigns.v1.Campaign.toObject, includeInstance),
+    cursor: (f = msg.getCursor()) && proto.rover.campaigns.v1.ListResponse.Cursor.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -2422,6 +3018,11 @@ proto.rover.campaigns.v1.ListResponse.deserializeBinaryFromReader = function(msg
       reader.readMessage(value,proto.rover.campaigns.v1.Campaign.deserializeBinaryFromReader);
       msg.addCampaigns(value);
       break;
+    case 2:
+      var value = new proto.rover.campaigns.v1.ListResponse.Cursor;
+      reader.readMessage(value,proto.rover.campaigns.v1.ListResponse.Cursor.deserializeBinaryFromReader);
+      msg.setCursor(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -2458,6 +3059,204 @@ proto.rover.campaigns.v1.ListResponse.serializeBinaryToWriter = function(message
       proto.rover.campaigns.v1.Campaign.serializeBinaryToWriter
     );
   }
+  f = message.getCursor();
+  if (f != null) {
+    writer.writeMessage(
+      2,
+      f,
+      proto.rover.campaigns.v1.ListResponse.Cursor.serializeBinaryToWriter
+    );
+  }
+};
+
+
+
+/**
+ * Generated by JsPbCodeGenerator.
+ * @param {Array=} opt_data Optional initial data array, typically from a
+ * server response, or constructed directly in Javascript. The array is used
+ * in place and becomes part of the constructed object. It is not cloned.
+ * If no data is provided, the constructed object will be empty, but still
+ * valid.
+ * @extends {jspb.Message}
+ * @constructor
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor = function(opt_data) {
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.rover.campaigns.v1.ListResponse.Cursor.repeatedFields_, null);
+};
+goog.inherits(proto.rover.campaigns.v1.ListResponse.Cursor, jspb.Message);
+if (goog.DEBUG && !COMPILED) {
+  proto.rover.campaigns.v1.ListResponse.Cursor.displayName = 'proto.rover.campaigns.v1.ListResponse.Cursor';
+}
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor.repeatedFields_ = [1];
+
+
+
+if (jspb.Message.GENERATE_TO_OBJECT) {
+/**
+ * Creates an object representation of this proto suitable for use in Soy templates.
+ * Field names that are reserved in JavaScript and will be renamed to pb_name.
+ * To access a reserved field use, foo.pb_<name>, eg, foo.pb_default.
+ * For the list of reserved names please see:
+ *     com.google.apps.jspb.JsClassTemplate.JS_RESERVED_WORDS.
+ * @param {boolean=} opt_includeInstance Whether to include the JSPB instance
+ *     for transitional soy proto support: http://goto/soy-param-migration
+ * @return {!Object}
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor.prototype.toObject = function(opt_includeInstance) {
+  return proto.rover.campaigns.v1.ListResponse.Cursor.toObject(opt_includeInstance, this);
+};
+
+
+/**
+ * Static version of the {@see toObject} method.
+ * @param {boolean|undefined} includeInstance Whether to include the JSPB
+ *     instance for transitional soy proto support:
+ *     http://goto/soy-param-migration
+ * @param {!proto.rover.campaigns.v1.ListResponse.Cursor} msg The msg instance to transform.
+ * @return {!Object}
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor.toObject = function(includeInstance, msg) {
+  var f, obj = {
+    tokensList: jspb.Message.getField(msg, 1),
+    totalCount: jspb.Message.getFieldWithDefault(msg, 2, 0)
+  };
+
+  if (includeInstance) {
+    obj.$jspbMessageInstance = msg;
+  }
+  return obj;
+};
+}
+
+
+/**
+ * Deserializes binary data (in protobuf wire format).
+ * @param {jspb.ByteSource} bytes The bytes to deserialize.
+ * @return {!proto.rover.campaigns.v1.ListResponse.Cursor}
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor.deserializeBinary = function(bytes) {
+  var reader = new jspb.BinaryReader(bytes);
+  var msg = new proto.rover.campaigns.v1.ListResponse.Cursor;
+  return proto.rover.campaigns.v1.ListResponse.Cursor.deserializeBinaryFromReader(msg, reader);
+};
+
+
+/**
+ * Deserializes binary data (in protobuf wire format) from the
+ * given reader into the given message object.
+ * @param {!proto.rover.campaigns.v1.ListResponse.Cursor} msg The message object to deserialize into.
+ * @param {!jspb.BinaryReader} reader The BinaryReader to use.
+ * @return {!proto.rover.campaigns.v1.ListResponse.Cursor}
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor.deserializeBinaryFromReader = function(msg, reader) {
+  while (reader.nextField()) {
+    if (reader.isEndGroup()) {
+      break;
+    }
+    var field = reader.getFieldNumber();
+    switch (field) {
+    case 1:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addTokens(value);
+      break;
+    case 2:
+      var value = /** @type {number} */ (reader.readInt64());
+      msg.setTotalCount(value);
+      break;
+    default:
+      reader.skipField();
+      break;
+    }
+  }
+  return msg;
+};
+
+
+/**
+ * Serializes the message to binary data (in protobuf wire format).
+ * @return {!Uint8Array}
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor.prototype.serializeBinary = function() {
+  var writer = new jspb.BinaryWriter();
+  proto.rover.campaigns.v1.ListResponse.Cursor.serializeBinaryToWriter(this, writer);
+  return writer.getResultBuffer();
+};
+
+
+/**
+ * Serializes the given message to binary data (in protobuf wire
+ * format), writing to the given BinaryWriter.
+ * @param {!proto.rover.campaigns.v1.ListResponse.Cursor} message
+ * @param {!jspb.BinaryWriter} writer
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor.serializeBinaryToWriter = function(message, writer) {
+  var f = undefined;
+  f = message.getTokensList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      1,
+      f
+    );
+  }
+  f = message.getTotalCount();
+  if (f !== 0) {
+    writer.writeInt64(
+      2,
+      f
+    );
+  }
+};
+
+
+/**
+ * repeated string tokens = 1;
+ * If you change this array by adding, removing or replacing elements, or if you
+ * replace the array itself, then you must call the setter to update it.
+ * @return {!Array.<string>}
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor.prototype.getTokensList = function() {
+  return /** @type {!Array.<string>} */ (jspb.Message.getField(this, 1));
+};
+
+
+/** @param {!Array.<string>} value */
+proto.rover.campaigns.v1.ListResponse.Cursor.prototype.setTokensList = function(value) {
+  jspb.Message.setField(this, 1, value || []);
+};
+
+
+/**
+ * @param {!string} value
+ * @param {number=} opt_index
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor.prototype.addTokens = function(value, opt_index) {
+  jspb.Message.addToRepeatedField(this, 1, value, opt_index);
+};
+
+
+proto.rover.campaigns.v1.ListResponse.Cursor.prototype.clearTokensList = function() {
+  this.setTokensList([]);
+};
+
+
+/**
+ * optional int64 total_count = 2;
+ * @return {number}
+ */
+proto.rover.campaigns.v1.ListResponse.Cursor.prototype.getTotalCount = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
+};
+
+
+/** @param {number} value */
+proto.rover.campaigns.v1.ListResponse.Cursor.prototype.setTotalCount = function(value) {
+  jspb.Message.setField(this, 2, value);
 };
 
 
@@ -2491,6 +3290,36 @@ proto.rover.campaigns.v1.ListResponse.prototype.addCampaigns = function(opt_valu
 
 proto.rover.campaigns.v1.ListResponse.prototype.clearCampaignsList = function() {
   this.setCampaignsList([]);
+};
+
+
+/**
+ * optional Cursor cursor = 2;
+ * @return {?proto.rover.campaigns.v1.ListResponse.Cursor}
+ */
+proto.rover.campaigns.v1.ListResponse.prototype.getCursor = function() {
+  return /** @type{?proto.rover.campaigns.v1.ListResponse.Cursor} */ (
+    jspb.Message.getWrapperField(this, proto.rover.campaigns.v1.ListResponse.Cursor, 2));
+};
+
+
+/** @param {?proto.rover.campaigns.v1.ListResponse.Cursor|undefined} value */
+proto.rover.campaigns.v1.ListResponse.prototype.setCursor = function(value) {
+  jspb.Message.setWrapperField(this, 2, value);
+};
+
+
+proto.rover.campaigns.v1.ListResponse.prototype.clearCursor = function() {
+  this.setCursor(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {!boolean}
+ */
+proto.rover.campaigns.v1.ListResponse.prototype.hasCursor = function() {
+  return jspb.Message.getField(this, 2) != null;
 };
 
 

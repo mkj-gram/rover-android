@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/jsonpb"
+	"github.com/pkg/errors"
 
 	campaignspb "github.com/roverplatform/rover/apis/go/campaigns/v1"
 	"github.com/roverplatform/rover/apis/go/protobuf/predicates"
@@ -317,4 +318,72 @@ func campaignToProtoScheduledNotification(c *campaigns.Campaign, proto *campaign
 	proto.ScheduledDeliveryStatus = campaignspb.ScheduledDeliveryStatus_Enum_FromString(c.ScheduledDeliveryStatus)
 
 	return nil
+}
+
+func cursorFromProto(pb *campaignspb.Cursor) *campaigns.Cursor {
+	var (
+		defaults = campaigns.CursorDefaults
+
+		cc campaigns.Cursor
+	)
+
+	switch start := pb.Start.(type) {
+	case nil:
+		cc.Start = defaults.Start
+	case *campaignspb.Cursor_After:
+		cc.Start = &campaigns.CursorStart{
+			Kind:  campaigns.CursorStartAfter,
+			Token: start.After,
+		}
+	case *campaignspb.Cursor_Before:
+		cc.Start = &campaigns.CursorStart{
+			Kind:  campaigns.CursorStartBefore,
+			Token: start.Before,
+		}
+	default:
+		panic(errors.Wrap(ErrInvalid, "Start"))
+	}
+
+	switch take := pb.Take.(type) {
+	case nil:
+		cc.Take = defaults.Take
+	case *campaignspb.Cursor_First:
+		cc.Take = &campaigns.CursorTake{
+			Kind: campaigns.CursorTakeFirst,
+			Size: take.First,
+		}
+	case *campaignspb.Cursor_Last:
+		cc.Take = &campaigns.CursorTake{
+			Kind: campaigns.CursorTakeLast,
+			Size: take.Last,
+		}
+	default:
+		panic(errors.Wrap(ErrInvalid, "Take"))
+	}
+
+	if pb.OrderBy == nil {
+		cc.OrderBy = defaults.OrderBy
+	} else {
+		var (
+			orderBy campaigns.CursorOrderBy
+		)
+
+		cc.OrderBy = &orderBy
+
+		switch pb.OrderBy.Direction {
+		case campaignspb.Cursor_OrderBy_DESC:
+			orderBy.Direction = campaigns.CursorOrderByDESC
+		default:
+			orderBy.Direction = campaigns.CursorOrderByASC
+		}
+
+		switch pb.OrderBy.Field {
+		case campaignspb.Cursor_OrderBy_UPDATED_AT:
+			orderBy.Field = campaigns.CursorOrderByUpdatedAt
+		default:
+			orderBy.Field = campaigns.CursorOrderById
+		}
+	}
+
+	return &cc
 }

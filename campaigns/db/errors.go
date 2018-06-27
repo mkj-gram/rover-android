@@ -5,8 +5,11 @@ import (
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
+	"github.com/roverplatform/rover/campaigns"
 	"google.golang.org/grpc/codes"
 )
+
+var ErrInvalid = campaigns.ErrInvalid
 
 func wrapError(err error, desc string) error {
 	return errors.Wrap(err, desc)

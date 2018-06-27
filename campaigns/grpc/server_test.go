@@ -15,6 +15,7 @@ import (
 	campaignspb "github.com/roverplatform/rover/apis/go/campaigns/v1"
 	"github.com/roverplatform/rover/apis/go/protobuf/predicates"
 	"github.com/roverplatform/rover/apis/go/protobuf/wrappers"
+	"github.com/roverplatform/rover/campaigns"
 	"github.com/roverplatform/rover/campaigns/db"
 	"github.com/roverplatform/rover/campaigns/db/testdb"
 	campaigns_grpc "github.com/roverplatform/rover/campaigns/grpc"
@@ -74,8 +75,10 @@ func dbOpen(t testing.TB, dsn string) (*db.DB, func() error) {
 		t.Fatal("setup:", err)
 	}
 
-	if _, err := pgdb.DB().Exec(`SELECT set_config('log_statement', 'all', false)`); err != nil {
-		t.Fatal("Enable logging:", err)
+	if testing.Verbose() {
+		if _, err := pgdb.DB().Exec(`SELECT set_config('log_statement', 'all', true)`); err != nil {
+			t.Fatal("Enable logging:", err)
+		}
 	}
 
 	return pgdb, pgdb.Close
@@ -146,6 +149,7 @@ func TestCampaigns(t *testing.T) {
 	db.TimeNow = func() time.Time { return timeCreatedAt }
 
 	t.Run("List+Options", test_List_Options)
+	t.Run("List+Cursor", test_List_Cursor)
 	t.Run("List", test_List)
 	t.Run("Get", test_Get)
 	t.Run("Create", test_Create)
@@ -288,6 +292,260 @@ func test_List_Options(t *testing.T) {
 			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
 				t.Fatalf("\nDiff:\n%v", Difff(diff))
 
+			}
+		})
+	}
+}
+
+func test_List_Cursor(t *testing.T) {
+
+	type (
+		cursor = campaignspb.Cursor
+		after  = campaignspb.Cursor_After
+		before = campaignspb.Cursor_Before
+		first  = campaignspb.Cursor_First
+		last   = campaignspb.Cursor_Last
+
+		orderBy = campaignspb.Cursor_OrderBy
+	)
+
+	var (
+		byUpdatedAt = campaignspb.Cursor_OrderBy_UPDATED_AT
+		desc        = campaignspb.Cursor_OrderBy_DESC
+	)
+
+	var (
+		ctx         = context.Background()
+		db, closeDB = dbOpen(t, tCfg.DSN)
+		svc         = campaigns_grpc.Server{DB: db}
+	)
+
+	defer closeDB()
+
+	var (
+		encodeCursor = func(args ...interface{}) string {
+			var fmts string
+			for i := range args {
+				fmts += "%v"
+				if i < len(args)-1 {
+					fmts += ","
+				}
+			}
+			return campaigns.EncodeCursor(fmts, args...)
+		}
+
+		encodeCursors = func(args ...interface{}) []string {
+			var cursors = make([]string, len(args))
+			for i := range args {
+				cursors[i] = encodeCursor(args[i])
+			}
+			return cursors
+		}
+	)
+
+	type Resp struct {
+		Ids     []int
+		Cursors []string
+		Total   int64
+	}
+
+	tests := []struct {
+		name string
+
+		req *campaignspb.ListRequest
+		exp *Resp
+
+		expErr error
+	}{
+		{
+			name: "first:10; defaults:orderBy: id,desc",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Cursor: &cursor{
+					Take: &first{10},
+				},
+			},
+
+			exp: &Resp{
+				Ids:     []int{1, 2, 3},
+				Cursors: encodeCursors(1, 2, 3),
+				Total:   3,
+			},
+		},
+		{
+			name: "first: 1",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Cursor: &cursor{
+					Take: &first{1},
+				},
+			},
+			exp: &Resp{
+				Ids:     []int{1},
+				Cursors: encodeCursors(1),
+				Total:   3,
+			},
+		},
+
+		{
+			name: `error: first: 1, after: "invalid" `,
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Cursor: &cursor{
+					Take:  &first{1},
+					Start: &after{"invalid"},
+				},
+			},
+			expErr: status.Errorf(codes.InvalidArgument, `cursor.Decode: encoding.Decode: invalid`),
+		},
+
+		{
+			name: "first:1 after: 1",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Cursor: &cursor{
+					Take:  &first{1},
+					Start: &after{encodeCursor(1)},
+				},
+			},
+			exp: &Resp{
+				Ids:     []int{2},
+				Cursors: encodeCursors(2),
+				Total:   3,
+			},
+		},
+
+		{
+			name: "last: 1 before: 3",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Cursor: &cursor{
+					Take:  &last{1},
+					Start: &before{encodeCursor(3)},
+				},
+			},
+			exp: &Resp{
+				Ids:     []int{2},
+				Cursors: encodeCursors(2),
+				Total:   3,
+			},
+		},
+
+		{
+			name: "last: 1 orderBy: updated_at,desc",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Cursor: &cursor{
+					Take: &last{1},
+					OrderBy: &orderBy{
+						Field:     byUpdatedAt,
+						Direction: desc,
+					},
+				},
+			},
+			exp: &Resp{
+				Ids:     []int{1},
+				Cursors: []string{encodeCursor("2017-05-04T16:26:25.445494Z", 1)},
+				Total:   3,
+			},
+		},
+
+		{
+			name: "last:10 before:1 orderBy: updated_at,desc",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Cursor: &cursor{
+					Take:  &last{10},
+					Start: &before{encodeCursor("2017-05-04T16:26:25.445494Z", 1)},
+					OrderBy: &orderBy{
+						Field:     byUpdatedAt,
+						Direction: desc,
+					},
+				},
+			},
+			exp: &Resp{
+				Ids: []int{3, 2},
+				Cursors: []string{
+					encodeCursor("2017-05-04T16:26:25.445494Z", 3),
+					encodeCursor("2017-05-04T16:26:25.445494Z", 2),
+				},
+				Total: 3,
+			},
+		},
+
+		{
+			name: "first:10 after:2 orderBy: updated_at,desc",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Cursor: &cursor{
+					Take:  &first{10},
+					Start: &after{encodeCursor("2017-05-04T16:26:25.445494Z", 2)},
+					OrderBy: &orderBy{
+						Field:     byUpdatedAt,
+						Direction: desc,
+					},
+				},
+			},
+			exp: &Resp{
+				Ids:     []int{1},
+				Cursors: []string{encodeCursor("2017-05-04T16:26:25.445494Z", 1)},
+				Total:   3,
+			},
+		},
+
+		{
+			name: "keyword: filters",
+			req: &campaignspb.ListRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				Keyword:     "C2",
+				Cursor: &cursor{
+					Take: &first{3},
+				},
+			},
+			exp: &Resp{
+				Ids:     []int{2},
+				Cursors: encodeCursors(2),
+				Total:   1,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.req == nil {
+				t.Skip("TODO")
+			}
+
+			var (
+				exp, expErr  = tt.exp, tt.expErr
+				resp, gotErr = svc.List(ctx, tt.req)
+				got          *Resp
+			)
+
+			if gotErr == nil {
+				var ids []int
+				for _, c := range resp.Campaigns {
+					switch cc := c.Campaign.(type) {
+					case *campaignspb.Campaign_AutomatedNotificationCampaign:
+						ids = append(ids, int(cc.AutomatedNotificationCampaign.CampaignId))
+					case *campaignspb.Campaign_ScheduledNotificationCampaign:
+						ids = append(ids, int(cc.ScheduledNotificationCampaign.CampaignId))
+					default:
+						t.Fatalf("unknown: %T=%v\n", c, c)
+					}
+				}
+
+				if resp.Cursor != nil {
+					got = &Resp{
+						Ids:     ids,
+						Cursors: resp.Cursor.Tokens,
+						Total:   resp.Cursor.TotalCount,
+					}
+				}
+			}
+
+			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+				t.Fatalf("\nDiff:\n%v", Difff(diff))
 			}
 		})
 	}
