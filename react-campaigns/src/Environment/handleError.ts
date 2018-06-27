@@ -8,4 +8,11 @@ export default (
 ): void => {
     dispatch({ type: actionType, message })
     setTimeout(() => dispatch({ type: 'DISMISS_FAILURE' }), 4000)
+
+    if (
+        message.includes('auth_context') ||
+        message.includes('Unauthenticated')
+    ) {
+        window.location.replace('/auth/sign-in')
+    }
 }
