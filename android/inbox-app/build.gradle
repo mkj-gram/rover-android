@@ -37,6 +37,7 @@ dependencies {
     implementation project(":rover-android-sdk:rover")
     implementation project(":rover-android-sdk:notifications")
     implementation project(":rover-android-sdk:experiences")
+    implementation project(":rover-android-sdk:debug")
     implementation project(":account")
 
     implementation "io.reactivex.rxjava2:rxjava:2.1.6"

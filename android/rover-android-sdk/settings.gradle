@@ -1,1 +1,1 @@
-include ':rover', ':location', ':experiences'
+include ':rover', ':location', ':experiences', ':debug'

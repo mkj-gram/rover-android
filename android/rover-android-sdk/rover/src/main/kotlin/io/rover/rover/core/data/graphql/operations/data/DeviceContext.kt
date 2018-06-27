@@ -39,7 +39,8 @@ internal fun DeviceContext.asJson(): JSONObject {
             DeviceContext::screenHeight,
             DeviceContext::timeZone,
             DeviceContext::isBluetoothEnabled,
-            DeviceContext::sdkVersion
+            DeviceContext::sdkVersion,
+            DeviceContext::isTestDevice
         )
 
         props.forEach { putProp(this@asJson, it) }
@@ -81,7 +82,8 @@ internal fun DeviceContext.Companion.decodeJson(json: JSONObject): DeviceContext
         sdkVersion = json.safeOptString("sdkVersion"),
         timeZone = json.safeOptString("timeZone"),
         isBluetoothEnabled = json.safeOptBoolean("isBluetoothEnabled"),
-        attributes = json.getJSONObject("attributes").toFlatAttributesHash()
+        attributes = json.getJSONObject("attributes").toFlatAttributesHash(),
+        isTestDevice = json.safeOptBoolean("isTestDevice")
     )
 }
 

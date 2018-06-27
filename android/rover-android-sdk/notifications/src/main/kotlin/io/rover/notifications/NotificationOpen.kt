@@ -34,8 +34,6 @@ open class NotificationOpen(
     }
 
     private fun intentForNotification(notification: Notification): Intent {
-
-
         return when(notification.tapBehavior) {
             is Notification.TapBehavior.OpenApp -> topLevelNavigation.openAppIntent()
             is Notification.TapBehavior.OpenUri -> router.route(

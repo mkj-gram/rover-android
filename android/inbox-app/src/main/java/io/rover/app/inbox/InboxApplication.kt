@@ -13,6 +13,7 @@ import io.rover.account.AccountAssembler
 import io.rover.account.AuthService
 import io.rover.app.inbox.BuildConfig
 import io.rover.app.inbox.R
+import io.rover.debug.DebugAssembler
 import io.rover.experiences.ExperiencesAssembler
 import io.rover.rover.Rover
 import io.rover.rover.core.CoreAssembler
@@ -84,7 +85,8 @@ class InboxApplication : Application() {
                     MainActivity::class.java
                 ),
                 roverBaseUrl
-            )
+            ),
+            DebugAssembler()
         )
 
         Rover.sharedInstance.eventQueue.trackEvent(

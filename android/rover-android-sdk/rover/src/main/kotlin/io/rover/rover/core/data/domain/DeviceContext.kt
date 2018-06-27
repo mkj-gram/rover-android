@@ -61,6 +61,8 @@ data class DeviceContext(
      */
     val isBluetoothEnabled: Boolean?,
 
+    val isTestDevice: Boolean?,
+
     /**
      * Device attributes.
      */
@@ -72,7 +74,7 @@ data class DeviceContext(
                 null, null, null, null, null, null,
                 null, null,null, null, null,null, null, null,
                 null, null, null, null, null, null,
-                null, null, null, null, null, false, hashMapOf()
+                null, null, null, null, null, null, false, hashMapOf()
             )
         }
     }

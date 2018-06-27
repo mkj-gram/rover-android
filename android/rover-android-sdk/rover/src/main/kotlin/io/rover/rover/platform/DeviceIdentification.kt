@@ -1,16 +1,27 @@
 package io.rover.rover.platform
 
+import android.content.Context
+import android.provider.Settings
 import io.rover.rover.core.logging.log
 import java.util.UUID
 
 interface DeviceIdentificationInterface {
+    /**
+     * A installation-specific, Rover generated UUID.
+     */
     val installationIdentifier: String
+
+    /**
+     * User-set name for the device, if available.
+     */
+    val deviceName: String?
 }
 
 /**
  * Responsible for maintaining an installation identifier.
  */
 class DeviceIdentification(
+    private val applicationContext: Context,
     localStorage: LocalStorage
 ) : DeviceIdentificationInterface {
     private val storageContextIdentifier = "io.rover.rover.device-identification"
@@ -29,4 +40,11 @@ class DeviceIdentification(
             log.v("Device Rover installation identifier: $this")
         }
     }
+
+    // On many manufacturers' Android devices, the set device name manifests as the Bluetooth name,
+    // but not as the device hostname.  So, we'll ignore the device hostname and use the Bluetooth
+    // name, if available.
+    override val deviceName: String? = Settings.Secure.getString(
+            applicationContext.contentResolver, "bluetooth_name"
+        )
 }

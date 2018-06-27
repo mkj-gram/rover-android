@@ -583,10 +583,10 @@ internal fun Block.TapBehavior.Companion.optDecodeJson(json: JSONObject?): Block
 
     return when(typeName) {
         "NoneBlockTapBehavior" -> Block.TapBehavior.None()
-        "OpenURLBehavior" -> Block.TapBehavior.OpenUri(
+        "OpenURLBlockTapBehavior" -> Block.TapBehavior.OpenUri(
             uri = json.safeGetUri("url")
         )
-        "GoToScreenBehavior" -> Block.TapBehavior.GoToScreen(
+        "GoToScreenBlockTapBehavior" -> Block.TapBehavior.GoToScreen(
             screenId = ID(json.getString("id"))
         )
         "PresentWebsiteBlockTapBehavior" -> Block.TapBehavior.PresentWebsite(
@@ -601,11 +601,11 @@ internal fun Block.TapBehavior.optEncodeJson(): JSONObject {
         put("__typename", when(this@optEncodeJson) {
             is Block.TapBehavior.GoToScreen -> {
                 putProp(this@optEncodeJson, Block.TapBehavior.GoToScreen::screenId) { it.toString() }
-                "GoToScreenBehavior"
+                "GoToScreenBlockTapBehavior"
             }
             is Block.TapBehavior.OpenUri -> {
                 putProp(this@optEncodeJson, Block.TapBehavior.OpenUri::uri, "url") { it.toString() }
-                "OpenURLBehavior"
+                "OpenURLBlockTapBehavior"
             }
             is Block.TapBehavior.PresentWebsite -> {
                 putProp(this@optEncodeJson, Block.TapBehavior.PresentWebsite::url) { it.toString() }

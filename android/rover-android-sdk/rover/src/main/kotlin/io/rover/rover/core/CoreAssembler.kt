@@ -33,7 +33,6 @@ import io.rover.rover.core.events.contextproviders.BluetoothContextProvider
 import io.rover.rover.core.events.contextproviders.DeviceAttributesContextProvider
 import io.rover.rover.core.events.contextproviders.DeviceContextProvider
 import io.rover.rover.core.events.contextproviders.DeviceIdentifierContextProvider
-import io.rover.rover.core.events.contextproviders.DeviceNameContextProvider
 import io.rover.rover.core.events.contextproviders.LocaleContextProvider
 import io.rover.rover.core.events.contextproviders.ReachabilityContextProvider
 import io.rover.rover.core.events.contextproviders.ScreenContextProvider
@@ -143,7 +142,10 @@ class CoreAssembler @JvmOverloads constructor(
         }
 
         container.register(Scope.Singleton, DeviceIdentificationInterface::class.java) { resolver ->
-            DeviceIdentification(resolver.resolveSingletonOrFail(LocalStorage::class.java))
+            DeviceIdentification(
+                application,
+                resolver.resolveSingletonOrFail(LocalStorage::class.java)
+            )
         }
 
         container.register(Scope.Singleton, AuthenticationContext::class.java) { _ ->
@@ -234,10 +236,6 @@ class CoreAssembler @JvmOverloads constructor(
 
         container.register(Scope.Singleton, ContextProvider::class.java, "application") { _ ->
             ApplicationContextProvider(application)
-        }
-
-        container.register(Scope.Singleton, ContextProvider::class.java, "deviceName") { _ ->
-            DeviceNameContextProvider(application)
         }
 
         container.register(Scope.Singleton, ContextProvider::class.java, "deviceIdentifier") { resolver ->
@@ -348,7 +346,6 @@ class CoreAssembler @JvmOverloads constructor(
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "timeZone"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "attributes"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "application"),
-            resolver.resolveSingletonOrFail(ContextProvider::class.java, "deviceName"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "deviceIdentifier"),
             resolver.resolveSingletonOrFail(ContextProvider::class.java, "sdkVersion")
         ).forEach { eventQueue.addContextProvider(it) }
