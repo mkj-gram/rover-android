@@ -32,7 +32,7 @@ declare module 'firebaseui' {
     interface ISignInOption {
         provider: string
         authMethod: string
-        clientId: string
+        clientId?: string
         scopes?: Array<string>
     }
 

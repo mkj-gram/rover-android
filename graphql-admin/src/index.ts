@@ -1,9 +1,13 @@
-import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
-import { json } from 'body-parser';
-import * as express from 'express';
-import { makeExecutableSchema } from 'graphql-tools';
-import { ContextMiddleware, HTTPLoggerMiddleware, OAuthMiddleware } from './middleware';
-import logger from './logger';
+import { graphiqlExpress, graphqlExpress } from 'apollo-server-express'
+import { json } from 'body-parser'
+import * as express from 'express'
+import { makeExecutableSchema } from 'graphql-tools'
+import {
+    ContextMiddleware,
+    HTTPLoggerMiddleware,
+    OAuthMiddleware
+} from './middleware'
+import logger from './logger'
 import typeDefs from './typedefs'
 import resolvers from './resolvers'
 
@@ -14,7 +18,12 @@ app.disable('x-powered-by')
 app.use(ContextMiddleware)
 app.use(HTTPLoggerMiddleware(logger))
 app.use(
-    OAuthMiddleware(process.env.AUTH_CLIENT_ID, process.env.AUTH_CLIENT_SECRET)
+    OAuthMiddleware(
+        process.env.PROJECT_ID,
+        process.env.CLIENT_EMAIL,
+        process.env.PRIVATE_KEY,
+        process.env.DATABASE_URL
+    )
 )
 
 const schema = makeExecutableSchema({ typeDefs, resolvers })

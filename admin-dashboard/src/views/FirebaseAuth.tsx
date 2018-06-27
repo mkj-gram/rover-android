@@ -9,7 +9,6 @@ const CONTAINER_ID = 'firebaseui_container'
 
 interface FirebaseAuthProps {
     ui: firebaseui.auth.AuthUI
-    oauthClientID: string
 }
 
 class FirebaseAuth extends React.Component<FirebaseAuthProps, {}> {
@@ -34,7 +33,6 @@ class FirebaseAuth extends React.Component<FirebaseAuthProps, {}> {
                     provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
                     // Required to enable this provider in One-Tap Sign-up.
                     authMethod: 'https://accounts.google.com',
-                    clientId: this.props.oauthClientID
                 }
             ]
         }

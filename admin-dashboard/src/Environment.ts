@@ -14,6 +14,9 @@ const uri =
     environments[process.env.NODE_ENV] || 'https://api.staging.rover.io/admin'
 
 function getToken() {
+    if (!firebase.apps.length) {
+        return ''
+    }
     firebase
         .auth()
         .currentUser.getIdToken()

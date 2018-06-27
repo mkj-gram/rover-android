@@ -5,7 +5,6 @@ import { authClient } from '../grpcClients'
 promisify(authClient)
 
 const listAccounts = async () => {
-    const Models = RoverApis.auth.v1.Models
     const request = new RoverApis.auth.v1.Models.ListAccountsRequest()
     const response = await authClient.listAccounts(request)
     // tslint:disable-next-line:no-any

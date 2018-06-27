@@ -10,8 +10,6 @@ import firebase, { ui } from '../Firebase'
 import { getIsUnauthorized, getUser } from '../reducers'
 import FirebaseAuth from './FirebaseAuth'
 
-const oauthClientID = process.env.AUTH_CLIENT_ID
-
 interface LoginStateProps {
     unauthorizedLogin: boolean
     user: User
@@ -109,7 +107,7 @@ class Login extends React.PureComponent<LoginPageProps, {}> {
                 ) : (
                     <div>
                         <h4>Sign in below using your rover.io account</h4>
-                        <FirebaseAuth ui={ui} oauthClientID={oauthClientID} />
+                        <FirebaseAuth ui={ui} />
                     </div>
                 )}
             </div>

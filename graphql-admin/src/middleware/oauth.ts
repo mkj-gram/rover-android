@@ -1,12 +1,22 @@
-import { OAuth2Client } from 'google-auth-library'
 import { Response, Request, NextFunction } from 'express'
-import { TokenPayload } from 'google-auth-library/build/src/auth/loginticket'
+import * as admin from 'firebase-admin'
 import * as httpContext from './http-context'
 
 export const OAuthMiddleware = function(
-    clientID: string,
-    clientSecret: string
+    projectId: string,
+    clientEmail: string,
+    privateKey: string,
+    databaseURL: string
 ) {
+    admin.initializeApp({
+        credential: admin.credential.cert({
+            projectId: projectId,
+            clientEmail: clientEmail,
+            privateKey: privateKey
+        }),
+        databaseURL: databaseURL
+    })
+
     return function(req: Request, res: Response, next: NextFunction) {
         const headers = req.headers
 
@@ -14,25 +24,20 @@ export const OAuthMiddleware = function(
             return res.status(401).send('Unauthorized request')
         }
         const idToken = headers.authorization.split(' ')[1]
-        const client = new OAuth2Client(clientID, clientSecret)
 
         async function verifyIdentity() {
-            const ticket = await client.verifyIdToken({
-                idToken: idToken,
-                audience: clientID
-            })
-            const payload = ticket.getPayload()
+            const decodedToken = await admin.auth().verifyIdToken(idToken)
 
-            if (payload === undefined) {
+            if (decodedToken === undefined) {
                 throw new Error('Auth error')
             }
-            const domain = payload.hd
-            const verified = payload.email_verified
-            if (domain !== 'rover.io' || !verified) {
-                httpContext.set('user', payload)
+            const email = decodedToken.email
+            const verified = decodedToken.email_verified
+            if (!email.endsWith('@rover.io') || !verified) {
+                httpContext.set('user', decodedToken)
                 throw new Error('User must be using a verified rover.io email')
             }
-            return payload
+            return decodedToken
         }
 
         verifyIdentity()

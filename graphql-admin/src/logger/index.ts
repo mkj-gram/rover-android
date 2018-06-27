@@ -12,7 +12,7 @@ function transactionData() {
     if (user) {
         data.user = {
             email: user.email,
-            googleId: user.sub
+            googleId: user.firebase.identities['google.com'][0]
         }
     }
     return data

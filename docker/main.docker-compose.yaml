@@ -279,9 +279,11 @@ services:
     working_dir: /rover/graphql-admin
     environment:
       AUTH_V1_SERVICE_HOST: auth-service
-      AUTH_CLIENT_ID: "1025209954364-pgmntrdfq5526cq2slgsa4ao82a3qtls.apps.googleusercontent.com"
-      AUTH_CLIENT_SECRET: "DPD50JrQqU5Xbsgdk2PkxSJh"
       NODE_ENV: development
+      PROJECT_ID: "rover-admin-staging"
+      CLIENT_EMAIL: "firebase-adminsdk-bj9zx@rover-admin-staging.iam.gserviceaccount.com"
+      PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDKbWw2/YSF0olg\nXCGCek/B43Pr9rXzz9qEgND7tooNAqBlO/g5ik2H0pKnAwdpkUqaCGnU0OnhEUm9\n4Jr05hDFHiMrZnpxamaENdC3jfpMmMacXr1T+DKyCKRygJWdgsRaen8TAwt2hgZn\nz4lnBxzp/uP5R4DFLZ0J0Z6ZLcagAfNNmJNqevHVdPxE68EBKVt3FbA6U33h8dgM\na6TFXz7ZWHHNwG+kp3pj49dZ2ErKGkSRPv4x8UUx1r+HEgKINLF7R/CUPDWR9BiS\nUBtN0iSPCGCoYMEUpfhiQDRHYY3Y/jMimIsRUArpu6mIL71MaK3Tgs4O/ZQUKaV7\n+BqKXyyZAgMBAAECggEAQ1biVGrCrqfqllkftqGMrcHGGt2QCuL+3OxjWREQ3KIe\njH7GJRIal4/XxGJQEXDJYfNhjW/QFdSj9NvmgIiWVJShe3sUSW1tXBbw71b2SIvc\nKkGj9u6OosYYOpUG8IaDXlv4sPDm289bCyaxnUny9u6ZlSARuMZjQtRuT6O4OxrC\nmLvPglsTck5Ji6gimB6mCBchoYZ0cCkkgfQ230pIuYXFbSLFxjvaY/Ouqx0JSvYL\nyjsRh/3qxpVyxgYxjYrgZFHtHOnKzZf7q9WKqjSpcOnzZsghAR58L2aXT3zN81MC\nmatPDJ1WDlEQJxFxQZ6U5yTMxdaJ4a6D1+G2pYwtrwKBgQD+e4WrIajmZBkjXy/6\n/j/rBsziqtNfxujDOC3zaVPcXAHEhVLtaI3QnZnKY/L/Dg+EOUR3Rw8kRmpdz4Qq\n17pzpzLNZzSgDFCtig52JUXdw4uEtQT5CHXeW+sENTGtP0eqj4Svdr+Ib31mBpt6\nQrOJzuxVp6T98YnKcYAxhxYlDwKBgQDLom+3Op9/Ehu35vPbkThPf6W0njfroULJ\ndz1BJ+UgyywrmhfcgnPrQ4OoML7pTHxufBmBi3FCI3wBq8znWdBvzSmg5xfxxt6R\nHt6fS8tmx7C7ppG+6L/t/g6brrpxdr0vt+WLKHi/QoHGxx2yKRpA4739dEbLVkq0\nuhj0pvsj1wKBgQDLplH79z3Q0b4EPoKJG7pO/OwtYIMzHFzdDTJInruLlt2bRQ5u\nCsOidNzDyGSHk9r691FBGs6VOvyYAh9EocsGDoFrOvI0Oma92cNk7MMSixA1rR9D\no2+f+HMEtQUCHafeaGfIewEf0AjMAvGdT4+Z8svSaAxzZD3ekiICgJZKJQKBgQCF\nsfxO/HpDX4w7TbLFca7a4x/UWhy044eJ5nOdF6hjw4EYj28jI7Mfv4/tGTP+0GzR\nzUChwP93QPzly/oX2uvyu2yda5xY7QyrkuzvAUBmFq1+RnpiMUXx51+H70wRurez\nYLWgi83bJLs32vswQbQu7leK1JC2Z81couJHnmo8uQKBgQCBGoIQySlrFwgwQlrT\nqYhHPYjlYWgWLWkiTb1o0JdGUV2G2gM9UkUJWcLt9iECn4mYSxGROGRw7qb8VWKy\nUvkvMJFZqrVe63HLcuouGCQDLQFon7AZh+PjAyVVb3Kttiyacl2fJKN0NpEzcVpC\nZi7Lbn9ZUFLmY6+OSR8GE0w1zQ==\n-----END PRIVATE KEY-----\n"
+      DATABASE_URL: "https://rover-admin-staging.firebaseio.com"
  
   admin-dashboard:
     image: node:7.10.1
@@ -293,7 +295,6 @@ services:
     command: bash -c "npm install && npm start"
     environment:
       NODE_ENV: development
-      AUTH_CLIENT_ID: "1025209954364-pgmntrdfq5526cq2slgsa4ao82a3qtls.apps.googleusercontent.com"
 
   geocoder-service:
     image: golang:1.10-alpine
