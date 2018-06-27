@@ -8,7 +8,6 @@ import io.rover.rover.core.container.InjectionContainer
 import io.rover.rover.core.data.http.AndroidHttpsUrlConnectionNetworkClient
 import io.rover.rover.core.events.EventQueueServiceInterface
 import io.rover.rover.core.logging.AndroidLogger
-import io.rover.rover.core.logging.EventQueueLogger
 import io.rover.rover.core.logging.GlobalStaticLogHolder
 import io.rover.rover.core.logging.LogBuffer
 import io.rover.rover.core.permissions.PermissionsNotifierInterface
@@ -33,12 +32,9 @@ class Rover(
         // global, which we "inject" using static scope
         GlobalStaticLogHolder.globalLogEmitter =
              LogBuffer(
-                EventQueueLogger(
-                    // uses the resolver to discover when the EventQueueService is ready and can be used
-                    // to submit the logs.
-                    this,
-                    AndroidLogger()
-                )
+                // uses the resolver to discover when the EventQueueService is ready and can be used
+                // to submit the logs.
+                AndroidLogger()
              )
 
         initializeContainer()
@@ -94,25 +90,5 @@ class Rover(
         fun installSaneGlobalHttpCache(applicationContext: Context) {
             AndroidHttpsUrlConnectionNetworkClient.installSaneGlobalHttpCache(applicationContext)
         }
-
-//        /**
-//         * If you wish to construct your own instance of [Rover], perhaps within your App's own
-//         * dependency injection system, then in lieu of calling [Rover.initialize] you may instead
-//         * instantiate your own [Rover] instance and register it here with
-//         * [registerCustomRoverInstance] so that it will become the globally shared
-//         * ([Rover.sharedInstance]) Rover instance.
-//         *
-//         * This is necessary because the Rover standalone Experience activity needs to be able to
-//         * discover its dependencies in the Rover SDK.
-//         *
-//         * If you're not sure if you need this method, then you probably don't.
-//         */
-//        @JvmStatic
-//        fun registerCustomRoverInstance(userProvidedRover: Rover) {
-//            if(sharedInstanceBackingField != null) {
-//                throw RuntimeException("Rover already initialized.  This is most likely a bug.")
-//            }
-//            sharedInstanceBackingField = userProvidedRover
-//        }
     }
 }

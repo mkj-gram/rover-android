@@ -2,7 +2,6 @@ package io.rover.experiences.ui
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
-import android.animation.TimeInterpolator
 import android.animation.TypeEvaluator
 import android.content.Context
 import android.os.Build
@@ -22,16 +21,16 @@ import android.view.Window
 import android.view.WindowManager
 import android.view.animation.LinearInterpolator
 import io.rover.experiences.R
-import io.rover.rover.core.logging.log
-import io.rover.rover.platform.whenNotNull
-import io.rover.rover.core.streams.androidLifecycleDispose
-import io.rover.rover.core.streams.subscribe
+import io.rover.experiences.ui.containers.StandaloneExperienceHostActivity
 import io.rover.experiences.ui.navigation.ExperienceNavigationView
 import io.rover.experiences.ui.toolbar.ViewExperienceToolbar
-import io.rover.experiences.ui.containers.StandaloneExperienceHostActivity
+import io.rover.rover.core.logging.log
+import io.rover.rover.core.streams.androidLifecycleDispose
+import io.rover.rover.core.streams.subscribe
 import io.rover.rover.core.ui.concerns.BindableView
 import io.rover.rover.core.ui.concerns.ViewModelBinding
 import io.rover.rover.core.ui.dpAsPx
+import io.rover.rover.platform.whenNotNull
 import org.reactivestreams.Publisher
 
 /**

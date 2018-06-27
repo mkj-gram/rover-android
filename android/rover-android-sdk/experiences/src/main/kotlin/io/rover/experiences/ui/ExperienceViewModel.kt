@@ -55,7 +55,7 @@ class ExperienceViewModel(
     override val actionBar: Publisher<ExperienceToolbarViewModelInterface>
     override val extraBrightBacklight: Publisher<Boolean>
     override val experienceNavigation: Publisher<ExperienceNavigationViewModelInterface>
-    override val events: Subject<ExperienceViewModelInterface.Event> = PublishSubject()
+    override val events: Publisher<ExperienceViewModelInterface.Event>
     override val loadingState: Publisher<Boolean>
 
     override fun pressBack() {
@@ -93,11 +93,12 @@ class ExperienceViewModel(
 
         val toolBarSubject = PublishSubject<ExperienceToolbarViewModelInterface>()
         val loadingSubject = PublishSubject<Boolean>()
+        val eventsSubject = PublishSubject<ExperienceViewModelInterface.Event>()
 
         actions.subscribe { action ->
             when(action!!) {
                 Action.BackPressedBeforeExperienceReady -> {
-                    events.onNext(ExperienceViewModelInterface.Event.NavigateTo(
+                    eventsSubject.onNext(ExperienceViewModelInterface.Event.NavigateTo(
                         ExperienceExternalNavigationEvent.Exit()
                     ))
                 }
@@ -144,7 +145,7 @@ class ExperienceViewModel(
            loadingSubject.onNext(false)
            when(networkResult) {
                is NetworkResult.Error -> {
-                   events.onNext(ExperienceViewModelInterface.Event.DisplayError(
+                   eventsSubject.onNext(ExperienceViewModelInterface.Event.DisplayError(
                        networkResult.throwable.message ?: "Unknown"
                    ))
                }
@@ -182,7 +183,7 @@ class ExperienceViewModel(
 
         // emit those navigation events to our view.
         navigateAwayEvents.subscribe { navigateAway ->
-            events.onNext(
+            eventsSubject.onNext(
                 ExperienceViewModelInterface.Event.NavigateTo(navigateAway)
             )
         }
@@ -198,9 +199,10 @@ class ExperienceViewModel(
         backlightEvents.subscribe { backlightSubject.onNext(it) }
         toolbarEvents.subscribe { toolBarSubject.onNext(it) }
 
-        actionBar = toolBarSubject.shareAndReplay(1)
-        extraBrightBacklight = backlightSubject.shareAndReplay(1)
-        loadingState = loadingSubject.shareAndReplay(1)
+        actionBar = toolBarSubject.shareAndReplay(1).observeOn(mainThreadScheduler)
+        extraBrightBacklight = backlightSubject.shareAndReplay(1).observeOn(mainThreadScheduler)
+        loadingState = loadingSubject.shareAndReplay(1).observeOn(mainThreadScheduler)
+        events = eventsSubject.shareAndReplay(0).observeOn(mainThreadScheduler)
     }
 
     protected fun trackEnterExperience(experience: Experience) {

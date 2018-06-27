@@ -15,6 +15,7 @@ import io.rover.app.inbox.BuildConfig
 import io.rover.app.inbox.R
 import io.rover.debug.DebugAssembler
 import io.rover.experiences.ExperiencesAssembler
+import io.rover.location.LocationAssembler
 import io.rover.rover.Rover
 import io.rover.rover.core.CoreAssembler
 import io.rover.rover.core.data.AuthenticationContext
@@ -86,6 +87,7 @@ class InboxApplication : Application() {
                 ),
                 roverBaseUrl
             ),
+            LocationAssembler(),
             DebugAssembler()
         )
 

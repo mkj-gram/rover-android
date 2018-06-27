@@ -14,6 +14,8 @@ import io.rover.rover.core.tracking.SessionTrackerInterface
 import io.rover.notifications.domain.Notification
 import io.rover.notifications.ui.concerns.NotificationCenterListViewModelInterface
 import io.rover.notifications.ui.concerns.NotificationsRepositoryInterface
+import io.rover.rover.core.streams.distinctUntilChanged
+import io.rover.rover.core.streams.subscribe
 import java.util.Date
 
 class NotificationCenterListViewModel(
@@ -95,11 +97,11 @@ class NotificationCenterListViewModel(
         ).shareHotAndReplay(0)
 
     override fun becameVisible() {
-        trackEnterNotificationCenter()
+        visibilityStateSubject.onNext(true)
     }
 
     override fun becameInvisible() {
-        trackLeaveNotificationCenter()
+        visibilityStateSubject.onNext(false)
     }
 
     protected fun trackEnterNotificationCenter() {
@@ -123,6 +125,18 @@ class NotificationCenterListViewModel(
         notifications.forEach { notification ->
             if(!stableIds.containsKey(notification.id)) {
                 stableIds[notification.id] = ++highestStableId
+            }
+        }
+    }
+
+    private val visibilityStateSubject = PublishSubject<Boolean>()
+
+    init {
+        visibilityStateSubject.distinctUntilChanged().subscribe { visible ->
+            if(visible) {
+                trackEnterNotificationCenter()
+            } else {
+                trackLeaveNotificationCenter()
             }
         }
     }

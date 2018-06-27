@@ -30,7 +30,9 @@ class AndroidHttpsUrlConnectionNetworkClient(
 
         // Using the Android HttpsUrlConnection HTTP client inherited from Java, which
         // has a synchronous API.
-        return Publishers.defer<HttpClientResponse> {
+
+
+        return Publishers.create<HttpClientResponse> { subscriber ->
             this@AndroidHttpsUrlConnectionNetworkClient.log.d("Starting request: $request")
             val connection = request.url
                 .openConnection() as HttpURLConnection
@@ -83,26 +85,24 @@ class AndroidHttpsUrlConnectionNetworkClient(
                     }
                 }
             } catch (e: IOException) {
-                return@defer(
-                    Publishers.just(
-                        HttpClientResponse.ConnectionFailure(
-                            e
-                        )
+                subscriber.onNext(
+                    HttpClientResponse.ConnectionFailure(
+                        e
                     )
                 )
+                return@create
             }
 
             // ensure the connection is up!
             val responseCode = try {
                 connection.responseCode
             } catch (e: IOException) {
-                return@defer(
-                    Publishers.just(
-                        HttpClientResponse.ConnectionFailure(
-                            e
-                        )
+                subscriber.onNext(
+                    HttpClientResponse.ConnectionFailure(
+                        e
                     )
                 )
+                return@create
             }
 
             this@AndroidHttpsUrlConnectionNetworkClient.log.d("$request : $responseCode")
@@ -153,7 +153,8 @@ class AndroidHttpsUrlConnectionNetworkClient(
             // completionHandler(result)
             this@AndroidHttpsUrlConnectionNetworkClient.log.v("Cache hit count currently is: ${HttpResponseCache.getInstalled().hitCount}")
 
-            Publishers.just(result)
+            subscriber.onNext(result)
+
         }.subscribeOn(ioScheduler)
     }
 

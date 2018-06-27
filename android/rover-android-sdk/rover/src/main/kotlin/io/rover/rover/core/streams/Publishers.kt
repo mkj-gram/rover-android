@@ -185,11 +185,36 @@ object Publishers {
     }
 
     /**
-     * When subscribed to, evaluate the given [builder] block that will yield an Observable
-     * that is then subscribed to.
+     * When subscribed to & requested, evaluate the given [builder] block that will yield a
+     * [Publisher] that is then subscribed to.
+     *
+     * Note that while [builder] method can block (provided you are subscribing your Publisher chain
+     * on a thread/scheduler that you do not mind blocking).
      */
     fun <T> defer(builder: () -> Publisher<T>): Publisher<T> {
         return Publisher { subscriber -> builder().subscribe(subscriber) }
+    }
+
+    /**
+     * When subscribed to & requested, the given [callable] is executed and given the subscriber.
+     * From there it can call onNext()/onError() and so forth as it likes.
+     */
+    fun <T> create(callable: (subscriber: Subscriber<in T>) -> Unit): Publisher<T> {
+        return Publisher { subscriber ->
+            subscriber.onSubscribe(
+                object : Subscription {
+                    override fun cancel() {
+                        // cancellation not supported.
+                    }
+
+                    override fun request(n: Long) {
+                        if(n != Long.MAX_VALUE) throw RuntimeException("Backpressure signalling not supported.  Request Long.MAX_VALUE.")
+
+                        callable(subscriber)
+                    }
+                }
+            )
+        }
     }
 
     fun <T, R> combineLatest(sources: List<Publisher<T>>, combiner: (List<T>) -> R): Publisher<R> {

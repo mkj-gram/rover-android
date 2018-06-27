@@ -10,7 +10,6 @@ import io.rover.rover.core.container.Assembler
 import io.rover.rover.core.container.Container
 import io.rover.rover.core.container.Resolver
 import io.rover.rover.core.container.Scope
-import io.rover.rover.core.context.ModulesTrackerInterface
 import io.rover.rover.core.data.state.StateManagerServiceInterface
 import io.rover.rover.core.events.EventQueueServiceInterface
 import io.rover.rover.core.permissions.PermissionsNotifierInterface
@@ -159,11 +158,6 @@ class LocationAssembler(
     }
 
     override fun afterAssembly(resolver: Resolver) {
-        resolver.resolveSingletonOrFail(ModulesTrackerInterface::class.java).version(
-            "experiences",
-            BuildConfig.VERSION_NAME
-        )
-
         if(automaticGeofenceMonitoring) {
             // register our GoogleGeofenceService as an observer of the Rover regions (in this case,
             // for geofences), if the developer wants the automatic Google-powered solution.

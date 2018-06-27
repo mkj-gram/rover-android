@@ -968,7 +968,33 @@ fun <T> Publisher<T>.subscribeOn(executor: Executor): Publisher<T> {
     return Publisher { subscriber ->
         executor.execute {
             // TODO: should we run unsubsriptions on the executor as well?
-            this@subscribeOn.subscribe(subscriber)
+
+            // subscriber is the downstream/client subscriber.  it's waiting for a subscription.
+            // however, rather than subscribing it right through to the parent publisher, we need to
+            // intercede to wrap the subscription.
+
+            this@subscribeOn.subscribe(
+                object : Subscriber<T> by subscriber as Subscriber<T> {
+                    override fun onSubscribe(subscription: Subscription) {
+                        subscriber.onSubscribe(
+                            object : Subscription {
+                                override fun cancel() {
+                                    // pass through to parent cancellation.
+                                    executor.execute {
+                                        subscription.cancel()
+                                    }
+                                }
+
+                                override fun request(n: Long) {
+                                    executor.execute {
+                                        subscription.request(n)
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            )
         }
     }
 }
@@ -981,7 +1007,32 @@ fun <T> Publisher<T>.subscribeOn(scheduler: Scheduler): Publisher<T> {
     return Publisher { subscriber ->
         scheduler.execute {
             // TODO: should we run unsubsriptions on the executor as well?
-            this@subscribeOn.subscribe(subscriber)
+
+            // subscriber is the downstream/client subscriber.  it's waiting for a subscription.
+            // however, rather than subscribing it right through to the parent publisher, we need to
+            // intercede to wrap the subscription.
+
+            this@subscribeOn.subscribe(
+                object : Subscriber<T> by subscriber as Subscriber<T> {
+                    override fun onSubscribe(subscription: Subscription) {
+                        subscriber.onSubscribe(
+                            object : Subscription {
+                                override fun cancel() {
+                                    scheduler.execute {
+                                        subscription.cancel()
+                                    }
+                                }
+
+                                override fun request(n: Long) {
+                                    scheduler.execute {
+                                        subscription.request(n)
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            )
         }
     }
 }
