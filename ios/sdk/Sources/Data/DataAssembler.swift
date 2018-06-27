@@ -136,9 +136,11 @@ public struct DataAssembler: Assembler {
         // MARK: TokenManager
         
         container.register(TokenManager.self) { resolver in
-            let eventQueue = resolver.resolve(EventQueue.self)
-            let logger = resolver.resolve(Logger.self)!
-            return TokenManagerService(eventQueue: eventQueue, logger: logger, userDefaults: UserDefaults.standard)
+            return TokenManagerService(
+                eventQueue: resolver.resolve(EventQueue.self)!,
+                logger: resolver.resolve(Logger.self)!,
+                userDefaults: UserDefaults.standard
+            )
         }
     }
     

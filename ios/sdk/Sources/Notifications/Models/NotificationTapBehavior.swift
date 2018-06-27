@@ -52,9 +52,9 @@ extension NotificationTapBehavior: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
         case .openApp:
-            try container.encode("OpenAppNotificationTapTapBehavior", forKey: .typeName)
+            try container.encode("OpenAppNotificationTapBehavior", forKey: .typeName)
         case .openURL(let url):
-            try container.encode("OpenURLNotificationTapTapBehavior", forKey: .typeName)
+            try container.encode("OpenURLNotificationTapBehavior", forKey: .typeName)
             var container = encoder.container(keyedBy: OpenURLKeys.self)
             try container.encode(url, forKey: .url)
         case .presentWebsite(let url):

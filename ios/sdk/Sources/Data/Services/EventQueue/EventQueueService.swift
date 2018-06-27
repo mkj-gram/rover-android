@@ -65,6 +65,10 @@ class EventQueueService: EventQueue {
             self.startTimer()
         }
         
+        if (UIApplication.shared.applicationState == .active) {
+            startTimer()
+        }
+        
         NotificationCenter.default.addObserver(forName: .UIApplicationWillResignActive, object: nil, queue: nil) { _ in
             self.stopTimer()
         }

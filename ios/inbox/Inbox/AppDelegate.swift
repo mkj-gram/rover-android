@@ -14,10 +14,12 @@ import UserNotifications
 
 @UIApplicationMain class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
-
+    var pendingToken: Data?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         application.registerForRemoteNotifications()
+        application.setMinimumBackgroundFetchInterval(UIApplicationBackgroundFetchIntervalMinimum)
         configureAppearance()
         return true
     }
@@ -25,6 +27,8 @@ import UserNotifications
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         if let tokenManager = Rover.shared?.resolve(TokenManager.self) {
             tokenManager.setToken(deviceToken)
+        } else {
+            pendingToken = deviceToken
         }
     }
     
@@ -36,6 +40,14 @@ import UserNotifications
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
         let router = Rover.shared!.resolve(Router.self)!
         return router.handle(userActivity)
+    }
+    
+    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        Rover.shared?.resolve(StateFetcher.self)?.fetchState(fetchCompletionHandler: completionHandler)
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        Rover.shared?.resolve(StateFetcher.self)?.fetchState(fetchCompletionHandler: completionHandler)
     }
     
     func configureAppearance() {

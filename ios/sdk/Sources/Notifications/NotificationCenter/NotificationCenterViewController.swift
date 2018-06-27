@@ -23,6 +23,7 @@ open class NotificationCenterViewController: UIViewController {
     
     private var cache: [Notification]?
     private var notificationsObservation: NSObjectProtocol?
+    private var applicationDidBecomeActiveToken: NSObjectProtocol?
     
     public var notifications: [Notification] {
         if let cache = cache {
@@ -76,6 +77,12 @@ open class NotificationCenterViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        if let applicationDidBecomeActiveToken = applicationDidBecomeActiveToken {
+            NotificationCenter.default.removeObserver(applicationDidBecomeActiveToken)
+        }
+    }
+    
     override open func viewDidLoad() {
         super.viewDidLoad()
         
@@ -92,6 +99,15 @@ open class NotificationCenterViewController: UIViewController {
         tableView.dataSource = self
         
         registerReusableViews()
+        
+        applicationDidBecomeActiveToken = NotificationCenter.default.addObserver(forName: .UIApplicationDidBecomeActive, object: nil, queue: OperationQueue.main) { [weak self] _ in
+            self?.resetApplicationIconBadgeNumber()
+        }
+    }
+    
+    /// Reset the application icon badge number to 0 any time the notification center is viewed, regardless of the number of unread messages
+    func resetApplicationIconBadgeNumber() {
+        UIApplication.shared.applicationIconBadgeNumber = 0
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -111,8 +127,7 @@ open class NotificationCenterViewController: UIViewController {
             return EventInfo(name: "Notification Center Viewed", namespace: "rover", attributes: attributes)
         }
         
-        // Clear badge number any time the notification center is viewed, regardless of the number of unread messages
-        UIApplication.shared.applicationIconBadgeNumber = 0
+        resetApplicationIconBadgeNumber()
     }
     
     override open func viewWillDisappear(_ animated: Bool) {

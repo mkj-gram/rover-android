@@ -118,7 +118,7 @@ class RootViewController: UIViewController {
         }
         
         Rover.initialize(assemblers: [
-            FoundationAssembler(loggerThreshold: .debug),
+            FoundationAssembler(),
             DataAssembler(accountToken: accountToken),
             UIAssembler(associatedDomains: ["inbox.rover.io"], urlSchemes: ["rv-inbox"]),
             ExperiencesAssembler(),
@@ -127,5 +127,10 @@ class RootViewController: UIViewController {
             BluetoothAssembler(),
             DebugAssembler()
         ])
+        
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate, let pendingToken = appDelegate.pendingToken {
+            Rover.shared!.resolve(TokenManager.self)!.setToken(pendingToken)
+            appDelegate.pendingToken = nil
+        }
     }
 }

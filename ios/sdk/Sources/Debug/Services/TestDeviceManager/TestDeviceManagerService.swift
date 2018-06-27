@@ -38,6 +38,8 @@ class TestDeviceManagerService: TestDeviceManager {
                 let event = EventInfo(name: "Disabled Testing", namespace: "rover")
                 eventQueue.addEvent(event)
             }
+            
+            eventQueue.flush()
         }
     }
     
