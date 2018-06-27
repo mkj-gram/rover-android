@@ -39,6 +39,7 @@ export interface Props {
     campaigns: StringMap<Campaign>
     media: Media
     pushToOverview: (campaignId: string) => void
+    pushToSettings: (campaignId: string) => void
     style?: React.CSSProperties
     campaignType: string
     campaignStatus: QueryParams['campaignStatus']
@@ -142,7 +143,8 @@ const renderCampaign = (
     pushToOverview: (campaignId: string) => void,
     getFormatDate: (campaign: Campaign, dateField: string) => Date,
     getDisplayTime: (campaign: Campaign, timeField: string) => string,
-    getTotalProgress: (campaignId: string) => number
+    getTotalProgress: (campaignId: string) => number,
+    pushToSettings: (campaignId: string) => void
 ) => {
     const { campaignId, name, campaignStatus, campaignType } = campaign
     return (
@@ -175,7 +177,7 @@ const renderCampaign = (
                 media === 'Desktop' &&
                 renderStat(0, 'Opened')}
             {media === 'Desktop' ? (
-                renderListButtons(campaign, pushToOverview)
+                renderListButtons(campaign, pushToOverview, pushToSettings)
             ) : (
                 <ChevronRightIcon fill={titanium} />
             )}
@@ -451,7 +453,8 @@ const renderCampaignProgressState = (
 
 const renderListButtons = (
     campaign: Campaign,
-    pushToOverview: (campaignId: string) => void
+    pushToOverview: (campaignId: string) => void,
+    pushToSettings: (campaignId: string) => void
 ) => {
     const { campaignId, campaignStatus } = campaign
 
@@ -476,6 +479,10 @@ const renderListButtons = (
                       viewBox="0 0 24 24"
                       style={{
                           marginRight: 8
+                      }}
+                      onClick={e => {
+                          e.stopPropagation()
+                          pushToSettings(campaignId)
                       }}
                   />
               ))
@@ -551,6 +558,25 @@ const renderStat = (value: number, description: string) => (
     </div>
 )
 
+const handleRowClick = (
+    campaign: Campaign,
+    pushToOverview: (campaignId: string) => void,
+    pushToSettings: (campaignId: string) => void
+) => {
+    const { campaignId, campaignStatus } = campaign
+    if (isScheduledCampaign(campaign)) {
+        if (campaignStatus === 'PUBLISHED') {
+            pushToSettings(campaignId)
+            return
+        }
+        pushToOverview(campaignId)
+    }
+
+    if (isAutomatedNotificationCampaign(campaign)) {
+        pushToOverview(campaignId)
+    }
+}
+
 const CampaignsList: React.SFC<Props & CampaignsListProps> = ({
     campaigns,
     media,
@@ -560,7 +586,8 @@ const CampaignsList: React.SFC<Props & CampaignsListProps> = ({
     campaignStatus,
     getFormatDate,
     getDisplayTime,
-    getTotalProgress
+    getTotalProgress,
+    pushToSettings
 }) => {
     const baseStyle: React.CSSProperties = {
         width: '100%',
@@ -613,7 +640,13 @@ const CampaignsList: React.SFC<Props & CampaignsListProps> = ({
                             flex: '0 0 auto',
                             borderBottom: `1px solid ${titanium}`
                         }}
-                        onClick={() => pushToOverview(campaignId)}
+                        onClick={() =>
+                            handleRowClick(
+                                campaigns[campaignId],
+                                pushToOverview,
+                                pushToSettings
+                            )
+                        }
                     >
                         {renderCampaign(
                             campaigns[campaignId],
@@ -621,7 +654,8 @@ const CampaignsList: React.SFC<Props & CampaignsListProps> = ({
                             pushToOverview,
                             getFormatDate,
                             getDisplayTime,
-                            getTotalProgress
+                            getTotalProgress,
+                            pushToSettings
                         )}
                     </div>
                 ))}

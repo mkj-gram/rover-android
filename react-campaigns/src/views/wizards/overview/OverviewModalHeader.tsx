@@ -155,10 +155,10 @@ class OverviewModalHeader extends React.Component<
         const { location, history, campaignId } = this.props
         const campaignIdRegEx = new RegExp(`[\\&-]?campaignId=${campaignId}`)
         const search = location.search.replace(campaignIdRegEx, '')
-        const pathname = location.pathname.replace('wizard/', '')
+
         this.props.handleCloseOverviewModalDisplay(
             history,
-            `${pathname}${search}`
+            `/campaigns/${search}`
         )
     }
 
@@ -308,9 +308,8 @@ const mapDispatchToProps = (
                     )
 
                     const search = location.search.replace(campaignIdRegEx, '')
-                    const pathname = location.pathname.replace('wizard/', '')
 
-                    history.push(`${pathname}${search}`)
+                    history.push(`/campaigns/${search}`)
                 }
             })
         },

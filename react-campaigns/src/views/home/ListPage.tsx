@@ -28,6 +28,7 @@ import OverviewContainer from '../wizards/overview/OverviewContainer'
 import ResponsiveContainer from '../utils/ResponsiveContainer'
 import ToolBar from './ToolBar'
 import { getCampaign } from '../../reducers/campaigns'
+import SettingsContainer from '../settings/SettingsContainer'
 
 export interface RouterProps {
     history: H.History
@@ -62,6 +63,7 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
         super(props)
         this.createNewCampaign = this.createNewCampaign.bind(this)
         this.pushToOverview = this.pushToOverview.bind(this)
+        this.pushToSettings = this.pushToSettings.bind(this)
     }
 
     componentWillMount() {
@@ -171,6 +173,20 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
         history.replace(`/campaigns/wizard/?${newQuery}`)
         this.props.handleOpenOverviewModalDisplay()
     }
+
+    pushToSettings(campaignId: string) {
+        const { history } = this.props
+        const params = this.getQueryParams()
+
+        const newQuery = stringify({
+            ...params,
+            campaignId
+        })
+
+        history.replace(`/campaigns/settings?${newQuery}`)
+        this.props.handleOpenOverviewModalDisplay()
+    }
+
     render() {
         const { Fragment } = React
         const { campaigns, device, history, location } = this.props
@@ -185,6 +201,9 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
             location.pathname === '/campaigns/wizard/' &&
             Object.keys(campaigns).includes(campaignId)
 
+        const shouldShowSettings =
+            location.pathname === '/campaigns/settings' &&
+            Object.keys(campaigns).includes(campaignId)
         return (
             <Route
                 path={location.pathname}
@@ -193,7 +212,9 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
                         {shouldShowWizard && (
                             <OverviewContainer device={device} />
                         )}
-
+                        {shouldShowSettings && (
+                            <SettingsContainer device={device} />
+                        )}
                         <div
                             style={{
                                 width: '100vw',
@@ -230,6 +251,7 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
                                 }}
                                 campaignType={campaignType}
                                 campaignStatus={campaignStatus}
+                                pushToSettings={this.pushToSettings}
                             />
                             <ToolBar
                                 currentPage={parseInt(pageNumber, 10)}
