@@ -159,24 +159,14 @@ func (s *Server) Duplicate(ctx context.Context, req *campaignspb.DuplicateReques
 		return nil, status.Errorf(ErrorToStatus(err), "validate: %v", err)
 	}
 
-	dup, err := s.DB.CampaignsStore().OneById(ctx, acctId, req.CampaignId)
-	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(err), "db.OneById: %v", err)
-	}
-
-	if req.Name != "" {
-		dup.Name = req.Name
-	} else {
-		dup.Name = dup.Name + " Copy"
-	}
-
-	campaign, err := s.DB.CampaignsStore().Insert(ctx, *dup)
+	var name = req.Name
+	dup, err := s.DB.CampaignsStore().Duplicate(ctx, acctId, req.CampaignId, name)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "db.Duplicate: %v", err)
 	}
 
 	var proto campaignspb.Campaign
-	if err := CampaignToProto(campaign, &proto); err != nil {
+	if err := CampaignToProto(dup, &proto); err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "toProto: %v", err)
 	}
 

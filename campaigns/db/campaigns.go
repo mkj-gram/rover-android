@@ -305,37 +305,160 @@ func (db *campaignsStore) Rename(ctx context.Context, accountId int32, campaignI
 	return nil
 }
 
-func (db *campaignsStore) Insert(ctx context.Context, c campaigns.Campaign) (*campaigns.Campaign, error) {
+func (db *campaignsStore) Duplicate(ctx context.Context, acctId, campaignId int32, name string) (*campaigns.Campaign, error) {
 	var (
 		now = TimeNow()
 
-		// TODO: fromCampaign
-
 		args = map[string]interface{}{
-			"account_id":    c.AccountId,
-			"name":          c.Name,
-			"campaign_type": c.CampaignType,
-			"created_at":    now,
-			"updated_at":    now,
+			"account_id":  acctId,
+			"campaign_id": campaignId,
+			"name":        name,
+			"created_at":  now,
+			"updated_at":  now,
 		}
 
 		q = `
 		INSERT INTO campaigns(
-			account_id,
-			name,
-			campaign_type,
-			created_at,
-			updated_at
+			account_id
+
+			,created_at
+			,updated_at
+
+			,name
+
+			,campaign_type
+			--,campaign_status
+
+			,segment_condition
+			,segment_ids
+
+			,ui_state
+
+			,experience_id
+
+			,notification_body
+			,notification_title
+			,notification_attachment_url
+			,notification_attachment_type
+			,notification_tap_behavior_type
+			,notification_tap_behavior_url
+			,notification_tap_behavior_presentation_type
+			,notification_ios_content_available
+			,notification_ios_mutable_content
+			,notification_ios_sound
+			,notification_ios_category_identifier
+			,notification_ios_thread_identifier
+			,notification_android_channel_id
+			,notification_android_sound
+			,notification_android_tag
+			,notification_expiration
+			,notification_attributes
+
+
+			,notification_alert_option_push_notification
+			,notification_alert_option_notification_center
+			,notification_alert_option_badge_number
+
+
+			-- ,scheduled_type
+			-- ,scheduled_time
+			-- ,scheduled_date
+			-- ,scheduled_use_local_device_time
+			-- ,scheduled_delivery_status
+
+			,automated_monday
+			,automated_tuesday
+			,automated_wednesday
+			,automated_thursday
+			,automated_friday
+			,automated_saturday
+			,automated_sunday
+
+			,automated_start_date
+			,automated_end_date
+			,automated_start_time
+			,automated_end_time
+			,automated_time_zone
+			,automated_use_local_device_time
+
+			,automated_event_name
+			,automated_event_predicates
+
+			,automated_frequency_single_use
+			,automated_frequency_limits
 		)
-		VALUES(
-			:account_id,
-			:name,
-			:campaign_type,
-			:created_at,
-			:updated_at
-		)
+		SELECT
+			account_id
+
+			,:created_at
+			,:updated_at
+
+			,(case :name when '' then concat(name, ' Copy') else :name end)
+
+			,campaign_type
+			--,campaign_status
+
+			,segment_condition
+			,segment_ids
+
+			,ui_state
+
+			,experience_id
+
+			,notification_body
+			,notification_title
+			,notification_attachment_url
+			,notification_attachment_type
+			,notification_tap_behavior_type
+			,notification_tap_behavior_url
+			,notification_tap_behavior_presentation_type
+			,notification_ios_content_available
+			,notification_ios_mutable_content
+			,notification_ios_sound
+			,notification_ios_category_identifier
+			,notification_ios_thread_identifier
+			,notification_android_channel_id
+			,notification_android_sound
+			,notification_android_tag
+			,notification_expiration
+			,notification_attributes
+
+			,notification_alert_option_push_notification
+			,notification_alert_option_notification_center
+			,notification_alert_option_badge_number
+
+
+			-- ,scheduled_type
+			-- ,scheduled_time
+			-- ,scheduled_date
+			-- ,scheduled_use_local_device_time
+			-- ,scheduled_delivery_status
+
+			,automated_monday
+			,automated_tuesday
+			,automated_wednesday
+			,automated_thursday
+			,automated_friday
+			,automated_saturday
+			,automated_sunday
+
+			,automated_start_date
+			,automated_end_date
+			,automated_start_time
+			,automated_end_time
+			,automated_time_zone
+			,automated_use_local_device_time
+
+			,automated_event_name
+			,automated_event_predicates
+
+			,automated_frequency_single_use
+			,automated_frequency_limits
+
+		FROM campaigns
+		WHERE id = :campaign_id and account_id = :account_id
 		RETURNING *
-	`
+`
 	)
 
 	var rows, err = db.db.NamedQueryContext(ctx, q, args)
@@ -351,6 +474,10 @@ func (db *campaignsStore) Insert(ctx context.Context, c campaigns.Campaign) (*ca
 	var inserted campaign
 	if err := rows.StructScan(&inserted); err != nil {
 		return nil, wrapError(err, "rows.StructScan")
+	}
+
+	if err := inserted.fromDB(); err != nil {
+		return nil, wrapError(err, "fromDb")
 	}
 
 	return &inserted.Campaign, nil

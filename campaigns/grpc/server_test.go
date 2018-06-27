@@ -1045,7 +1045,7 @@ func test_Duplicate(t *testing.T) {
 				Name:        "new name",
 			},
 
-			expErr: status.Errorf(codes.NotFound, "db.OneById: db.Get: sql: no rows in result set"),
+			expErr: status.Errorf(codes.NotFound, "db.Duplicate: rows.Next: sql: no rows in result set"),
 		},
 
 		{
@@ -1090,8 +1090,8 @@ func test_Duplicate(t *testing.T) {
 		{
 			name: "duplicates scheduled campaign",
 			req: &campaignspb.DuplicateRequest{
-				AuthContext: &auth.AuthContext{AccountId: 1},
-				CampaignId:  10001,
+				AuthContext: &auth.AuthContext{AccountId: 2},
+				CampaignId:  1000,
 				Name:        "a duplicated scheduled campaign",
 			},
 
@@ -1102,14 +1102,111 @@ func test_Duplicate(t *testing.T) {
 							CreatedAt: createdAt,
 							UpdatedAt: updatedAt,
 
-							CampaignId:     10003,
-							Name:           "a duplicated scheduled campaign",
+							CampaignId:   10003,
+							Name:         "a duplicated scheduled campaign",
+							ExperienceId: "123455",
+
 							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
 
+							SegmentIds:       []string{"1", "2", "3"},
 							SegmentCondition: campaignspb.SegmentCondition_ALL,
 
-							NotificationExpiration:                  -1,
-							NotificationAlertOptionPushNotification: true,
+							UiState: `{"progres_percentage": 90}`,
+
+							NotificationBody:                        `notification body`,
+							NotificationTitle:                       `notification title`,
+							NotificationAttachmentUrl:               `http://example.com/id.png`,
+							NotificationAttachmentType:              campaignspb.NotificationAttachmentType_IMAGE,
+							NotificationTapBehaviorType:             campaignspb.NotificationTapBehaviorType_OPEN_APP,
+							NotificationTapBehaviorPresentationType: campaignspb.NotificationTapPresentationType_IN_APP,
+							NotificationTapBehaviorUrl:              `http://rover.io/homepage`,
+
+							NotificationIosContentAvailable:   true,
+							NotificationIosMutableContent:     true,
+							NotificationIosSound:              "none",
+							NotificationIosCategoryIdentifier: "advertizing",
+							NotificationIosThreadIdentifier:   "12345",
+							NotificationAndroidChannelId:      "12345",
+							NotificationAndroidSound:          "none",
+							NotificationAndroidTag:            "a tag",
+
+							NotificationExpiration: 3600,
+
+							NotificationAttributes: map[string]string{"c": "d", "a": "b"},
+
+							NotificationAlertOptionPushNotification:   true,
+							NotificationAlertOptionNotificationCenter: true,
+							NotificationAlertOptionBadgeNumber:        true,
+
+							// clears scheduled attrs
+							ScheduledType:               campaignspb.ScheduledType_NOW,
+							ScheduledDate:               nil,
+							ScheduledTime:               nil,
+							ScheduledTimeZone:           "",
+							ScheduledUseLocalDeviceTime: false,
+						},
+					},
+				},
+			},
+		},
+
+		{
+			name: "duplicates scheduled campaign with optional name",
+			req: &campaignspb.DuplicateRequest{
+				AuthContext: &auth.AuthContext{AccountId: 2},
+				CampaignId:  1000,
+				Name:        "",
+			},
+
+			exp: &campaignspb.DuplicateResponse{
+				Campaign: &campaignspb.Campaign{
+					&campaignspb.Campaign_ScheduledNotificationCampaign{
+						&campaignspb.ScheduledNotificationCampaign{
+							CreatedAt: createdAt,
+							UpdatedAt: updatedAt,
+
+							CampaignId:   10004,
+							Name:         "c10 Copy",
+							ExperienceId: "123455",
+
+							CampaignStatus: campaignspb.CampaignStatus_DRAFT,
+
+							SegmentIds:       []string{"1", "2", "3"},
+							SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+							UiState: `{"progres_percentage": 90}`,
+
+							NotificationBody:                        `notification body`,
+							NotificationTitle:                       `notification title`,
+							NotificationAttachmentUrl:               `http://example.com/id.png`,
+							NotificationAttachmentType:              campaignspb.NotificationAttachmentType_IMAGE,
+							NotificationTapBehaviorType:             campaignspb.NotificationTapBehaviorType_OPEN_APP,
+							NotificationTapBehaviorPresentationType: campaignspb.NotificationTapPresentationType_IN_APP,
+							NotificationTapBehaviorUrl:              `http://rover.io/homepage`,
+
+							NotificationIosContentAvailable:   true,
+							NotificationIosMutableContent:     true,
+							NotificationIosSound:              "none",
+							NotificationIosCategoryIdentifier: "advertizing",
+							NotificationIosThreadIdentifier:   "12345",
+							NotificationAndroidChannelId:      "12345",
+							NotificationAndroidSound:          "none",
+							NotificationAndroidTag:            "a tag",
+
+							NotificationExpiration: 3600,
+
+							NotificationAttributes: map[string]string{"c": "d", "a": "b"},
+
+							NotificationAlertOptionPushNotification:   true,
+							NotificationAlertOptionNotificationCenter: true,
+							NotificationAlertOptionBadgeNumber:        true,
+
+							// clears scheduled attrs
+							ScheduledType:               campaignspb.ScheduledType_NOW,
+							ScheduledDate:               nil,
+							ScheduledTime:               nil,
+							ScheduledTimeZone:           "",
+							ScheduledUseLocalDeviceTime: false,
 						},
 					},
 				},
