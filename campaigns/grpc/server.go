@@ -68,6 +68,10 @@ func (s *Server) Get(ctx context.Context, req *campaignspb.GetRequest) (*campaig
 		return nil, status.Errorf(ErrorToStatus(err), "db.OneById: %v", err)
 	}
 
+	if err := s.setScheduledDeliveryStatus(ctx, campaign); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "setScheduledDeliveryStatus: %v", err)
+	}
+
 	var proto campaignspb.Campaign
 	if err := CampaignToProto(campaign, &proto); err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "toProto: %v", err)
@@ -76,6 +80,39 @@ func (s *Server) Get(ctx context.Context, req *campaignspb.GetRequest) (*campaig
 	return &campaignspb.GetResponse{
 		Campaign: &proto,
 	}, nil
+}
+
+func (s *Server) setScheduledDeliveryStatus(ctx context.Context, campaigns ...*campaigns.Campaign) error {
+	var scheduledCampaignIds []int32
+	for i := range campaigns {
+		if !isScheduledType(campaigns[i]) {
+			continue
+		}
+		scheduledCampaignIds = append(scheduledCampaignIds, campaigns[i].CampaignId)
+	}
+
+	if len(scheduledCampaignIds) > 0 {
+		csx, err := s.DB.ScheduledTasksStore().ListDeliveryStatuses(ctx, scheduledCampaignIds)
+		if err != nil {
+			return errors.Wrap(err, "db.ListDeliveryStatuses")
+		}
+
+		var deliveryStatusByCampaignId = DeliveryStatusByCampaignId(csx)
+		for i := range campaigns {
+			if !isScheduledType(campaigns[i]) {
+				continue
+			}
+			if s, ok := deliveryStatusByCampaignId[campaigns[i].CampaignId]; ok {
+				campaigns[i].ScheduledDeliveryStatus = s.String()
+			}
+		}
+	}
+
+	return nil
+}
+
+func isScheduledType(c *campaigns.Campaign) bool {
+	return campaignspb.CampaignType_Enum_FromString(c.CampaignType) == campaignspb.CampaignType_SCHEDULED_NOTIFICATION
 }
 
 func (s *Server) List(ctx context.Context, req *campaignspb.ListRequest) (*campaignspb.ListResponse, error) {
@@ -96,11 +133,6 @@ func (s *Server) List(ctx context.Context, req *campaignspb.ListRequest) (*campa
 			Keyword:        req.Keyword,
 			PageSize:       req.PageSize,
 			Page:           req.Page,
-		}
-
-		isScheduledType = func(c *campaigns.Campaign) bool {
-			return campaignspb.CampaignType_Enum_FromString(c.CampaignType) ==
-				campaignspb.CampaignType_SCHEDULED_NOTIFICATION
 		}
 	)
 
@@ -537,6 +569,10 @@ func (s *Server) UpdateScheduledDeliverySettings(ctx context.Context, req *campa
 
 	if err := tx.Commit(); err != nil {
 		return nil, status.Errorf(codes.Canceled, "tx.Commit: %v", err)
+	}
+
+	if err := s.setScheduledDeliveryStatus(ctx, campaign); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "setScheduledDeliveryStatus: %v", err)
 	}
 
 	var proto campaignspb.Campaign
