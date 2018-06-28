@@ -153,8 +153,8 @@ func (s *Server) List(ctx context.Context, req *campaignspb.ListRequest) (*campa
 		return nil, status.Errorf(ErrorToStatus(err), "db.List: %v", err)
 	}
 
-	if err := s.setDeliveryStatus(ctx, list.Campaigns); err != nil {
-		return nil, status.Errorf(ErrorToStatus(err), "setDeliveryStatus: %v", err)
+	if err := s.setScheduledDeliveryStatus(ctx, list.Campaigns...); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "setScheduledDeliveryStatus: %v", err)
 	}
 
 	var protos []*campaignspb.Campaign
@@ -185,39 +185,6 @@ func (s *Server) List(ctx context.Context, req *campaignspb.ListRequest) (*campa
 		Campaigns: protos,
 		Cursor:    cursor,
 	}, nil
-}
-
-func (s *Server) setDeliveryStatus(ctx context.Context, cx []*campaigns.Campaign) error {
-	var (
-
-		scheduledCampaignIds []int32
-	)
-
-	for i := range cx {
-		if !isScheduledType(cx[i]) {
-			continue
-		}
-		scheduledCampaignIds = append(scheduledCampaignIds, cx[i].CampaignId)
-	}
-
-	if len(scheduledCampaignIds) > 0 {
-		csx, err := s.DB.ScheduledTasksStore().ListDeliveryStatuses(ctx, scheduledCampaignIds)
-		if err != nil {
-			return errors.Wrap(err, "ListDeliveryStatuses")
-		}
-
-		var deliveryStatusByCampaignId = DeliveryStatusByCampaignId(csx)
-		for i := range cx {
-			if !isScheduledType(cx[i]) {
-				continue
-			}
-			if s, ok := deliveryStatusByCampaignId[cx[i].CampaignId]; ok {
-				cx[i].ScheduledDeliveryStatus = s.String()
-			}
-		}
-	}
-
-	return nil
 }
 
 func (s *Server) Duplicate(ctx context.Context, req *campaignspb.DuplicateRequest) (*campaignspb.DuplicateResponse, error) {
@@ -469,6 +436,10 @@ func (s *Server) UpdateNotificationSettings(ctx context.Context, req *campaignsp
 	campaign, err := s.DB.CampaignsStore().UpdateNotificationSettings(ctx, &update)
 	if err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "campaigns.UpdateNotificationSettings: %v", err)
+	}
+
+	if err := s.setScheduledDeliveryStatus(ctx, campaign); err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "setScheduledDeliveryStatus: %v", err)
 	}
 
 	var proto campaignspb.Campaign
