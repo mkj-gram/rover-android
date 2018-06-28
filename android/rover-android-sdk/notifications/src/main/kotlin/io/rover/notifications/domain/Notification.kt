@@ -53,7 +53,9 @@ data class Notification(
 
     val tapBehavior: TapBehavior,
 
-    val attachment: NotificationAttachment?
+    val attachment: NotificationAttachment?,
+
+    val campaignId: String
 ) {
     companion object;
 

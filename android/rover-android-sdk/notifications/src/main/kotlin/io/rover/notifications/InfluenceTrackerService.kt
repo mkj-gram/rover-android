@@ -37,10 +37,21 @@ class InfluenceTrackerService(
             }
         }
 
+    private var lastSeenCampaignId: String?
+        get() = store["last-seen-campaign-id"]
+        set(value) {
+            if(value == null) {
+                store.unset("last-seen-campaign-id")
+            } else {
+                store["last-seen-campaign-id"] = value
+            }
+        }
+
     override fun notifyNotificationReceived(notification: Notification) {
         // track current time
         lastSeenNotificationAt = System.currentTimeMillis() / 1000L
         lastSeenNotificationId = notification.id
+        lastSeenCampaignId = notification.campaignId
         log.v("Marked that a notification arrived.")
     }
 
@@ -72,14 +83,19 @@ class InfluenceTrackerService(
                         }
 
                         val capturedLastSeenNotificationId = lastSeenNotificationId
+                        val capturedLastSeenCampaignId = lastSeenCampaignId
 
-                        if(seenWithinThreshold == true && capturedLastSeenNotificationId != null) {
+                        if(seenWithinThreshold == true && capturedLastSeenNotificationId != null && capturedLastSeenCampaignId != null) {
                             log.v("App open influenced by a notification detected.")
 
-                            notificationOpen.appOpenedAfterReceivingNotification(capturedLastSeenNotificationId)
+                            notificationOpen.appOpenedAfterReceivingNotification(
+                                capturedLastSeenNotificationId,
+                                capturedLastSeenCampaignId
+                            )
 
                             lastSeenNotificationAt = null
                             lastSeenNotificationId = null
+                            lastSeenCampaignId = null
                         }
                     }
 

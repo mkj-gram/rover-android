@@ -27,6 +27,7 @@ internal fun Notification.encodeJson(dateFormatting: DateFormattingInterface): J
         putProp(this@encodeJson, Notification::expiresAt, "expiresAt") { it.whenNotNull { dateFormatting.dateAsIso8601(it) } }
         putProp(this@encodeJson, Notification::attachment, "attachment") { it.whenNotNull { it.encodeJson() }}
         putProp(this@encodeJson, Notification::tapBehavior, "tapBehavior") { it.encodeJson() }
+        putProp(this@encodeJson, Notification::campaignId)
     }
 }
 
@@ -69,7 +70,8 @@ internal fun Notification.Companion.decodeJson(json: JSONObject, dateFormatting:
         deliveredAt = json.getDate("deliveredAt", dateFormatting),
         isNotificationCenterEnabled = json.getBoolean("isNotificationCenterEnabled"),
         tapBehavior = Notification.TapBehavior.decodeJson(json.getJSONObject("tapBehavior")),
-        attachment = if (json.has("attachment") && !json.isNull("attachment")) NotificationAttachment.decodeJson(json.getJSONObject("attachment")) else null
+        attachment = if (json.has("attachment") && !json.isNull("attachment")) NotificationAttachment.decodeJson(json.getJSONObject("attachment")) else null,
+        campaignId = json.safeGetString("campaignID")
     )
 }
 

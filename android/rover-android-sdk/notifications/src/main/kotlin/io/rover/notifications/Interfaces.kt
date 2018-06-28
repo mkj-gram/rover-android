@@ -92,7 +92,7 @@ interface NotificationOpenInterface {
     /**
      * Should be called when the application is opened soon after a notification is received.
      */
-    fun appOpenedAfterReceivingNotification(notificationId: String)
+    fun appOpenedAfterReceivingNotification(notificationId: String, campaignId: String)
 }
 
 interface InfluenceTrackerServiceInterface {

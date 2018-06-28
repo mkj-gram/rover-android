@@ -52,6 +52,7 @@ open class NotificationOpen(
 
         issueNotificationOpenedEvent(
             notification.id,
+            notification.campaignId,
             NotificationSource.Push
         )
 
@@ -66,28 +67,38 @@ open class NotificationOpen(
 
         issueNotificationOpenedEvent(
             notification.id,
+            notification.campaignId,
             NotificationSource.NotificationCenter
         )
 
         return intentForNotification(notification)
     }
 
-    protected fun issueNotificationOpenedEvent(notificationId: String, source: NotificationSource) {
+    protected fun issueNotificationOpenedEvent(
+        notificationId: String,
+        campaignId: String,
+        source: NotificationSource
+    ) {
         eventsService.trackEvent(
             Event(
                 "Notification Opened",
                 hashMapOf(
                     Pair("notificationID", AttributeValue.String(notificationId)),
-                    Pair("source", AttributeValue.String(source.wireValue))
+                    Pair("source", AttributeValue.String(source.wireValue)),
+                    Pair("campaignID", AttributeValue.String(campaignId))
                 )
             ),
             EventQueueService.ROVER_NAMESPACE
         )
     }
 
-    override fun appOpenedAfterReceivingNotification(notificationId: String) {
+    override fun appOpenedAfterReceivingNotification(
+        notificationId: String,
+        campaignId: String
+    ) {
         issueNotificationOpenedEvent(
             notificationId,
+            campaignId,
             NotificationSource.InfluencedOpen
         )
     }
