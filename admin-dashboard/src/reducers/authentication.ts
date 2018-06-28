@@ -2,7 +2,18 @@ import { User } from '@firebase/auth-types'
 import { AnyAction, combineReducers } from 'redux'
 import { AuthState } from '../../typings'
 
-const isLoggedin = (state: boolean = false, action: AnyAction) => {
+const isAuthLoading = (state: boolean = true, action: AnyAction) => {
+    switch (action.type) {
+        case 'AUTHENTICATION_LOGIN':
+            return false
+        case 'AUTHENTICATION_LOGOUT':
+            return true
+        default:
+            return state
+    }
+}
+
+const isAuthenticated = (state: boolean = false, action: AnyAction) => {
     switch (action.type) {
         case 'AUTHENTICATION_LOGIN':
             return true
@@ -35,12 +46,14 @@ const isUnauthorizedUser = (state: boolean = false, action: AnyAction) => {
     }
 }
 
-export const getIsLoggedIn = (state: AuthState) => state.isLoggedin
+export const getIsAuthLoading = (state: AuthState) => state.isAuthLoading
+export const getIsAuthenticated = (state: AuthState) => state.isAuthenticated
 export const getUser = (state: AuthState) => state.user
 export const getIsUnauthorized = (state: AuthState) => state.isUnauthorizedUser
 
 export default combineReducers({
-    isLoggedin,
+    isAuthLoading,
+    isAuthenticated,
     user,
     isUnauthorizedUser
 })

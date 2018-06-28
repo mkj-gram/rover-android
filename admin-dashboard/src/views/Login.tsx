@@ -1,21 +1,19 @@
-import { User } from '@firebase/auth-types'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { AnyAction } from 'redux'
 import { ThunkDispatch } from 'redux-thunk'
 import { State } from '../../typings'
-import { authenticate, resetLogin } from '../actions'
-import firebase, { ui } from '../Firebase'
-import { getIsUnauthorized, getUser } from '../reducers'
+import { resetLogin } from '../actions'
+import { ui } from '../Firebase'
+import { getIsAuthenticated, getIsUnauthorized } from '../reducers'
 import FirebaseAuth from './FirebaseAuth'
 
 interface LoginStateProps {
     unauthorizedLogin: boolean
-    user: User
+    isAuthenticated: boolean
 }
 interface DispatchProps {
-    authenticate: (user: User) => void
     resetLogin: () => void
 }
 
@@ -26,22 +24,13 @@ class Login extends React.PureComponent<LoginPageProps, {}> {
         super(props)
     }
 
-    componentDidMount() {
-        firebase.auth().onAuthStateChanged(user => {
-            this.props.authenticate(user)
-        })
-    }
-
     resetLogin = () => {
         this.props.resetLogin()
     }
 
-    logout = () => {
-        firebase.auth().signOut()
-    }
-
     render() {
-        const { unauthorizedLogin, user } = this.props
+        const { unauthorizedLogin, isAuthenticated } = this.props
+
         return (
             <div
                 style={{
@@ -56,49 +45,16 @@ class Login extends React.PureComponent<LoginPageProps, {}> {
                         color: 'white'
                     }}
                 >
-                    <h2>Admin Dashboard</h2>
+                    <h2>Rover Admin</h2>
                 </div>
-                {user && !unauthorizedLogin ? (
-                    <div>
-                        <div
-                            style={{
-                                border: '1px solid #CCC',
-                                clear: 'both',
-                                margin: '0 auto 20px',
-                                maxWidth: '400px',
-                                padding: '10px',
-                                textAlign: 'left',
-                                display: 'table',
-                                content: ''
-                            }}
-                        >
-                            <div
-                                style={{
-                                    backgroundColor: '#EEE',
-                                    border: '1px solid #CCC',
-                                    float: 'left',
-                                    height: '80px',
-                                    marginRight: '10px',
-                                    width: '80px'
-                                }}
-                            >
-                                <img
-                                    style={{
-                                        height: '80px',
-                                        margin: 0,
-                                        width: '80px'
-                                    }}
-                                    src={user.photoURL}
-                                    alt={user.displayName}
-                                />
-                            </div>
-                            <div>{user.displayName}</div>
-                            <div>{user.email}</div>
-                        </div>
-                        <p>
-                            <button onClick={this.logout}>Sign Out</button>
-                        </p>
-                    </div>
+                {isAuthenticated && !unauthorizedLogin ? (
+                    <h1
+                        style={{
+                            textAlign: 'center'
+                        }}
+                    >
+                        Loading...
+                    </h1>
                 ) : unauthorizedLogin ? (
                     <div>
                         <h4>You must login using a valid rover.io email!</h4>
@@ -119,15 +75,12 @@ class Login extends React.PureComponent<LoginPageProps, {}> {
 const mapDispatchToProps = (
     dispatch: ThunkDispatch<State, void, AnyAction>
 ): DispatchProps => ({
-    authenticate: (user: User) => {
-        dispatch(authenticate(user))
-    },
     resetLogin: () => dispatch(resetLogin())
 })
 
 const mapStateToProps = (state: State): LoginStateProps => ({
     unauthorizedLogin: getIsUnauthorized(state),
-    user: getUser(state)
+    isAuthenticated: getIsAuthenticated(state)
 })
 
 export default withRouter(connect(

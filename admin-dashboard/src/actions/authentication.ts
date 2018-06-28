@@ -12,6 +12,9 @@ export const authenticate: ActionCreator<
         dispatch({
             type: 'USER_LOGOUT'
         })
+        if (window.location.pathname !== '/login') {
+            window.location.replace('/login')
+        }
         return
     }
     if (user.email.endsWith('@rover.io')) {
@@ -22,6 +25,9 @@ export const authenticate: ActionCreator<
         dispatch({
             type: 'AUTHENTICATION_LOGIN'
         })
+        if (window.location.pathname !== '/') {
+            window.location.replace('/')
+        }
         return
     }
     firebase.auth().currentUser.delete()
