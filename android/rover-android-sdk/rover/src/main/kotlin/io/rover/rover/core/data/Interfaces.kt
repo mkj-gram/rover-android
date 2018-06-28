@@ -119,7 +119,7 @@ interface GraphQlRequest<out TInput> {
                 if (operationName != null) {
                     put("operationName", operationName)
                 }
-            }.toString(4)
+            }.toString()
         } else null
     }
 

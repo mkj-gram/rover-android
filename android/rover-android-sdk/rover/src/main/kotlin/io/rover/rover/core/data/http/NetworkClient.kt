@@ -9,10 +9,13 @@ import io.rover.rover.core.streams.Scheduler
 import io.rover.rover.core.streams.subscribeOn
 import org.reactivestreams.Publisher
 import java.io.BufferedInputStream
+import java.io.ByteArrayOutputStream
 import java.io.DataOutputStream
 import java.io.File
 import java.io.IOException
 import java.net.HttpURLConnection
+import java.nio.charset.Charset
+import java.util.zip.GZIPOutputStream
 import javax.net.ssl.HttpsURLConnection
 
 /**
@@ -56,7 +59,7 @@ class AndroidHttpsUrlConnectionNetworkClient(
                 throw missingCacheException()
             }
 
-            val requestBody = bodyData?.toByteArray(Charsets.UTF_8)
+            val requestBody = bodyData?.toByteArray(Charsets.UTF_8)?.asGzip()
             val requestHasBody = when (request.verb) {
                 HttpVerb.POST, HttpVerb.PUT -> requestBody != null
                 else -> false
@@ -68,6 +71,7 @@ class AndroidHttpsUrlConnectionNetworkClient(
                     // TODO: set a nice user agent.
                     if(requestHasBody) {
                         setFixedLengthStreamingMode(requestBody?.size ?: 0)
+                        setRequestProperty("Content-Encoding", "gzip")
                     }
 
                     // add the request headers.
@@ -176,6 +180,18 @@ class AndroidHttpsUrlConnectionNetworkClient(
             return RuntimeException("An HTTPUrlConnection cache is not enabled.\n" +
                 "Please see the Rover documentation for the Data Plugin and the Google documentation: https://developer.android.com/reference/android/net/http/HttpResponseCache.html\n" +
                 "Consider calling Rover.installSaneGlobalHttpCache() in your Application.onCreate()")
+        }
+    }
+
+    private fun ByteArray.asGzip(): ByteArray {
+        val outputStream = ByteArrayOutputStream()
+        val gzipStream = GZIPOutputStream(outputStream)
+        gzipStream.write(this)
+        gzipStream.finish()
+
+        return outputStream.toByteArray().apply {
+            outputStream.close()
+            gzipStream.close()
         }
     }
 }

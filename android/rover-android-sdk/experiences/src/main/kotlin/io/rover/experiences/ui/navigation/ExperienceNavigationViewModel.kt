@@ -33,11 +33,10 @@ import org.reactivestreams.Publisher
  */
 open class ExperienceNavigationViewModel(
     private val experience: Experience,
-    private val eventsPlugin: EventQueueServiceInterface,
+    private val eventQueueService: EventQueueServiceInterface,
     private val sessionTracker: SessionTrackerInterface,
     private val resolveScreenViewModel: (screen: Screen) -> ScreenViewModelInterface,
     private val resolveToolbarViewModel: (configuration: ToolbarConfiguration) -> ExperienceToolbarViewModelInterface,
-    // TODO: consider an optional interface type here called "CustomNavigationBehaviour", which implementers may provide if they want custom nav
     icicle: Parcelable? = null
 ) : ExperienceNavigationViewModelInterface {
 
@@ -159,7 +158,7 @@ open class ExperienceNavigationViewModel(
                         ).apply { putAll(attributes) } + attributeHashFragmentForCampaignId()
                     )
 
-                    eventsPlugin.trackEvent(event, EventQueueService.ROVER_NAMESPACE)
+                    eventQueueService.trackEvent(event, EventQueueService.ROVER_NAMESPACE)
                 }
             }
         }
@@ -249,7 +248,6 @@ open class ExperienceNavigationViewModel(
             trackLeaveScreen()
         }
     }
-
 
     /**
      * Navigates to a screen, backwards or forwards by emitting the appropriate events,
