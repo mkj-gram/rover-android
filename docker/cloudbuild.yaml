@@ -104,17 +104,6 @@ steps:
     waitFor:
       - 'lint-complete'
 
-# Bulk Gateway
-  - id: 'install-bulk-gateway'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args:
-      - install
-      - --silent
-    dir: 'bulk-gateway'
-    waitFor:
-      - 'lint-complete'
-
 # GraphQL Gateway
   - id: 'install-graphql-gateway'
     name: 'node:7.10.1'
@@ -123,43 +112,6 @@ steps:
       - install
       - --silent
     dir: 'graphql-gateway'
-    env:
-      - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
-    waitFor:
-      - 'lint-complete'
-
-# REST Gateway
-  - id: 'install-rest-gateway'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args:
-      - install
-      - --silent
-    dir: 'rest-gateway'
-    waitFor:
-      - 'lint-complete'
-
-# Scheduled Messages Worker
-  - id: 'install-scheduled-messages-worker'
-    name: 'node:6.9.1'
-    entrypoint: 'npm'
-    args:
-      - install
-      - --silent
-    dir: 'scheduled-messages-worker'
-    env:
-      - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
-    waitFor:
-      - 'lint-complete'
-
-# SDK API
-  - id: 'install-sdk-api'
-    name: 'node:6.9.1'
-    entrypoint: 'npm'
-    args:
-      - install
-      - --silent
-    dir: 'sdk-api'
     env:
       - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
     waitFor:
@@ -187,11 +139,7 @@ steps:
       - printf "\n\n Install Stage Complete (ᵔᴥᵔ)\n\n"
     waitFor:
       - 'install-rover-apis'
-      - 'install-bulk-gateway'
       - 'install-graphql-gateway'
-      - 'install-rest-gateway'
-      - 'install-scheduled-messages-worker'
-      - 'install-sdk-api'
       - 'install-graphql-admin'
 
 
@@ -287,26 +235,6 @@ steps:
     waitFor:
       - 'install-complete'
 
-# SDK-API
-  - id: 'test-sdk-api'
-    name: 'node:6.9.1'
-    entrypoint: 'npm'
-    args:
-      - test
-    dir: 'sdk-api'
-    waitFor:
-      - 'install-complete'
-
-# Bulk Gateway
-  - id: 'test-bulk-gateway'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args:
-      - test
-    dir: 'bulk-gateway'
-    waitFor:
-      - 'install-complete'
-
 # Notification Service
   - id: 'test-notification'
     name: 'docker/compose:1.16.1'
@@ -338,8 +266,6 @@ steps:
         - 'test-notification'
         - 'test-events-pipeline'
         - 'test-rover-apis'
-        - 'test-sdk-api'
-        - 'test-bulk-gateway'
 
 # End Test Stage
   - id: 'test-complete'
@@ -558,27 +484,6 @@ steps:
     waitFor:
       - 'build-events-resources'
 
-# Bulk Gateway
-  
-  - id: 'build-bulk-gateway-prune'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args: 
-      - prune
-      - --production
-      - --silent
-    dir: 'bulk-gateway'
-    waitFor:
-      - 'test-complete'
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - build
-      - '--tag=gcr.io/$PROJECT_ID/bulk-gateway:$SHORT_SHA'
-      - 'bulk-gateway'
-    waitFor:
-      - 'build-bulk-gateway-prune'
-
 
 # GraphQL Gateway
 
@@ -611,68 +516,6 @@ steps:
       - 'graphql-gateway'
     waitFor:
       - 'build-graphql-gateway-prune'
-
-# REST Gateway
-  - id: 'build-rest-gateway-prune'
-    name: 'node:7.10.1'
-    entrypoint: 'npm'
-    args: 
-      - prune
-      - --production
-      - --silent
-    dir: 'rest-gateway'
-    waitFor:
-      - 'test-complete'
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - build
-      - '--tag=gcr.io/$PROJECT_ID/rest-gateway:$SHORT_SHA'
-      - 'rest-gateway'
-    waitFor:
-      - 'build-rest-gateway-prune'
-
-# Scheduled Messages Worker
-  - id: 'build-scheduled-messages-worker-prune'
-    name: 'node:6.9.1'
-    entrypoint: 'npm'
-    args: 
-      - prune
-      - --production
-      - --silent
-    dir: 'scheduled-messages-worker'
-    env:
-      - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
-    waitFor:
-      - 'test-complete'
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - build
-      - '--tag=gcr.io/$PROJECT_ID/scheduled-messages-worker:$SHORT_SHA'
-      - 'scheduled-messages-worker'
-    waitFor:
-      - 'build-scheduled-messages-worker-prune'
-
-# SDK API
-  - id: 'build-sdk-api-prune'
-    name: 'node:6.9.1'
-    entrypoint: 'npm'
-    args: 
-      - prune
-      - --production
-      - --silent
-    dir: 'sdk-api'
-    waitFor:
-      - 'test-complete'
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - build
-      - '--tag=gcr.io/$PROJECT_ID/sdk-api:$SHORT_SHA'
-      - 'sdk-api'
-    waitFor:
-      - 'build-sdk-api-prune'
 
 # GraphQL Admin
 
@@ -721,9 +564,5 @@ images:
   - 'gcr.io/$PROJECT_ID/campaigns:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/notification:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/events:$SHORT_SHA'
-  - 'gcr.io/$PROJECT_ID/bulk-gateway:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/graphql-gateway:$SHORT_SHA'
-  - 'gcr.io/$PROJECT_ID/rest-gateway:$SHORT_SHA'
-  - 'gcr.io/$PROJECT_ID/scheduled-messages-worker:$SHORT_SHA'
-  - 'gcr.io/$PROJECT_ID/sdk-api:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/graphql-admin:$SHORT_SHA'
