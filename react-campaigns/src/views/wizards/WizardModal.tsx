@@ -12,8 +12,8 @@ export interface WizardModalProps extends InjectedProps {
     rightHeaderElement?: JSX.Element
     leftToolbarElement?: JSX.Element
     rightToolbarElement?: JSX.Element
-    progress: number
-    children?: JSX.Element[]
+    progress?: number
+    children?: JSX.Element[] | JSX.Element
 }
 
 const WizardModal: React.SFC<WizardModalProps> = ({
@@ -62,16 +62,22 @@ const WizardModal: React.SFC<WizardModalProps> = ({
                 {leftHeaderElement}
                 {rightHeaderElement}
             </div>
-            <ProgressBarThin
-                progress={progress}
-                barPropStyle={{
-                    width: '100%',
-                    flex: '0 0 auto'
-                }}
-                progressPropStyle={{
-                    transition: 'width 500ms ease'
-                }}
-            />
+            {progress ? (
+                <ProgressBarThin
+                    progress={progress}
+                    barPropStyle={{
+                        width: '100%',
+                        flex: '0 0 auto'
+                    }}
+                    progressPropStyle={{
+                        transition: 'width 500ms ease'
+                    }}
+                />
+            ) : (
+                <div
+                    style={{ height: 1, width: '100%', background: titanium }}
+                />
+            )}
 
             <div
                 id="wizardModalBody"

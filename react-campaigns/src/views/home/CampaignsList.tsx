@@ -248,6 +248,22 @@ const renderCampaignProgressState = (
                 style={{ marginLeft: 8 }}
             />
         )
+
+        const formattedDateTime =
+            date && campaign.scheduledType === 'SCHEDULED' ? (
+                <React.Fragment>
+                    <Text
+                        label={true}
+                        size="small"
+                        text={`${date} at ${displayTime}`}
+                        textStyle={{
+                            color: steel
+                        }}
+                    />
+                    {media !== 'Mobile' ? displayTimeZone : null}
+                </React.Fragment>
+            ) : null
+
         // tslint:disable-next-line:switch-default
         switch (campaign.scheduledDeliveryStatus) {
             case 'UNKNOWN':
@@ -293,19 +309,7 @@ const renderCampaignProgressState = (
                             text="SCHEDULED"
                             style={{ marginRight: 8 }}
                         />
-                        {date ? (
-                            <React.Fragment>
-                                <Text
-                                    label={true}
-                                    size="small"
-                                    text={`${date} at ${displayTime}`}
-                                    textStyle={{
-                                        color: steel
-                                    }}
-                                />
-                                {media !== 'Mobile' ? displayTimeZone : null}
-                            </React.Fragment>
-                        ) : null}
+                        {formattedDateTime}
                     </div>
                 )
             case 'INPROGRESS':
@@ -336,19 +340,7 @@ const renderCampaignProgressState = (
                             text="SENT"
                             style={{ marginRight: 8 }}
                         />
-                        {date ? (
-                            <React.Fragment>
-                                <Text
-                                    label={true}
-                                    size="small"
-                                    text={`${date} at ${displayTime}`}
-                                    textStyle={{
-                                        color: steel
-                                    }}
-                                />
-                                {media !== 'Mobile' ? displayTimeZone : null}
-                            </React.Fragment>
-                        ) : null}
+                        {formattedDateTime}
                     </div>
                 )
         }

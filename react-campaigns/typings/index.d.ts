@@ -42,6 +42,7 @@ type UIStateType =
     | 'experience'
     | 'scheduleddelivery'
     | 'automateddelivery'
+    | 'Date and Time'
 
 type UIStateField = {
     seen: boolean

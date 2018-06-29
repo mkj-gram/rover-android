@@ -131,4 +131,7 @@ const mapStateToProps = (state: State): OwnProps => ({
     showPhonePreview: getShouldShowPhonePreview(state)
 })
 
-export default connect(mapStateToProps, {})(DeviceTransitionContainer)
+export default connect(
+    mapStateToProps,
+    {}
+)(DeviceTransitionContainer)

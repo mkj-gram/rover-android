@@ -367,4 +367,7 @@ const mapDispatchToProps = (
     updateEditableCampaign: (x: object) => dispatch(updateEditableCampaign(x))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(MessageAndMedia)
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(MessageAndMedia)
