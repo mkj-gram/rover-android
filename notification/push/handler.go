@@ -30,6 +30,23 @@ type (
 	notificationsStore interface {
 		Create(ctx context.Context, note *scylla.Notification) error
 	}
+
+	Response struct {
+		Message              notification_pubsub.Message
+		Device               *notification_pubsub.Device
+		NotificationSettings *scylla.NotificationSettings
+		Notification         *scylla.Notification
+		APNS                 struct {
+			Request  interface{}
+			Response interface{}
+		}
+		FCM struct {
+			Request  interface{}
+			Response interface{}
+		}
+	}
+
+	HandlerFunc func(ctx context.Context, m notification_pubsub.Message) (*Response, error)
 )
 
 type Handler struct {
@@ -38,101 +55,130 @@ type Handler struct {
 	NotificationsStore        notificationsStore
 }
 
-func (w *Handler) Handle(ctx context.Context, m notification_pubsub.Message) error {
+func (w *Handler) Handle(ctx context.Context, m notification_pubsub.Message) (*Response, error) {
 
 	var (
 		device *notification_pubsub.Device
 
 		mkAPNSRequest func() *apns2.Notification
 		mkFCMRequest  func() *fcm.Message
+
+		response = Response{
+			Message: m,
+		}
 	)
 
-	switch msg := m.(type) {
-	case *notification_pubsub.PushMessage:
-
-		settings, err := w.NotificationSettingsStore.OneById(ctx, int32(msg.CampaignID))
-		if err != nil {
-			if scylla.IsRetryableError(err) {
-				err = &retryable{error: err}
+	err := func() error {
+		switch msg := m.(type) {
+		case *notification_pubsub.PushMessage:
+			settings, err := w.NotificationSettingsStore.OneById(ctx, int32(msg.CampaignID))
+			if err != nil {
+				if scylla.IsRetryableError(err) {
+					err = &retryable{error: err}
+				}
+				return errors.Wrap(err, "settings.OneById")
 			}
-			return errors.Wrap(err, "settings.OneById")
-		}
 
-		var note scylla.Notification
-		if err := PushMessageToNotification(msg, settings, &note); err != nil {
-			return errors.Wrap(err, "toNotification")
-		}
-
-		if err := w.NotificationsStore.Create(ctx, &note); err != nil {
-			if scylla.IsRetryableError(err) {
-				err = &retryable{error: err}
+			var note scylla.Notification
+			if err := PushMessageToNotification(msg, settings, &note); err != nil {
+				return errors.Wrap(err, "toNotification")
 			}
-			return errors.Wrap(err, "notifications.Create")
+
+			if err := w.NotificationsStore.Create(ctx, &note); err != nil {
+				if scylla.IsRetryableError(err) {
+					err = &retryable{error: err}
+				}
+				return errors.Wrap(err, "notifications.Create")
+			}
+
+			if note.Id.String() == "" {
+				panic(errors.Wrap(ErrInvalid, "validation: notification.id"))
+			}
+
+			response.Notification = &note
+			response.NotificationSettings = settings
+
+			if !settings.AlertOptionPushNotification {
+				return nil
+			}
+
+			device = &msg.Device
+
+			mkFCMRequest = func() *fcm.Message { return ToFCMRequest(m, settings, &note) }
+			mkAPNSRequest = func() *apns2.Notification { return ToAPNSRequest(m, settings, &note) }
+
+		case *notification_pubsub.SilentPush:
+			device = &msg.Device
+
+			mkFCMRequest = func() *fcm.Message { return ToFCMRequest(m, nil, nil) }
+			mkAPNSRequest = func() *apns2.Notification { return ToAPNSRequest(m, nil, nil) }
+		default:
+			panic(errors.Wrapf(ErrUnknown, "message_type=%T", msg))
 		}
 
-		if note.Id.String() == "" {
-			panic(errors.Wrap(ErrInvalid, "validation: notification.id"))
-		}
+		response.Device = device
 
-		// TODO: check for push token
-
-		if !settings.AlertOptionPushNotification {
+		if device.PushToken == "" {
+			// NOTE: devices having no push tokens are just silently skipped
 			return nil
 		}
 
-		device = &msg.Device
-		mkFCMRequest = func() *fcm.Message { return ToFCMRequest(m, settings, &note) }
-		mkAPNSRequest = func() *apns2.Notification { return ToAPNSRequest(m, settings, &note) }
+		switch device.OsName {
+		case OsAndroid:
+			var (
+				req         = mkFCMRequest()
+				packageName = device.AppNamespace
+			)
 
-	case *notification_pubsub.SilentPush:
-		device = &msg.Device
-		mkFCMRequest = func() *fcm.Message { return ToFCMRequest(m, nil, nil) }
-		mkAPNSRequest = func() *apns2.Notification { return ToAPNSRequest(m, nil, nil) }
-	default:
-		panic(errors.Wrapf(ErrUnknown, "message_type=%T", msg))
-	}
+			response.FCM.Request = req
 
-	switch device.OsName {
-	case OsAndroid:
-		var (
-			req         = mkFCMRequest()
-			packageName = device.AppNamespace
-		)
+			client, err := w.ClientFactory.GetFCMClient(ctx, int32(device.AccountID), packageName)
+			if err != nil {
+				return errors.Wrap(err, "fcmfactory.GetClient")
+			}
 
-		client, err := w.ClientFactory.GetFCMClient(ctx, int32(device.AccountID), packageName)
-		if err != nil {
-			return errors.Wrap(err, "fcmfactory.GetClient")
-		}
+			resp, err := sendFCMRequest(ctx, client, req)
+			if err != nil {
+				return errors.Wrap(err, "fcm.SendPushMessage")
+			}
 
-		if err := sendFCMRequest(ctx, client, req); err != nil {
-			return errors.Wrap(err, "fcm.SendPushMessage")
+			response.FCM.Response = resp
+
+			return nil
+
+		case OsiOS:
+			var (
+				req      = mkAPNSRequest()
+				env      = strings.ToLower(device.PushTokenEnvironment)
+				bundleId = device.AppNamespace
+			)
+
+			response.APNS.Request = req
+
+			client, err := w.ClientFactory.GetAPNSClient(ctx, int32(device.AccountID), bundleId, env)
+			if err != nil {
+				return errors.Wrap(err, "apnsfactory.GetClient")
+			}
+
+			resp, err := sendAPNSRequest(ctx, client, req)
+			if err != nil {
+				return errors.Wrap(err, "apns.SendPushMessage")
+			}
+
+			response.APNS.Response = resp
+
+			return nil
+
+		default:
+			// IDEA: maybe query for known Os-es in the first place?
+			// NOTE: skip unknown OS-es
+			// return errors.Wrapf(ErrUnknown, "os_name=%q", device.OsName)
 		}
 
 		return nil
+	}()
 
-	case OsiOS:
-		var (
-			req      = mkAPNSRequest()
-			env      = strings.ToLower(device.PushTokenEnvironment)
-			bundleId = device.AppNamespace
-		)
-
-		client, err := w.ClientFactory.GetAPNSClient(ctx, int32(device.AccountID), bundleId, env)
-		if err != nil {
-			return errors.Wrap(err, "apnsfactory.GetClient")
-		}
-
-		if err := sendAPNSRequest(ctx, client, req); err != nil {
-			return errors.Wrap(err, "apns.SendPushMessage")
-		}
-
-		return nil
-
-	default:
-		return errors.Wrapf(ErrUnknown, "os_name=%q", device.OsName)
-	}
-
-	return nil
+	return &response, err
 }
 
 func PushMessageToNotification(msg *notification_pubsub.PushMessage, settings *scylla.NotificationSettings, note *scylla.Notification) error {

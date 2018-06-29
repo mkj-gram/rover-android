@@ -3,7 +3,6 @@ package push
 import (
 	"context"
 	"net"
-	"time"
 
 	fcm "github.com/appleboy/go-fcm"
 	"github.com/pkg/errors"
@@ -60,13 +59,8 @@ func ToFCMRequest(m notification_pubsub.Message, settings *scylla.NotificationSe
 	return req
 }
 
-func sendFCMRequest(ctx context.Context, client *fcm.Client, req *fcm.Message) error {
-	start := time.Now()
-	metrics.pushTotal.WithLabelValues("fcm").Inc()
-
+func sendFCMRequest(ctx context.Context, client *fcm.Client, req *fcm.Message) (*fcm.Response, error) {
 	resp, err := client.Send(req)
-
-	metrics.pushDuration.WithLabelValues("fcm").Observe(time.Since(start).Seconds())
 
 	switch err2 := err.(type) {
 	case net.Error:
@@ -76,12 +70,8 @@ func sendFCMRequest(ctx context.Context, client *fcm.Client, req *fcm.Message) e
 	}
 
 	if err != nil {
-		metrics.pushErrors.WithLabelValues("fcm").Inc()
-		return errors.Wrap(err, "fcm.Send")
+		return resp, errors.Wrap(err, "fcm.Send")
 	}
 
-	// TODO:
-	_ = resp.Error
-
-	return nil
+	return resp, nil
 }

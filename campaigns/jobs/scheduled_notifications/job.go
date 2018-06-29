@@ -1,4 +1,4 @@
-package jobs
+package scheduled_notifications
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	notificationpb "github.com/roverplatform/rover/apis/go/notification/v1"
 	"github.com/roverplatform/rover/apis/go/protobuf"
 	"github.com/roverplatform/rover/campaigns"
-	sn "github.com/roverplatform/rover/campaigns/que/scheduled_notifications"
+	tasks "github.com/roverplatform/rover/campaigns/que/scheduled_notifications"
 	"github.com/roverplatform/rover/go/retry"
 )
 
@@ -22,8 +22,24 @@ var (
 	BatchSize = 1000
 )
 
+type Handler interface {
+	Handle(context.Context, *tasks.Task) (*JobResult, error)
+}
+
+type HandlerFunc func(ctx context.Context, t *tasks.Task) (*JobResult, error)
+
+func (fn HandlerFunc) Handle(ctx context.Context, t *tasks.Task) (*JobResult, error) {
+	return fn(ctx, t)
+}
+
 type (
-	Result struct {
+	JobHandler struct {
+		CampaignsStore     CampaignsStore
+		AudienceClient     audiencepb.AudienceClient
+		NotificationClient notificationpb.NotificationClient
+	}
+
+	JobResult struct {
 		AccountId  int
 		CampaignId int
 
@@ -40,29 +56,12 @@ type (
 		}
 	}
 
-	Handler interface {
-		Handle(*sn.Task, Result) error
-	}
-
 	CampaignsStore interface {
 		OneById(ctx context.Context, accountId int32, campaignId int32) (*campaigns.Campaign, error)
 	}
-
-	ScheduledNotificationJob struct {
-		Log                Logger
-		CampaignsStore     CampaignsStore
-		AudienceClient     audiencepb.AudienceClient
-		NotificationClient notificationpb.NotificationClient
-	}
 )
 
-type HandlerFunc func(*sn.Task, Result) error
-
-func (fn HandlerFunc) Handle(t *sn.Task, b Result) error {
-	return fn(t, b)
-}
-
-func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) (*Result, error) {
+func (w *JobHandler) Handle(ctx context.Context, task *tasks.Task) (*JobResult, error) {
 	// 1. Query for a new task on table scheduled_notification_task where status is not failed, completed or cancelled and run_at <= now()
 	//  2. Update task state to be IN_PROGRESS
 	//  3. Fetch the campaign from task.campaign_id
@@ -80,8 +79,11 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) (*Resu
 	// if it succeeds you're done
 	// if it fails update task state to in-progress, update error property with last error, update run_at time to be some exponential time using number_of_attempts added to the current timestamp and increment number_of_attempts
 
-	if sn.TaskState(task.State) == sn.TaskStateQueued {
-		if err := task.SetState(sn.TaskStateInProgress); err != nil {
+	// release task PG's lock eventually
+	defer task.Done()
+
+	if tasks.TaskState(task.State) == tasks.TaskStateQueued {
+		if err := task.SetState(tasks.TaskStateInProgress); err != nil {
 			return nil, errors.Wrap(err, "SetState: inprogress")
 		}
 	}
@@ -95,7 +97,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) (*Resu
 			PermissionScopes: []string{"server"},
 		}
 
-		batch = &Result{
+		batch = &JobResult{
 			IsTest:     task.IsTest,
 			AccountId:  acctId,
 			CampaignId: campaignId,
@@ -121,7 +123,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) (*Resu
 
 		processBatch = func() error {
 
-			if err := task.SetState(sn.TaskStateCompleted); err != nil {
+			if err := task.SetState(tasks.TaskStateCompleted); err != nil {
 				return errors.Wrap(err, "SetState: completed")
 			}
 
@@ -188,7 +190,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) (*Resu
 
 			// no devices - no need to continue
 			if len(devices) == 0 {
-				if err := task.SetState(sn.TaskStateCompleted); err != nil {
+				if err := task.SetState(tasks.TaskStateCompleted); err != nil {
 					return errors.Wrap(err, "SetState: completed")
 				}
 				return nil
@@ -240,7 +242,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) (*Resu
 			resp, err := w.AudienceClient.Query(ctx, Q)
 			if err != nil {
 				if !isRetryable(err) {
-					if err := task.SetState(sn.TaskStateFailed); err != nil {
+					if err := task.SetState(tasks.TaskStateFailed); err != nil {
 						panic(errors.Errorf("audience.Query: SetState=failed: %v", err))
 					}
 				}
@@ -353,7 +355,7 @@ func (w *ScheduledNotificationJob) Do(ctx context.Context, task *sn.Task) (*Resu
 }
 
 // TODO: add RPC to bulk fetch by the ids
-func (w *ScheduledNotificationJob) getDevices(ctx context.Context, authCtx *auth.AuthContext, deviceIds []string) ([]*audiencepb.Device, error) {
+func (w *JobHandler) getDevices(ctx context.Context, authCtx *auth.AuthContext, deviceIds []string) ([]*audiencepb.Device, error) {
 	var devices []*audiencepb.Device
 
 	for _, deviceId := range deviceIds {
@@ -400,7 +402,7 @@ func buildQueryRequest(input interface{}) *audiencepb.QueryRequest {
 	panic(errors.Errorf("buildQueryRequest: unexpected input:%T, %v", input, input))
 }
 
-func buildNotificationRequest(b *Result, c *campaigns.Campaign) (*notificationpb.SendCampaignNotificationRequest, error) {
+func buildNotificationRequest(b *JobResult, c *campaigns.Campaign) (*notificationpb.SendCampaignNotificationRequest, error) {
 
 	var messages = make([]*notificationpb.SendCampaignNotificationRequest_Message, len(b.Devices))
 	for i, d := range b.Devices {

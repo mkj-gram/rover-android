@@ -44,7 +44,7 @@ func UnaryInterceptor(log rlog.Logger) grpc.UnaryServerInterceptor {
 				}
 				log.Error(err.Error())
 			} else {
-				log.Info("")
+				log.Info("ok")
 			}
 		}()
 

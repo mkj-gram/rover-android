@@ -23,7 +23,8 @@ import (
 	"github.com/roverplatform/rover/campaigns"
 	db "github.com/roverplatform/rover/campaigns/db"
 	"github.com/roverplatform/rover/campaigns/db/testdb"
-	"github.com/roverplatform/rover/campaigns/jobs"
+
+	snj "github.com/roverplatform/rover/campaigns/jobs/scheduled_notifications"
 	sn "github.com/roverplatform/rover/campaigns/que/scheduled_notifications"
 	campaigns_mocks "github.com/roverplatform/rover/campaigns/tests/mocks"
 	rtesting "github.com/roverplatform/rover/go/testing"
@@ -152,20 +153,19 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 
 		expect struct {
 			Task, Forked *sn.Task
-			Result       *jobs.Result
 
 			Err error
 		}
 	)
 
-	jobs.BatchSize = 2
+	snj.BatchSize = 2
 
 	var (
 		iterator = &audiencepb.QueryRequest_ScrollIterator_{
 			ScrollIterator: &audiencepb.QueryRequest_ScrollIterator{
 				Operation: &audiencepb.QueryRequest_ScrollIterator_StartScroll_{
 					StartScroll: &audiencepb.QueryRequest_ScrollIterator_StartScroll{
-						BatchSize: int32(jobs.BatchSize),
+						BatchSize: int32(snj.BatchSize),
 					},
 				},
 			},
@@ -995,7 +995,7 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 				}
 
 				// instantiate job with mocks
-				job = jobs.ScheduledNotificationJob{
+				job = snj.JobHandler{
 					AudienceClient:     m.AudienceClient,
 					NotificationClient: m.NotificationClient,
 					CampaignsStore:     m.CampaignsStore,
@@ -1025,7 +1025,7 @@ func test_ScheduledNotificationTasks(t *testing.T) {
 
 			var (
 				exp, expErr = tc.after, tc.expErr
-				_, gotErr   = job.Do(context.TODO(), task)
+				_, gotErr   = job.Handle(context.TODO(), task)
 				got         = &expect{
 					Task: fetchTask(t, pgpool, int64(exp.Task.ID)),
 				}

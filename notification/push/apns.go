@@ -129,7 +129,7 @@ func ToAPNSRequest(m notification_pubsub.Message, settings *scylla.NotificationS
 	return req
 }
 
-func sendAPNSRequest(ctx context.Context, client *apns2.Client, req *apns2.Notification) error {
+func sendAPNSRequest(ctx context.Context, client *apns2.Client, req *apns2.Notification) (*apns2.Response, error) {
 	start := time.Now()
 	metrics.pushTotal.WithLabelValues("apns").Inc()
 
@@ -139,7 +139,7 @@ func sendAPNSRequest(ctx context.Context, client *apns2.Client, req *apns2.Notif
 
 	if err != nil {
 		metrics.pushErrors.WithLabelValues("apns").Inc()
-		return errors.Wrap(err, "apns.Push")
+		return resp, errors.Wrap(err, "apns.Push")
 	}
 
 	metrics.pushResponseStatus.WithLabelValues("apns", fmt.Sprintf("%d", resp.StatusCode)).Inc()
@@ -148,19 +148,19 @@ func sendAPNSRequest(ctx context.Context, client *apns2.Client, req *apns2.Notif
 	switch {
 	case resp.StatusCode >= 500 && resp.StatusCode < 600:
 		// service errors
-		return retryable{error: err}
+		return resp, &retryable{error: err}
 	case resp.StatusCode >= 400 && resp.StatusCode < 500:
 		// client errors
-		return err
+		return resp, err
 	case resp.StatusCode >= 300 && resp.StatusCode < 400:
 		// redirection
-		return err
+		return resp, err
 	case resp.StatusCode >= 200 && resp.StatusCode < 300:
 		// success
-		return nil
+		return resp, nil
 	default:
-		return err
+		return resp, err
 	}
 
-	return nil
+	return resp, nil
 }

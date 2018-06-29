@@ -22,8 +22,8 @@ import (
 	audiencepb "github.com/roverplatform/rover/apis/go/audience/v1"
 	"github.com/roverplatform/rover/apis/go/notification/v1"
 	"github.com/roverplatform/rover/campaigns/db"
-	campaignjobs "github.com/roverplatform/rover/campaigns/jobs"
-	"github.com/roverplatform/rover/campaigns/que"
+	jobs "github.com/roverplatform/rover/campaigns/jobs"
+	snj "github.com/roverplatform/rover/campaigns/jobs/scheduled_notifications"
 	sn "github.com/roverplatform/rover/campaigns/que/scheduled_notifications"
 	rhttp "github.com/roverplatform/rover/go/http"
 	rlog "github.com/roverplatform/rover/go/logger"
@@ -88,24 +88,7 @@ func main() {
 	// Prometheus metrics
 	//
 
-	var (
-		jobsErrors = prom.NewCounter(prom.CounterOpts{
-			Name: "schedueled_notification_tasks_errors",
-			Help: "number of jobs error-ed",
-		})
-
-		jobsPanics = prom.NewCounter(prom.CounterOpts{
-			Name: "schedueled_notification_tasks_panics",
-			Help: "number of jobs panic-ed",
-		})
-
-		jobsStats = prom.NewSummary(prom.SummaryOpts{
-			Name: "schedueled_notification_tasks",
-			Help: "summary(duration and count) of jobs processed",
-		})
-	)
-
-	prom.MustRegister(jobsErrors, jobsPanics, jobsStats)
+	prom.MustRegister(jobs.PrometheusCollectors...)
 
 	//
 	// GCP
@@ -176,7 +159,7 @@ func main() {
 
 	var (
 		clientOpts = []grpc.DialOption{
-			grpc.WithUnaryInterceptor(grpc.UnaryClientInterceptor(Logger(log))),
+			grpc.WithUnaryInterceptor(grpc.UnaryClientInterceptor(ClientLogger(log))),
 			grpc.WithInsecure(),
 		}
 	)
@@ -199,14 +182,18 @@ func main() {
 
 	//
 	// worker pool
+	//
 	var (
-		taskc = make(chan *sn.Task)
+		handler = snj.WithMetrics(
+			snj.WithLogger(log.WithFields(rlog.Fields{"method": "campaigns/jobs/scheduled_notifications/(*JobHandler).Handle"}),
+				&snj.JobHandler{
+					AudienceClient:     audienceClient,
+					CampaignsStore:     pg.CampaignsStore(),
+					NotificationClient: notificationClient,
+				},
+			))
 
-		snw = campaignjobs.ScheduledNotificationJob{
-			AudienceClient:     audienceClient,
-			CampaignsStore:     pg.CampaignsStore(),
-			NotificationClient: notificationClient,
-		}
+		taskc = make(chan *sn.Task)
 
 		worker = func(n int) {
 			log := log.WithFields(rlog.Fields{"worker.id": n})
@@ -217,54 +204,23 @@ func main() {
 					log.Infof("stopping")
 					return
 				case task := <-taskc:
-					var (
-						start  = time.Now()
-						result *campaignjobs.Result
-						err    error
-					)
-
-					log = log.WithFields(rlog.Fields{
-						"task.id":    task.ID,
-						"task.state": task.State,
-					})
-
-					log.Infof("starting")
-
 					// function call is required for defers to fire after
 					func() {
-						// release task PG's lock eventually
-						defer task.Done()
-
-						// Recover any panics and log/update task.Error
-						defer que.Recover(func(val interface{}, trace string) {
-							jobsPanics.Inc()
-							log.WithFields(rlog.Fields{"panic": trace}).Error(val)
-							if errClient != nil {
-								errClient.Reportf(ctx, nil, "job_id=%d error=%q panic=%q", task.ID, trace, val)
-							}
-						})
-
 						defer func() {
-							log = log.WithFields(rlog.Fields{
-								"dur": time.Since(start),
-							})
-							jobsStats.Observe(time.Since(start).Seconds())
-
-							if err != nil {
-								jobsErrors.Inc()
-								log.Errorf(err.Error())
-							} else {
-								log.Infof("ok")
+							if val := recover(); val != nil {
+								var (
+									buf   [1024 * 16]byte
+									stack = buf[:runtime.Stack(buf[:], false)]
+								)
+								if errClient == nil {
+									panic(val)
+								}
+								errClient.Reportf(ctx, nil, "task_id=%d error=%q panic=%q", task.ID, val, stack)
 							}
-
-							log.WithFields(rlog.Fields{
-								"task":   task,
-								"result": result,
-							}).Debug("")
 						}()
 
 						// work
-						result, err = snw.Do(ctx, task)
+						_, _ = handler.Handle(ctx, task)
 					}()
 				}
 			}
@@ -280,14 +236,19 @@ func main() {
 				default:
 				}
 
+				start := time.Now()
+
 				task, err := sn.LockOne(pgpool)
 				if err != nil {
-					log.Error(errors.Wrap(err, "poller: LockOne"))
-					time.Sleep(*queSleepDuration)
-					continue
+					log.Fatal(errors.Wrap(err, "poller: LockOne"))
 				}
+
+				jobs.Metrics.FetchLatencySeconds.
+					WithLabelValues("scheduled_notifications").
+					Observe(time.Since(start).Seconds())
+
 				if task == nil {
-					log.Infof("poller: status=idling for=%v dispatched=%d\n", queSleepDuration, count)
+					log.Debugf("poller: status=idling for=%v dispatched=%d\n", queSleepDuration, count)
 					if count > 0 {
 						count = 0
 					}
@@ -369,7 +330,7 @@ func main() {
 	log.Infof("status=stopped")
 }
 
-func Logger(log rlog.Logger) grpc.UnaryClientInterceptor {
+func ClientLogger(log rlog.Logger) grpc.UnaryClientInterceptor {
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		var (
 			start = time.Now()
@@ -377,24 +338,20 @@ func Logger(log rlog.Logger) grpc.UnaryClientInterceptor {
 		)
 
 		defer func() {
-			log := log.WithFields(rlog.Fields{
+			log = log.WithFields(rlog.Fields{
 				"rpc": method,
 				"dur": time.Since(start),
-				"req": req,
 			})
 
-			if val := recover(); val != nil {
-				trace := make([]byte, 1024)
-				trace = trace[:runtime.Stack(trace, false)]
-
-				log.WithFields(rlog.Fields{"panic": string(trace)}).Error(val)
-
-				panic(val)
+			debugFields := rlog.Fields{
+				"req":  req,
+				"resp": reply,
 			}
 
 			if err != nil {
-				log.Errorf(err.Error())
+				log.WithFields(debugFields).Errorf(err.Error())
 			} else {
+				log.WithFields(debugFields).Debug("")
 				log.Infof("ok")
 			}
 		}()

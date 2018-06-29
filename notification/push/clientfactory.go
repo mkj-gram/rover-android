@@ -5,6 +5,8 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
+	"net"
+	"net/http"
 	"strings"
 	"time"
 
@@ -190,13 +192,60 @@ func NewAPNSClient(certDataBase64Encoded string, certKey string) (*apns2.Client,
 		Leaf:        cert,
 	}
 
+	// TODO: use custom transport
 	return apns2.NewClient(tlsCert), nil
 }
 
 func NewFCMClient(serverKey string) (*fcm.Client, error) {
-	c, err := fcm.NewClient(serverKey)
+	var (
+		wrapperClient = &http.Client{
+			Timeout: 10 * time.Second,
+			Transport: &transport{
+				Transport: httpTransport(),
+				RoundTripFunc: func(rt http.RoundTripper, req *http.Request) (*http.Response, error) {
+					start := time.Now()
+					metrics.pushTotal.WithLabelValues("fcm").Inc()
+					resp, err := rt.RoundTrip(req)
+					metrics.pushDuration.WithLabelValues("fcm").Observe(time.Since(start).Seconds())
+					if err != nil {
+						metrics.pushErrors.WithLabelValues("fcm").Inc()
+					}
+					if resp != nil {
+						if resp.StatusCode >= 400 {
+							metrics.pushErrors.WithLabelValues("fcm").Inc()
+						}
+						metrics.pushResponseStatus.WithLabelValues("fcm", fmt.Sprint(resp.StatusCode)).Inc()
+					}
+					return resp, err
+				},
+			},
+		}
+	)
+
+	c, err := fcm.NewClient(serverKey, fcm.WithHTTPClient(wrapperClient))
 	if err != nil {
 		return nil, errors.Wrap(err, "fcm.NewClient")
 	}
 	return c, nil
+}
+
+type transport struct {
+	RoundTripFunc func(http.RoundTripper, *http.Request) (*http.Response, error)
+	*http.Transport
+}
+
+func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
+	return t.RoundTripFunc(t.Transport, req)
+}
+
+func httpTransport() *http.Transport {
+	return &http.Transport{
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ResponseHeaderTimeout: 10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
 }

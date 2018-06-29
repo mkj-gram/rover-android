@@ -194,6 +194,13 @@ func main() {
 	// Notification Pubsub
 	//
 	var (
+		withPanicReporter = func(h push.HandlerFunc) push.HandlerFunc {
+			return push.HandlerFunc(func(ctx context.Context, m notification_pubsub.Message) (*push.Response, error) {
+				defer errClient.Catch(ctx, gerrors.Repanic(false))
+				return h(ctx, m)
+			})
+		}
+
 		handler = &push.Handler{
 			ClientFactory: &push.ClientFactory{
 				Cache:                 platformCache,
@@ -205,35 +212,19 @@ func main() {
 			NotificationsStore:        scyllaDB.NotificationsStore(),
 		}
 
+		instrumentedHandler = withPanicReporter(
+			push.WithLogging(log.WithFields(rlog.Fields{"method": "notification/push.(*Handler).Handle"}),
+				push.WithMetrics(
+					push.HandlerFunc(handler.Handle),
+				)))
+
+		receiver = notification_pubsub.ReceiverFunc(func(ctx context.Context, m notification_pubsub.Message) error {
+			_, err := instrumentedHandler(ctx, m)
+			return err
+		})
+
 		subscriber = notification_pubsub.Subscriber{
 			Subscription: subscription,
-		}
-
-		instrument = func(h notification_pubsub.ReceiverFunc) notification_pubsub.ReceiverFunc {
-			return notification_pubsub.ReceiverFunc(func(ctx context.Context, m notification_pubsub.Message) error {
-				var (
-					err   error
-					start = time.Now()
-				)
-
-				defer errClient.Catch(ctx, gerrors.Repanic(false))
-
-				defer func() {
-					log := log.WithFields(rlog.Fields{
-						"src": "handler.handle", "dur": time.Since(start),
-					})
-
-					if err != nil {
-						log.Error(err.Error())
-					} else {
-						log.Infof("status=ok")
-					}
-				}()
-
-				err = h(ctx, m)
-
-				return nil
-			})
 		}
 	)
 
@@ -241,13 +232,9 @@ func main() {
 	go func() {
 		defer wg.Done()
 
-		handler := instrument(
-			notification_pubsub.ReceiverFunc(push.WithMetrics(
-				handler.Handle)))
+		log := log.WithFields(rlog.Fields{"method": "notification/pubsub.(*Subscriber).Subscribe"})
 
-		log := log.WithFields(rlog.Fields{"src": "pubsub.receive"})
-
-		if err := subscriber.Subscribe(ctx, handler); err != nil {
+		if err := subscriber.Subscribe(ctx, receiver); err != nil {
 			log.Error(err.Error())
 		} else {
 			log.Infof("exiting")

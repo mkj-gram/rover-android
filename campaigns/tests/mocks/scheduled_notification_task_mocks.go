@@ -6,7 +6,7 @@ package mock_jobs
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	jobs "github.com/roverplatform/rover/campaigns/jobs"
+	snj "github.com/roverplatform/rover/campaigns/jobs/scheduled_notifications"
 	scheduled_notifications "github.com/roverplatform/rover/campaigns/que/scheduled_notifications"
 	reflect "reflect"
 )
@@ -35,7 +35,7 @@ func (m *MockHandler) EXPECT() *MockHandlerMockRecorder {
 }
 
 // Handle mocks base method
-func (m *MockHandler) Handle(arg0 *scheduled_notifications.Task, arg1 jobs.Result) error {
+func (m *MockHandler) Handle(arg0 *scheduled_notifications.Task, arg1 *snj.JobResult) error {
 	ret := m.ctrl.Call(m, "Handle", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0

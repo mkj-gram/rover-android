@@ -83,10 +83,8 @@ var PrometheusMetrics = []prom.Collector{
 	metrics.pushTotal,
 }
 
-type handlerFunc func(ctx context.Context, m notification_pubsub.Message) error
-
-func WithMetrics(h handlerFunc) handlerFunc {
-	return handlerFunc(func(ctx context.Context, m notification_pubsub.Message) error {
+func WithMetrics(h HandlerFunc) HandlerFunc {
+	return HandlerFunc(func(ctx context.Context, m notification_pubsub.Message) (*Response, error) {
 		var start = time.Now()
 		defer func() {
 			metrics.jobsTotal.Inc()
@@ -97,11 +95,13 @@ func WithMetrics(h handlerFunc) handlerFunc {
 			}
 		}()
 
-		if err := h(ctx, m); err != nil {
+		var resp, err = h(ctx, m)
+
+		if err != nil {
 			metrics.jobsErrors.WithLabelValues("error").Inc()
-			return err
+			return resp, err
 		}
 
-		return nil
+		return resp, nil
 	})
 }

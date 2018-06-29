@@ -729,7 +729,7 @@ func TestHandler(t *testing.T) {
 			var (
 				exp, expErr = tc.expReq, tc.expErr
 				got         = gotReq
-				gotErr      = handler.Handle(context.TODO(), tc.message)
+				_, gotErr   = handler.Handle(context.TODO(), tc.message)
 			)
 
 			if diff := rtesting.Diff(exp, got, expErr, gotErr); diff != nil {
