@@ -27,7 +27,7 @@ internal fun Notification.encodeJson(dateFormatting: DateFormattingInterface): J
         putProp(this@encodeJson, Notification::expiresAt, "expiresAt") { it.whenNotNull { dateFormatting.dateAsIso8601(it) } }
         putProp(this@encodeJson, Notification::attachment, "attachment") { it.whenNotNull { it.encodeJson() }}
         putProp(this@encodeJson, Notification::tapBehavior, "tapBehavior") { it.encodeJson() }
-        putProp(this@encodeJson, Notification::campaignId)
+        putProp(this@encodeJson, Notification::campaignId, "campaignID")
     }
 }
 

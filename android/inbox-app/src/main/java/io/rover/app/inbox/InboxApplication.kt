@@ -66,26 +66,26 @@ class InboxApplication : Application() {
 
         Rover.initialize(
             CoreAssembler(
-                "",
-                this,
-                "inbox",
+                accountToken  = "",
+                application = this,
+                deepLinkSchemeSlug = "inbox",
                 endpoint = "$roverBaseUrl/graphql"
             ),
             NotificationsAssembler(
-                this,
-                R.mipmap.rover_notification_icon
+                applicationContext = this,
+                smallIconResId = R.mipmap.rover_notification_icon
             ) {
                 FirebaseInstanceId.getInstance().deleteInstanceId()
                 FirebaseInstanceId.getInstance().token
             },
             ExperiencesAssembler(),
             AccountAssembler(
-                this,
-                Intent(
+                application = this,
+                targetIntent = Intent(
                     this,
                     MainActivity::class.java
                 ),
-                roverBaseUrl
+                roverEndpoint = roverBaseUrl
             ),
             LocationAssembler(),
             DebugAssembler()
