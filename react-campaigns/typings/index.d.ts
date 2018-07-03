@@ -43,6 +43,7 @@ type UIStateType =
     | 'scheduleddelivery'
     | 'automateddelivery'
     | 'Date and Time'
+    | 'Tap Behavior'
 
 type UIStateField = {
     seen: boolean
@@ -205,7 +206,12 @@ type AppState = {
     notificationDelivery: NotificationDeliveryState
     overview: OverviewModalState
     phonePreview: PhonePreviewState
+    settings: SettingsState
     wizardModal: WizardModal
+}
+
+type SettingsState = {
+    readonly isPhonePreviewOpen: boolean
 }
 
 type AudienceState = StringMap<number>

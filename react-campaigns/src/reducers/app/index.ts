@@ -11,6 +11,7 @@ import notification, * as notificationSelector from './notification'
 import notificationDelivery, * as notificationDeliverySelector from './notificationDelivery'
 import overview, * as overviewSelector from './overview'
 import phonePreview, * as phonePreviewSelector from './phonePreview'
+import settings, * as settingsSelector from './settings'
 import wizardModal, * as wizardModalSelector from './wizardModal'
 
 export default combineReducers({
@@ -23,6 +24,7 @@ export default combineReducers({
     notificationDelivery,
     phonePreview,
     overview,
+    settings,
     wizardModal
 })
 // Audience
@@ -95,8 +97,12 @@ export const getActivePopover = (state: AppState) =>
 export const getCurrentFormPage = (state: AppState) =>
     formSelector.getCurrentPage(state.form)
 
-export const getShouldShowPhonePreview = (state: AppState) =>
-    formSelector.getShouldShowPhonePreview(state.form)
+export const getShouldShowPhonePreview = (state: AppState) => {
+    if (window.location.pathname.includes('settings')) {
+        return settingsSelector.getShouldShowPhonePreview(state.settings)
+    }
+    return formSelector.getShouldShowPhonePreview(state.form)
+}
 
 export const getIsAudienceSizeUpdating = (state: AppState) =>
     formSelector.getIsAudienceSizeUpdating(state.form)

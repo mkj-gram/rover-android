@@ -319,3 +319,15 @@ export const closeWizardModal: ActionCreator<
         })
     }, 350)
 }
+
+export const openSettingsPagePhonePreview: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'OPEN_SETTINGS_PAGE_PHONE_PREVIEW' })
+}
+
+export const closeSettingsPagePhonePreview: ActionCreator<
+    ThunkAction<void, State, void>
+> = () => (dispatch: Dispatch<State>): void => {
+    dispatch({ type: 'CLOSE_SETTINGS_PAGE_PHONE_PREVIEW' })
+}

@@ -13,12 +13,17 @@ import FormSection from '../utils/FormSection'
 import Row from '../wizards/components/Row'
 import InverseLabel from '../wizards/components/InverseLabel'
 
-import { getEditableCampaign, getCurrentWizard } from '../../reducers'
+import {
+    getEditableCampaign,
+    getCurrentWizard,
+    getCampaign
+} from '../../reducers'
 import {
     createEditableCampaign,
     openWizardModal,
     updateScheduledDeliverySettings,
-    updateNotificationSettings
+    updateNotificationSettings,
+    openSettingsPagePhonePreview
 } from '../../actions'
 
 import {
@@ -30,10 +35,15 @@ import DateAndTime from '../wizards/ScheduledDelivery/DateAndTime'
 import DateAndTimeLabel from './DateAndTimeLabel'
 import EditButton from './EditButton'
 import ScheduledSettingsForm from './ScheduledSettingsForm'
+import TapBehaviorLabel from './TapBehaviorLabel'
+import TapBehaviorContainer from '../wizards/notification/TapBehaviorContainer'
+
+import MessageAndMedia from '../wizards/notification/MessageAndMedia'
 
 export interface SettingsContainerStateProps {
     editableCampaign: ScheduledCampaign | AutomatedNotificationCampaign
     currentWizard: UIStateType
+    getCampaign: (campaignId: string) => Campaign
 }
 
 export interface SettingsContainerDispatchProps {
@@ -41,6 +51,7 @@ export interface SettingsContainerDispatchProps {
     openWizardModal: (stateType: UIStateType) => void
     updateScheduledDeliverySettings: () => void
     updateNotificationSettings: () => void
+    openSettingsPagePhonePreview: () => void
 }
 
 export type SettingsContainerProps = RouteComponentProps<Location> &
@@ -64,7 +75,11 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
     }
 
     openSelectedWizard(wizard: UIStateType) {
-        const { editableCampaign, openWizardModal } = this.props
+        const {
+            editableCampaign,
+            openWizardModal,
+            openSettingsPagePhonePreview
+        } = this.props
         if (
             !(
                 isScheduledCampaign(editableCampaign) &&
@@ -72,15 +87,58 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
             )
         ) {
             openWizardModal(wizard)
+
+            switch (wizard) {
+                case 'Tap Behavior':
+                    openSettingsPagePhonePreview()
+                    break
+                default:
+                    return
+            }
         }
     }
 
     getWizardSection() {
-        const { currentWizard, device } = this.props
+        const { currentWizard, device, getCampaign } = this.props
+        const { campaignId } = parse(location.search.substring(1))
+        const campaign = getCampaign(campaignId)
+        const { Fragment } = React
+
         switch (currentWizard) {
             case 'Date and Time':
                 return (
                     <DateAndTime device={device} wizardSection="dateAndTime" />
+                )
+            case 'Tap Behavior':
+                return (
+                    <Fragment>
+                        <TapBehaviorContainer
+                            campaign={
+                                campaign as
+                                    | ScheduledCampaign
+                                    | AutomatedNotificationCampaign
+                            }
+                            device={device}
+                            wizardSection="tapBehavior"
+                        />
+                        {device === 'Desktop' &&
+                            ReactDOM.createPortal(
+                                <div
+                                    style={{
+                                        position: 'absolute',
+                                        top: 96,
+                                        left: 24,
+                                        textAlign: 'center',
+                                        width: 320,
+                                        height: 568,
+                                        background:
+                                            'white linear-gradient(rgba(233,233,233,1.0), rgba(238,238,238,0.5))',
+                                        zIndex: 10
+                                    }}
+                                />,
+                                document.getElementById('phone-bezel')
+                            )}
+                    </Fragment>
                 )
             default:
                 return null
@@ -93,9 +151,12 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
             updateScheduledDeliverySettings,
             updateNotificationSettings
         } = this.props
+
         switch (currentWizard) {
             case 'Date and Time':
                 return updateScheduledDeliverySettings
+            case 'Tap Behavior':
+                return updateNotificationSettings
             default:
                 return null
         }
@@ -142,6 +203,26 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                         </Row>
                     </FormSection>
 
+                    <FormSection device={device}>
+                        <Text
+                            text="Notification"
+                            size="h2"
+                            textStyle={{ marginBottom: 8 }}
+                        />
+                        <Row
+                            onClick={() =>
+                                this.openSelectedWizard(
+                                    'Tap Behavior' as UIStateType
+                                )
+                            }
+                        >
+                            <InverseLabel title="Tap Behavior">
+                                <TapBehaviorLabel />
+                            </InverseLabel>
+                            <EditButton />
+                        </Row>
+                    </FormSection>
+
                     {currentWizard &&
                         ReactDOM.createPortal(
                             <ScheduledSettingsForm
@@ -161,11 +242,12 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
 
 const mapStateToProps = (state: State): SettingsContainerStateProps => ({
     editableCampaign: getEditableCampaign(state),
-    currentWizard: getCurrentWizard(state)
+    currentWizard: getCurrentWizard(state),
+    getCampaign: (campaignId: string) => getCampaign(state, campaignId)
 })
 
-// tslint:disable-next-line:no-any
 const mapDispatchToProps = (
+    // tslint:disable-next-line:no-any
     dispatch: Dispatch<any>
 ): SettingsContainerDispatchProps => {
     return {
@@ -175,7 +257,11 @@ const mapDispatchToProps = (
         openWizardModal: stateType => dispatch(openWizardModal(stateType)),
         updateScheduledDeliverySettings: () =>
             dispatch(updateScheduledDeliverySettings()),
-        updateNotificationSettings: () => dispatch(updateNotificationSettings())
+        updateNotificationSettings: () =>
+            dispatch(updateNotificationSettings()),
+        openSettingsPagePhonePreview: () => {
+            dispatch(openSettingsPagePhonePreview())
+        }
     }
 }
 

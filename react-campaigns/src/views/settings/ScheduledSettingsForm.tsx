@@ -9,7 +9,11 @@ import {
     getIsWizardModalClosing,
     getShouldShowSaveAndClose
 } from '../../reducers'
-import { createEditableCampaign, closeWizardModal } from '../../actions'
+import {
+    createEditableCampaign,
+    closeWizardModal,
+    closeSettingsPagePhonePreview
+} from '../../actions'
 
 export interface ScheduledSettingsFormStateProps {
     isWizardModalClosing: boolean
@@ -26,6 +30,7 @@ export interface ScheduledSettingsFormProps {
 export interface ScheduledSettingsFormDispatchProps {
     closeWizardModal: () => void
     createEditableCampaign: (campaignId: string) => void
+    closeSettingsPagePhonePreview: () => void
 }
 
 const ScheduledDelivery: React.SFC<
@@ -40,6 +45,7 @@ const ScheduledDelivery: React.SFC<
 
     closeWizardModal,
     createEditableCampaign,
+    closeSettingsPagePhonePreview,
 
     isWizardModalClosing,
     showSaveAndClose
@@ -55,6 +61,7 @@ const ScheduledDelivery: React.SFC<
                 onClick={() => {
                     saveAndClose()
                     closeWizardModal()
+                    closePhonePreview()
                 }}
                 size="large"
                 text="Save & Close"
@@ -63,12 +70,26 @@ const ScheduledDelivery: React.SFC<
         )
     }
 
+    const closePhonePreview = () => {
+        const wizardSection =
+            children.props.wizardSection ||
+            children.props.children[0].props.wizardSection
+        switch (wizardSection) {
+            case 'tapBehavior':
+                closeSettingsPagePhonePreview()
+                break
+            default:
+                break
+        }
+    }
+
     const getCancelButton = () => {
         return (
             <Button
                 onClick={() => {
                     closeWizardModal()
                     createEditableCampaign(campaignId)
+                    closePhonePreview()
                 }}
                 size="large"
                 text="Cancel"
@@ -127,7 +148,10 @@ const mapDispatchToProps = (
     return {
         createEditableCampaign: (campaignId: string) =>
             dispatch(createEditableCampaign(campaignId)),
-        closeWizardModal: () => dispatch(closeWizardModal())
+        closeWizardModal: () => dispatch(closeWizardModal()),
+        closeSettingsPagePhonePreview: () => {
+            dispatch(closeSettingsPagePhonePreview())
+        }
     }
 }
 
