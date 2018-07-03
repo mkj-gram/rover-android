@@ -1,0 +1,99 @@
+syntax = "proto3";
+
+package rover.analytics;
+
+option go_package = "analytics/v1;analytics";
+
+import "auth/v1/auth.proto";
+
+service Analytics {
+	// Notification Open Reports
+	rpc GetNotificationOpenedReport(GetNotificationOpenedReportRequest) returns (GetNotificationOpenedReportResponse);
+	rpc GetNotificationOpenedByDateReport(GetNotificationOpenedByDateReportRequest) returns (GetNotificationOpenedByDateReportResponse);
+
+	// Notification Sent Reports
+	rpc GetNotificationSentReport(GetNotificationSentReportRequest) returns (GetNotificationSentReportResponse);
+}
+
+// TODO make this a global protobuf type
+message Cursor {
+	oneof start {
+		string before = 1;
+		string after  = 2;
+	}
+	oneof take {
+		int32 first = 3;
+		int32 last  = 4;
+	}
+}
+
+// TODO make this a global protobuf type
+message PageInfo {
+	bool has_previous_page = 1;
+	bool has_next_page     = 2;
+}
+
+message GetNotificationOpenedReportRequest {
+	auth.v1.AuthContext auth_context = 1;
+	int32 campaign_id = 2;
+}
+
+message GetNotificationOpenedReportResponse {
+	// Total opens regardless of source
+	int32 total  = 1;
+	// Total unique opens regardless of source
+	int32 unique = 2;
+
+	// Breakdown
+	int32 notification_center_total =  3;
+	int32 notification_center_unique = 4;
+
+	int32 push_direct_total      = 5;
+	int32 push_direct_unique     = 6;
+
+	int32 push_influenced_total  = 7;
+	int32 push_influenced_unique = 8;
+}
+
+message GetNotificationOpenedByDateReportRequest {
+	auth.v1.AuthContext auth_context = 1;
+	int32  campaign_id = 2;
+	Cursor cursor      = 3;
+	string time_zone   = 4;
+}
+
+message GetNotificationOpenedByDateReportResponse {
+	message DateReport {
+		string id                  = 1;
+		int32  notification_center = 2;
+		int32  push_direct         = 3;
+		int32  push_influence      = 4;
+		string cursor              = 5;
+	}
+
+	repeated DateReport reports = 1;
+	PageInfo page_info = 2;
+}
+
+message GetNotificationSentReportRequest {
+	auth.v1.AuthContext auth_context = 1;
+	int32 campaign_id = 2;
+}
+
+message GetNotificationSentReportResponse {
+	// Total delivered regardless of channel
+	int32 total_delivered  = 1;
+	// Total unique regardless of channel
+	int32 unique_delivered = 2;
+
+	int32 notification_center_attempted   = 3;
+	int32 notification_center_delivered   = 4;
+	int32 notification_center_unreachable = 5;
+	int32 notification_center_invalid     = 6;
+
+	int32 push_attempted   = 7;
+	int32 push_delivered   = 8;
+	int32 push_unreachable = 9;
+	int32 push_invalid     = 10;
+}
+

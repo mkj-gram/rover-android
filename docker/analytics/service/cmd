@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -e
+source ./docker/functions.bash
+
+setup() {
+	waiton influxdb 8086
+	go run ./go/cmd/influx-cli/main.go create -dsn http://influxdb:8086 -db-name $1
+}
+
+shell() {
+	setup analytics_dev
+	sh
+}
+
+run() {
+	setup analytics_dev
+	go run ./analytics/backend/cmd/service/main.go
+}
+
+test() {
+	setup analytics_test
+	go test ./analytics/backend/...
+}
+
+main $@

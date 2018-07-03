@@ -46,7 +46,7 @@ steps:
       - '-c'
       - |
         set -x
-        export GO_PKGS="./auth/... ./audience/... ./campaigns/... ./notification/... ./go/..."
+        export GO_PKGS="./auth/... ./audience/... ./campaigns/... ./notification/... ./go/... ./analytics/backend/..."
 
         files=$(go fmt $$GO_PKGS)
         if [[ $? != 0 ]]; then
@@ -225,6 +225,18 @@ steps:
     waitFor:
       - 'install-complete'
 
+# Analytics
+  - id: 'test-analytics-service'
+    name: 'docker/compose:1.16.1'
+    args:
+      - -f
+      - ./analytics/backend/test.docker-compose.yaml
+      - run
+      - --rm
+      - service
+    waitFor:
+      - 'install-complete'
+
 # @rover/apis node module
   - id: 'test-rover-apis'
     name: 'node:7.10.1'
@@ -265,6 +277,7 @@ steps:
         - 'test-campaigns'
         - 'test-notification'
         - 'test-events-pipeline'
+        - 'test-analytics-service'
         - 'test-rover-apis'
 
 # End Test Stage
@@ -484,6 +497,40 @@ steps:
     waitFor:
       - 'build-events-resources'
 
+# Analytics
+  - id: 'build-analytics-service-binary'
+    name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -o
+      - docker/analytics/build/bin/service
+      - github.com/roverplatform/rover/analytics/backend/cmd/service
+    waitFor:
+      - 'test-complete'
+
+  - id: 'build-analytics-influx-cli'
+    name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -o
+      - docker/analytics/build/bin/influx-cli
+      - ./go/cmd/influx-cli
+    waitFor:
+      - 'test-complete'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - -t
+      - gcr.io/$PROJECT_ID/analytics:$SHORT_SHA
+      - docker/analytics
+    waitFor:
+      - 'build-analytics-influx-cli'
+      - 'build-analytics-service-binary'
 
 # GraphQL Gateway
 
@@ -564,5 +611,6 @@ images:
   - 'gcr.io/$PROJECT_ID/campaigns:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/notification:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/events:$SHORT_SHA'
+  - 'gcr.io/$PROJECT_ID/analytics:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/graphql-gateway:$SHORT_SHA'
   - 'gcr.io/$PROJECT_ID/graphql-admin:$SHORT_SHA'

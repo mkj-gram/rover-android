@@ -1,0 +1,7 @@
+2018-06-14T00:01:40Z account_id=1,campaign_id=1,channel=notification-center,result=delivered device_id="477c5095-59f6-4dca-bbb5-ace1bde3c90e"
+2018-06-14T01:01:40Z account_id=1,campaign_id=1,channel=push,result=invalid device_id="4d0b2a40-7ede-11e8-adc0-fa7ae01bbebc"
+2018-06-14T02:01:40Z account_id=1,campaign_id=1,channel=push,result=delivered device_id="5191bb38-7ede-11e8-adc0-fa7ae01bbebc"
+2018-06-14T03:01:40Z account_id=1,campaign_id=1,channel=notification-center,result=delivered device_id="5191bb38-7ede-11e8-adc0-fa7ae01bbebc"
+2018-06-14T04:01:40Z account_id=1,campaign_id=1,channel=push,result=unreachable device_id="5a4afd20-7ede-11e8-adc0-fa7ae01bbebc"
+2018-06-14T05:01:40Z account_id=1,campaign_id=1,channel=notification-center,result=delivered device_id="5a4afd20-7ede-11e8-adc0-fa7ae01bbebc"
+2018-06-14T06:01:40Z account_id=1,campaign_id=1,channel=notification-center,result=delivered device_id="6123eeae-7ede-11e8-adc0-fa7ae01bbebc"

@@ -1,34 +1,23 @@
 DCF ?= docker-compose -f ../../docker/main.docker-compose.yaml
+DCFTEST ?= docker-compose -f test.docker-compose.yaml
 
-COLLECTOR_RUN ?= ${DCF} run --rm analytics-collector
 SERVICE_RUN ?= ${DCF} run --rm analytics-service
 
 help:
 	@echo
-	@echo "  \033[34mcollector.run\033[0m - run the collector"
-	@echo "  \033[34mcollector.shell\033[0m - create a shell in the collector context"
-	@echo "  \033[34mcollector.test\033[0m - test the collector"
-	@echo "  \033[34mservice.run\033[0m - run the service"
-	@echo "  \033[34mservice.shell\033[0m - create a shell in the service context"
-	@echo "  \033[34mservice.test\033[0m - test the service"
+	@echo "  \033[34mtest\033[0m   - test the service & collector"
+	@echo "  \033[34mrun\033[0m    - run the grpc service"
+	@echo "  \033[34mshell\033[0m  - open a shell inside the docker container"
 	@echo
 
-collector.run:
-	${COLLECTOR_RUN}
-
-collector.shell:
-	${COLLECTOR_RUN} sh
-
-collector.test:
-	${COLLECTOR_RUN} ./docker/analytics/cmd test_collector
-
-service.run:
+run:
 	${SERVICE_RUN}
 
-service.shell:
-	${SERVICE_RUN} sh
+shell:
+	${SERVICE_RUN} ./docker/analytics/service/cmd shell
 
-service.test:
-	${SERVICE_RUN} ./docker/analytics/cmd test_service
+test:
+	${DCFTEST} run --rm service
 
-.PHONY: help collector.run collector.shell collector.test service.run service.shell service.test
+
+.PHONY: help run

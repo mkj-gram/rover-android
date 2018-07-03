@@ -945,8 +945,7 @@ func (m *ListResponse) GetCursor() *ListResponse_Cursor {
 }
 
 // Cursor provider cursor information
-// in case it list was requested with one
-//
+// in case ListRequest comes with one
 type ListResponse_Cursor struct {
 	// tokens contain encoded cursors for the corresponding campaings
 	Tokens     []string `protobuf:"bytes,1,rep,name=tokens" json:"tokens,omitempty"`

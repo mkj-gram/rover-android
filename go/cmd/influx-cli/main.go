@@ -33,6 +33,7 @@ func main() {
 		log.Println("The most commonly used commands are: ")
 		log.Println("create    Create an influx database")
 		log.Println("migrate   Migrate an influx database")
+		os.Exit(2)
 		return
 	}
 
