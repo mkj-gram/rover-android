@@ -1,6 +1,8 @@
 package campaigns
 
-import "time"
+import (
+	"time"
+)
 
 type RateLimit struct {
 	Frequency     int32  `json:"frequency"`
@@ -34,8 +36,9 @@ type UpdateAutomatedDeliverySettingsRequest struct {
 }
 
 type UpdateNotificationSettingsRequest struct {
-	AccountId  int32 `db:"account_id"`
-	CampaignId int32 `db:"campaign_id"`
+	AccountId   int32  `db:"account_id"`
+	AccountName string `db:"-"`
+	CampaignId  int32  `db:"campaign_id"`
 
 	ExperienceId string `db:"experience_id"`
 

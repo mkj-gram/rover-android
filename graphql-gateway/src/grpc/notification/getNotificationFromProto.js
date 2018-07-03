@@ -5,7 +5,7 @@ const getTapBehavior = (n) => {
 		case 0:
 			return {
 				__typename: 'OpenURLNotificationTapBehavior',
-				url: `rv-inbox://presentExperience?campaignID=${n.getCampaignId()}`
+				url: n.getTapBehaviorUrl()
 			}
 		case 1:
 			return {

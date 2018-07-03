@@ -48,22 +48,25 @@ func toBase64(t *testing.T, data []byte) string {
 
 func makeNotificationSettings(fn func(t *scylla.NotificationSettings)) *scylla.NotificationSettings {
 	var defaultNS = &scylla.NotificationSettings{
-		CampaignId:                  1,
-		AccountID:                   1,
-		ExperienceId:                "abc123",
-		AttachmentUrl:               "https://google.ca/cat.png",
-		AttachmentType:              scylla.AttachmentType_IMAGE,
+		CampaignId:     1,
+		AccountID:      1,
+		ExperienceId:   "abc123",
+		AttachmentUrl:  "https://google.ca/cat.png",
+		AttachmentType: scylla.AttachmentType_IMAGE,
+
 		TapBehaviorType:             scylla.TapBehaviorType_OPEN_EXPERIENCE,
+		TapBehaviorUrl:              "rv-acct_1://presentExperience?campaignID=1",
 		TapBehaviorPresentationType: scylla.TapBehaviorPresentationType_UNKNOWN,
-		IosContentAvailable:         true,
-		IosMutableContent:           true,
-		IosSound:                    "sound-file.wav",
-		IosCategoryIdentifier:       "category",
-		IosThreadIdentifier:         "thread",
-		AndroidChannelId:            "channel-id",
-		AndroidSound:                "sound-file.android",
-		AndroidTag:                  "android-tag",
-		Expiration:                  99,
+
+		IosContentAvailable:   true,
+		IosMutableContent:     true,
+		IosSound:              "sound-file.wav",
+		IosCategoryIdentifier: "category",
+		IosThreadIdentifier:   "thread",
+		AndroidChannelId:      "channel-id",
+		AndroidSound:          "sound-file.android",
+		AndroidTag:            "android-tag",
+		Expiration:            99,
 		Attributes: map[string]string{
 			"value1": "something",
 			"value2": "another",
@@ -318,6 +321,124 @@ func TestHandler(t *testing.T) {
 			expReq: &HTTPRequest{
 				Headers: http.Header{
 					"User-Agent":      []string{"Go-http-client/1.1"},
+					"Content-Length":  []string{"485"},
+					"Authorization":   []string{"key=server_key"},
+					"Content-Type":    []string{"application/json"},
+					"Accept-Encoding": []string{"gzip"},
+				},
+				Body: M{
+					"to":           "pushtoken",
+					"collapse_key": "channel-id",
+
+					"data": M{
+						"rover": M{
+							"notification": M{
+								"id":         "09702289-4329-11e8-a214-784f43835469",
+								"campaignID": "1",
+								"title":      "a title",
+								"body":       "a body",
+								"attachment": M{
+									"type": "IMAGE",
+									"url":  "https://google.ca/cat.png",
+								},
+								"tapBehavior": M{
+									"__typename": "OpenURLNotificationTapBehavior",
+									"url":        "rv-acct_1://presentExperience?campaignID=1",
+								},
+								"deliveredAt":                 "2018-04-18T16:53:36.5864073Z",
+								"expiresAt":                   nil,
+								"isRead":                      false,
+								"isDeleted":                   false,
+								"isNotificationCenterEnabled": false,
+							},
+						},
+					},
+				},
+			},
+
+			serverResponse: func(rw http.ResponseWriter, req *http.Request) {
+				rw.WriteHeader(http.StatusOK)
+				rw.Header().Set("Content-Type", "application/json")
+				fmt.Fprint(rw, `{
+													"success": 1,
+													"failure":0,
+													"results": [{
+														"message_id":"q1w2e3r4",
+														"registration_id": "t5y6u7i8o9",
+														"error": ""
+													}]
+												}`)
+			},
+
+			setupMocks: func(m mocked) {
+
+				m.MocknotificationSettingsStore.
+					EXPECT().OneById(ctx, int32(1)).
+					Return(
+						makeNotificationSettings(nil),
+						nil,
+					)
+
+				notification := scylla.Notification{
+					AccountId:  1,
+					CampaignId: 1,
+					DeviceId:   "device_id",
+					Id:         uuid(t, "09702289-4329-11e8-a214-784f43835469"),
+					IsDeleted:  false,
+					IsRead:     false,
+					Body:       "a body",
+					Title:      "a title",
+				}
+
+				m.MocknotificationsStore.
+					EXPECT().Create(ctx, &notification).
+					Return(
+						nil,
+					)
+
+				m.MockAndroidPlatformStore.
+					EXPECT().
+					ListByAccountId(ctx, int32(1)).
+					Return(
+						[]*postgres.AndroidPlatform{
+							&postgres.AndroidPlatform{
+								Id:        1,
+								AccountId: 1,
+								CreatedAt: timeNow,
+								UpdatedAt: timeNow,
+								Title:     "a key",
+								PushCredentialsSenderId:  "server_sender_id",
+								PushCredentialsServerKey: "server_key",
+								PushCredentialsUpdatedAt: timeNow,
+							},
+						},
+						nil,
+					)
+			},
+		},
+
+		{
+			desc: "inbox-app: FCM sdk 2.0 request",
+
+			message: &notification_pubsub.PushMessage{
+				CampaignID:        1,
+				NotificationBody:  "a body",
+				NotificationTitle: "a title",
+				Device: notification_pubsub.Device{
+					AccountID:            1,
+					AppNamespace:         "io.rover.Inbox",
+					AppBadgeNumber:       intPtr(2),
+					ID:                   "device_id",
+					OsName:               "Android",
+					PushToken:            "pushtoken",
+					PushTokenEnvironment: "production",
+					SdkVersion:           sdkVersion,
+				},
+			},
+
+			expReq: &HTTPRequest{
+				Headers: http.Header{
+					"User-Agent":      []string{"Go-http-client/1.1"},
 					"Content-Length":  []string{"484"},
 					"Authorization":   []string{"key=server_key"},
 					"Content-Type":    []string{"application/json"},
@@ -338,7 +459,10 @@ func TestHandler(t *testing.T) {
 									"type": "IMAGE",
 									"url":  "https://google.ca/cat.png",
 								},
-								"tapBehavior":                 M{"__typename": "OpenURLNotificationTapBehavior", "url": "rv-inbox://presentExperience?campaignID=1"},
+								"tapBehavior": M{
+									"__typename": "OpenURLNotificationTapBehavior",
+									"url":        "rv-inbox://presentExperience?campaignID=1",
+								},
 								"deliveredAt":                 "2018-04-18T16:53:36.5864073Z",
 								"expiresAt":                   nil,
 								"isRead":                      false,
@@ -434,7 +558,7 @@ func TestHandler(t *testing.T) {
 
 				Headers: http.Header{
 					"User-Agent":       []string{"Go-http-client/1.1"},
-					"Content-Length":   []string{"598"},
+					"Content-Length":   []string{"581"},
 					"Apns-Collapse-Id": []string{"thread"},
 					"Apns-Id":          []string{"09702289-4329-11e8-a214-784f43835469"},
 					"Apns-Topic":       []string{"io.rover.Bagel"},
@@ -467,7 +591,7 @@ func TestHandler(t *testing.T) {
 							"read":              false,
 							"saved-to-inbox":    false,
 							"content-type":      "website",
-							"deep-link-url":     "https://google.ca",
+							"deep-link-url":     "",
 							"website-url":       "https://google.ca",
 							"properties": M{
 								"value1": "something",
@@ -565,7 +689,7 @@ func TestHandler(t *testing.T) {
 
 				Headers: http.Header{
 					"User-Agent":       []string{"Go-http-client/1.1"},
-					"Content-Length":   []string{"602"},
+					"Content-Length":   []string{"603"},
 					"Apns-Collapse-Id": []string{"thread"},
 					"Apns-Id":          []string{"09702289-4329-11e8-a214-784f43835469"},
 					"Apns-Topic":       []string{"io.rover.Bagel"},
@@ -587,11 +711,14 @@ func TestHandler(t *testing.T) {
 					},
 					"rover": M{
 						"notification": M{
-							"id":          "09702289-4329-11e8-a214-784f43835469",
-							"campaignID":  "1",
-							"body":        "a body",
-							"title":       "a title",
-							"tapBehavior": M{"__typename": "OpenURLNotificationTapBehavior", "url": "rv-inbox://presentExperience?campaignID=1"},
+							"id":         "09702289-4329-11e8-a214-784f43835469",
+							"campaignID": "1",
+							"body":       "a body",
+							"title":      "a title",
+							"tapBehavior": M{
+								"__typename": "OpenURLNotificationTapBehavior",
+								"url":        "rv-acct_1://presentExperience?campaignID=1",
+							},
 							"deliveredAt": "2018-04-18T16:53:36.5864073Z",
 
 							"attachment": M{

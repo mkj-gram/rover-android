@@ -104,6 +104,14 @@ func (w *Handler) Handle(ctx context.Context, m notification_pubsub.Message) (*R
 
 			device = &msg.Device
 
+			var (
+				isOpenExperience = settings.TapBehaviorType == scylla.TapBehaviorType_OPEN_EXPERIENCE
+				isInboxApp       = isRoverInboxAndroidApp(device.AppNamespace) || isRoverInboxIOSApp(device.AppNamespace)
+			)
+			if isOpenExperience && isInboxApp {
+				settings.TapBehaviorUrl = roverInboxURL(settings.TapBehaviorUrl)
+			}
+
 			mkFCMRequest = func() *fcm.Message { return ToFCMRequest(m, settings, &note) }
 			mkAPNSRequest = func() *apns2.Notification { return ToAPNSRequest(m, settings, &note) }
 

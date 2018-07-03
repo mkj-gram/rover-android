@@ -102,6 +102,7 @@ func protoToUpdateScheduledDeliverySettingsRequest(req *campaignspb.UpdateSchedu
 
 func protoToUpdateNotificationSettingsRequest(req *campaignspb.UpdateNotificationSettingsRequest, update *campaigns.UpdateNotificationSettingsRequest) error {
 	update.AccountId = req.AuthContext.AccountId
+	update.AccountName = req.GetAuthContext().GetAccountName()
 	update.CampaignId = req.CampaignId
 	update.ExperienceId = req.ExperienceId
 

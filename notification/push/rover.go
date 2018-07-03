@@ -2,9 +2,9 @@ package push
 
 import (
 	"encoding/json"
-	"time"
 	"fmt"
 	"github.com/roverplatform/rover/notification/scylla"
+	"time"
 )
 
 type Attachment struct {
@@ -33,7 +33,7 @@ func (tapBehavior *tapBehaviorInfo) MarshalJSON() ([]byte, error) {
 	case string(scylla.TapBehaviorType_OPEN_EXPERIENCE):
 		payload = M{
 			"__typename": "OpenURLNotificationTapBehavior",
-			"url": fmt.Sprintf("rv-inbox://presentExperience?campaignID=%d", tapBehavior.campaignId),
+			"url":        tapBehavior.tapBehaviorUrl,
 		}
 		// 1
 	case string(scylla.TapBehaviorType_OPEN_APP):
@@ -73,12 +73,12 @@ func (tapBehavior *tapBehaviorInfo) MarshalJSON() ([]byte, error) {
 
 type RoverNotification struct {
 	Id         string `json:"id"`
-	CampaignID string  `json:"campaignID"`
+	CampaignID string `json:"campaignID"`
 
 	Title string `json:"title"`
 	Body  string `json:"body"`
 
-	Attachment *Attachment `json:"attachment,omitempty"`
+	Attachment  *Attachment      `json:"attachment,omitempty"`
 	TapBehavior *tapBehaviorInfo `json:"tapBehavior"`
 
 	DeliveredAt time.Time  `json:"deliveredAt"`
@@ -151,21 +151,7 @@ type LegacyNotificationAttributes struct {
 }
 
 func ToLegacyRoverNotification(settings *scylla.NotificationSettings, note *scylla.Notification) *LegacyRoverNotification {
-	var contentType string
-	switch settings.TapBehaviorType {
-	case scylla.TapBehaviorType_OPEN_APP:
-		contentType = "custom"
-	case scylla.TapBehaviorType_OPEN_DEEP_LINK:
-		contentType = "deep-link"
-	case scylla.TapBehaviorType_OPEN_WEBSITE:
-		contentType = "website"
-	case scylla.TapBehaviorType_OPEN_EXPERIENCE:
-		contentType = "experience"
-	default:
-		contentType = "custom"
-	}
-
-	return &LegacyRoverNotification{
+	pushNote := &LegacyRoverNotification{
 		ID:   note.Id.String(),
 		Type: "messages",
 		Attributes: LegacyNotificationAttributes{
@@ -175,12 +161,30 @@ func ToLegacyRoverNotification(settings *scylla.NotificationSettings, note *scyl
 			Tags:             []string{},
 			Read:             false,
 			SavedToInbox:     settings.AlertOptionNotificationCenter,
-			ContentType:      contentType,
-			WebsiteURL:       settings.TapBehaviorUrl,
-			DeepLinkURL:      settings.TapBehaviorUrl,
+			ContentType:      "", // see below
+			WebsiteURL:       "",
+			DeepLinkURL:      "",
 			Timestamp:        note.CreatedAt(),
 			Properties:       settings.Attributes,
 			ExperienceID:     settings.ExperienceId,
 		},
 	}
+
+	var attrs = &pushNote.Attributes
+	switch settings.TapBehaviorType {
+	case scylla.TapBehaviorType_OPEN_APP:
+		attrs.ContentType = "custom"
+	case scylla.TapBehaviorType_OPEN_WEBSITE:
+		attrs.ContentType = "website"
+		attrs.WebsiteURL = settings.TapBehaviorUrl
+	case scylla.TapBehaviorType_OPEN_DEEP_LINK:
+		attrs.ContentType = "deep-link"
+		attrs.DeepLinkURL = settings.TapBehaviorUrl
+	case scylla.TapBehaviorType_OPEN_EXPERIENCE:
+		attrs.ContentType = "experience"
+	default:
+		attrs.ContentType = "custom"
+	}
+
+	return pushNote
 }

@@ -2,6 +2,7 @@ package campaigns_grpc
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"google.golang.org/grpc/codes"
@@ -419,7 +420,6 @@ func (s *Server) UpdateNotificationSettings(ctx context.Context, req *campaignsp
 	}
 
 	var update campaigns.UpdateNotificationSettingsRequest
-
 	if err := protoToUpdateNotificationSettingsRequest(req, &update); err != nil {
 		return nil, status.Errorf(ErrorToStatus(err), "fromProto: %v", err)
 	}
@@ -433,9 +433,9 @@ func (s *Server) UpdateNotificationSettings(ctx context.Context, req *campaignsp
 		return nil, err
 	}
 
-	campaign, err := s.DB.CampaignsStore().UpdateNotificationSettings(ctx, &update)
+	campaign, err := s.updateNotificationSettings(ctx, &update)
 	if err != nil {
-		return nil, status.Errorf(ErrorToStatus(err), "campaigns.UpdateNotificationSettings: %v", err)
+		return nil, status.Errorf(ErrorToStatus(err), "updateNotificationSettings: %v", err)
 	}
 
 	if err := s.setScheduledDeliveryStatus(ctx, campaign); err != nil {
@@ -450,6 +450,24 @@ func (s *Server) UpdateNotificationSettings(ctx context.Context, req *campaignsp
 	return &campaignspb.UpdateNotificationSettingsResponse{
 		Campaign: &proto,
 	}, nil
+}
+
+func (s *Server) updateNotificationSettings(ctx context.Context, update *campaigns.UpdateNotificationSettingsRequest) (*campaigns.Campaign, error) {
+	var isTapBehaviorTypeOpenExperience = update.NotificationTapBehaviorType == campaignspb.NotificationTapBehaviorType_OPEN_EXPERIENCE.String()
+
+	if isTapBehaviorTypeOpenExperience {
+		if update.AccountName == "" {
+			return nil, status.Errorf(codes.FailedPrecondition, "account_name: blank")
+		}
+		update.NotificationTapBehaviorUrl = fmt.Sprintf("rv-%s://presentExperience?campaignID=%d", update.AccountName, update.CampaignId)
+	}
+
+	campaign, err := s.DB.CampaignsStore().UpdateNotificationSettings(ctx, update)
+	if err != nil {
+		return nil, status.Errorf(ErrorToStatus(err), "campaigns.UpdateNotificationSettings: %v", err)
+	}
+
+	return campaign, nil
 }
 
 func (s *Server) canUpdateState(ctx context.Context, campaign *campaigns.Campaign) error {

@@ -2056,8 +2056,7 @@ func test_UpdateNotificationSettings(t *testing.T) {
 								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
 
-								CampaignId: 2,
-								// CampaignType:     int32(campaignspb.CampaignType_AUTOMATED_NOTIFICATION),
+								CampaignId:       2,
 								CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
 								Name:             "c2",
 								SegmentCondition: campaignspb.SegmentCondition_ALL,
@@ -2125,6 +2124,105 @@ func test_UpdateNotificationSettings(t *testing.T) {
 							AutomatedSunday:    true,
 
 							AutomatedFrequencySingleUse: true,
+						},
+					},
+				},
+			},
+		},
+
+		{
+			name: "updates scheduled_notification campaign",
+			req: &campaignspb.UpdateNotificationSettingsRequest{
+				AuthContext: &auth.AuthContext{AccountId: 2, AccountName: "rover"},
+				CampaignId:  13,
+
+				ExperienceId: "123",
+				UiState:      "this is my state",
+
+				NotificationBody:                          "body",
+				NotificationTitle:                         "title",
+				NotificationAttachmentUrl:                 "https://www.rover.io/logo.png",
+				NotificationAttachmentType:                campaignspb.NotificationAttachmentType_IMAGE,
+				NotificationTapBehaviorType:               campaignspb.NotificationTapBehaviorType_OPEN_EXPERIENCE,
+				NotificationTapBehaviorPresentationType:   campaignspb.NotificationTapPresentationType_UNKNOWN,
+				NotificationTapBehaviorUrl:                "https://google.ca",
+				NotificationIosContentAvailable:           false,
+				NotificationIosMutableContent:             false,
+				NotificationIosSound:                      "default",
+				NotificationIosCategoryIdentifier:         "ios-id",
+				NotificationIosThreadIdentifier:           "ios-thread-id",
+				NotificationAndroidChannelId:              "android-channel-id",
+				NotificationAndroidSound:                  "default",
+				NotificationAndroidTag:                    "android-tag",
+				NotificationExpiration:                    3600,
+				NotificationAttributes:                    map[string]string{"my-custom-attr": "hi"},
+				NotificationAlertOptionPushNotification:   true,
+				NotificationAlertOptionNotificationCenter: true,
+				NotificationAlertOptionBadgeNumber:        false,
+			},
+
+			before: &expect{
+				exp: &campaign{
+					AccountId: 2,
+					Campaign: &campaignspb.Campaign{
+						Campaign: &campaignspb.Campaign_ScheduledNotificationCampaign{
+							ScheduledNotificationCampaign: &campaignspb.ScheduledNotificationCampaign{
+								CreatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+								UpdatedAt: ts(t, "2017-05-04T16:26:25.445494+00:00"),
+
+								CampaignId: 13,
+
+								Name: "c13",
+
+								CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
+								SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+								NotificationBody:  "a body",
+								NotificationTitle: "a title",
+
+								NotificationExpiration:                  -1,
+								NotificationAlertOptionPushNotification: true,
+							},
+						},
+					},
+				},
+			},
+
+			exp: &campaignspb.UpdateNotificationSettingsResponse{
+				Campaign: &campaignspb.Campaign{
+					Campaign: &campaignspb.Campaign_ScheduledNotificationCampaign{
+						ScheduledNotificationCampaign: &campaignspb.ScheduledNotificationCampaign{
+							CampaignId:       13,
+							CampaignStatus:   campaignspb.CampaignStatus_DRAFT,
+							Name:             "c13",
+							CreatedAt:        ts(t, "2017-05-04T16:26:25.445494+00:00"),
+							UpdatedAt:        updatedAt,
+							SegmentCondition: campaignspb.SegmentCondition_ALL,
+
+							ExperienceId: "123",
+
+							UiState: "this is my state",
+
+							NotificationBody:                          "body",
+							NotificationTitle:                         "title",
+							NotificationAttachmentUrl:                 "https://www.rover.io/logo.png",
+							NotificationAttachmentType:                campaignspb.NotificationAttachmentType_IMAGE,
+							NotificationTapBehaviorType:               campaignspb.NotificationTapBehaviorType_OPEN_EXPERIENCE,
+							NotificationTapBehaviorPresentationType:   campaignspb.NotificationTapPresentationType_UNKNOWN,
+							NotificationTapBehaviorUrl:                "rv-rover://presentExperience?campaignID=13",
+							NotificationIosContentAvailable:           false,
+							NotificationIosMutableContent:             false,
+							NotificationIosSound:                      "default",
+							NotificationIosCategoryIdentifier:         "ios-id",
+							NotificationIosThreadIdentifier:           "ios-thread-id",
+							NotificationAndroidChannelId:              "android-channel-id",
+							NotificationAndroidSound:                  "default",
+							NotificationAndroidTag:                    "android-tag",
+							NotificationExpiration:                    3600,
+							NotificationAttributes:                    map[string]string{"my-custom-attr": "hi"},
+							NotificationAlertOptionPushNotification:   true,
+							NotificationAlertOptionNotificationCenter: true,
+							NotificationAlertOptionBadgeNumber:        false,
 						},
 					},
 				},
