@@ -6,12 +6,20 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { AnyAction } from 'redux'
 import { ThunkDispatch } from 'redux-thunk'
-import { Menu, MenuItemProps, Segment } from 'semantic-ui-react'
-import { State } from '../../typings'
+import { Grid, Menu, MenuItemProps, Table } from 'semantic-ui-react'
+import { State, StringMap, Account } from '../../typings'
 import { tabSwitch, fetchAccounts } from '../actions'
-import { getActiveTab, getIsAuthenticated, getUser } from '../reducers'
+import {
+    getActiveTab,
+    getIsAuthenticated,
+    getIsAuthLoading,
+    getUser
+} from '../reducers'
+import * as moment from 'moment-timezone'
 
 interface DashboardStateProps {
+    accounts: StringMap<Account>
+    isAuthLoading: boolean
     isAuthenticated: boolean
     user: User
     activeTab: string
@@ -28,6 +36,15 @@ class Dashboard extends React.PureComponent<DashboardPageProps, {}> {
         super(props)
     }
 
+    componentDidUpdate(prevProps: DashboardStateProps & DispatchProps) {
+        const { isAuthLoading, fetchAccounts } = this.props
+        const prevIsAuthLoading = prevProps.isAuthLoading
+
+        if (prevIsAuthLoading && !isAuthLoading) {
+            fetchAccounts()
+        }
+    }
+
     handleItemClick = (
         e: React.MouseEvent<HTMLAnchorElement>,
         { name }: MenuItemProps
@@ -41,34 +58,36 @@ class Dashboard extends React.PureComponent<DashboardPageProps, {}> {
     }
 
     render() {
-        const { isAuthenticated, user, activeTab } = this.props
+        const {
+            accounts,
+            isAuthLoading,
+            isAuthenticated,
+            user,
+            activeTab,
+            fetchAccounts
+        } = this.props
 
-        return isAuthenticated && user ? (
+        return isAuthenticated && user && !isAuthLoading ? (
             <div>
                 <Menu pointing={true} secondary={true} color={'teal'}>
                     <Menu.Item header={true}>Rover Admin</Menu.Item>
-                    <Menu.Item
-                        name="dashboard"
-                        active={activeTab === 'dashboard'}
-                        onClick={this.handleItemClick}
-                    />
-                    <Menu.Item
-                        name="create account"
-                        active={activeTab === 'create account'}
-                        onClick={this.handleItemClick}
-                    />
                     <Menu.Menu position="right">
                         <Menu.Item
+                            name="create account"
+                            active={activeTab === 'create account'}
+                            onClick={this.handleItemClick}
+                        />
+                        <Menu.Item
                             style={{
-                                paddingBottom: '2%',
-                                paddingTop: '2%'
+                                paddingTop: '5px',
+                                paddingBottom: '5px'
                             }}
                         >
                             <img
                                 style={{
-                                    height: '30px',
+                                    height: '30',
                                     marginRight: '2%',
-                                    width: '30px'
+                                    width: '30'
                                 }}
                                 src={user.photoURL}
                                 alt={user.displayName}
@@ -79,7 +98,74 @@ class Dashboard extends React.PureComponent<DashboardPageProps, {}> {
                     </Menu.Menu>
                 </Menu>
 
-                <Segment>Accounts List Here</Segment>
+                <Grid>
+                    <Grid.Column stretched={true} width={4}>
+                        <Menu
+                            vertical={true}
+                            pointing={true}
+                            secondary={true}
+                            color={'teal'}
+                        >
+                            {/* <Menu.Item header={true}>Rover Admin</Menu.Item> */}
+                            <Menu.Item
+                                name="dashboard"
+                                active={activeTab === 'dashboard'}
+                                onClick={this.handleItemClick}
+                            />
+                        </Menu>
+                    </Grid.Column>
+
+                    <Grid.Column stretched={true} width={12}>
+                        <Table>
+                            <Table.Header>
+                                <Table.Row>
+                                    <Table.HeaderCell>ID</Table.HeaderCell>
+                                    <Table.HeaderCell>Name</Table.HeaderCell>
+                                    <Table.HeaderCell>
+                                        Updated At
+                                    </Table.HeaderCell>
+                                    <Table.HeaderCell>
+                                        Created At
+                                    </Table.HeaderCell>
+                                </Table.Row>
+                            </Table.Header>
+                            <Table.Body>
+                                {Object.keys(accounts).map(accountId => {
+                                    return (
+                                        <Table.Row key={accountId}>
+                                            <Table.Cell>
+                                                {accounts[accountId].id}
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                {accounts[accountId].name}
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                {moment(
+                                                    accounts[accountId]
+                                                        .updatedAt
+                                                )
+                                                    .tz(moment.tz.guess())
+                                                    .format(
+                                                        'YYYY-MM-DD HH:mm z'
+                                                    )}
+                                            </Table.Cell>
+                                            <Table.Cell>
+                                                {moment(
+                                                    accounts[accountId]
+                                                        .createdAt
+                                                )
+                                                    .tz(moment.tz.guess())
+                                                    .format(
+                                                        'YYYY-MM-DD HH:mm z'
+                                                    )}
+                                            </Table.Cell>
+                                        </Table.Row>
+                                    )
+                                })}
+                            </Table.Body>
+                        </Table>
+                    </Grid.Column>
+                </Grid>
             </div>
         ) : (
             <h1
@@ -102,6 +188,8 @@ const mapDispatchToProps = (
 })
 
 const mapStateToProps = (state: State): DashboardStateProps => ({
+    accounts: state.accounts,
+    isAuthLoading: getIsAuthLoading(state),
     isAuthenticated: getIsAuthenticated(state),
     user: getUser(state),
     activeTab: getActiveTab(state)

@@ -2,6 +2,14 @@ import { combineReducers } from 'redux'
 import { State } from '../../typings'
 import authentication, * as authenticationSelector from './authentication'
 import dashboard, * as dashboardSelector from './dashboard'
+import accounts, * as accountsSelector from './accounts'
+
+// Accounts
+export const getCampaign = (state: State, id: string) =>
+    accountsSelector.getAccount(state.accounts, id)
+
+export const getAllCampaigns = (state: State) =>
+    accountsSelector.getAllAccounts(state.accounts)
 
 // Authentication
 export const getIsAuthLoading = (state: State) =>
@@ -21,6 +29,7 @@ export const getActiveTab = (state: State) =>
     dashboardSelector.getActiveTab(state.dashboard)
 
 export default combineReducers({
+    accounts,
     authentication,
     dashboard
 })

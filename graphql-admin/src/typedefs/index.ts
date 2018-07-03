@@ -9,7 +9,7 @@ type Account {
 }
 
 type Query {
-    listAccounts: [Account]!
+    accounts: [Account]!
 }
 
 type Mutation {

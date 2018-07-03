@@ -13,29 +13,17 @@ const environments: StringMap<string> = {
 const uri =
     environments[process.env.NODE_ENV] || 'https://api.staging.rover.io/admin'
 
-function getToken() {
-    if (!firebase.apps.length) {
-        return ''
-    }
-    firebase
-        .auth()
-        .currentUser.getIdToken()
-        .then(token => {
-            return token
-        })
-        .catch(err => {
-            return ''
-        })
-}
-
-const link = new HttpLink({
-    headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${getToken()}`
-    },
-    uri
-})
-
-export default (operation: GraphQLRequest) => {
-    return makePromise(execute(link, operation))
+export default (token: string, operation: GraphQLRequest) => {
+    return makePromise(
+        execute(
+            new HttpLink({
+                headers: {
+                    accept: 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                uri
+            }),
+            operation
+        )
+    )
 }

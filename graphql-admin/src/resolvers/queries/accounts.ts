@@ -4,7 +4,7 @@ import * as promisify from '@rover-common/grpc-promisify'
 import { authClient } from '../grpcClients'
 promisify(authClient)
 
-const listAccounts = async () => {
+const accounts = async () => {
     const request = new RoverApis.auth.v1.Models.ListAccountsRequest()
     const response = await authClient.listAccounts(request)
     // tslint:disable-next-line:no-any
@@ -13,4 +13,4 @@ const listAccounts = async () => {
     })
 }
 
-export default listAccounts
+export default accounts

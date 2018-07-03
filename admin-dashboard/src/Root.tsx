@@ -11,11 +11,10 @@ import Login from './views/Login'
 const store = configureStore()
 
 const Root: React.SFC = () => {
-    firebase
-        .auth()
+    firebase.auth().onAuthStateChanged(user => {
         // tslint:disable-next-line:no-any
-        .onAuthStateChanged(user => store.dispatch<any>(authenticate(user)))
-
+        store.dispatch<any>(authenticate(user))
+    })
     return (
         <Provider store={store}>
             <Router>
