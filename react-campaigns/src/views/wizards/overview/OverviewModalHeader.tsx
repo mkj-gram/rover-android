@@ -297,7 +297,8 @@ const mapDispatchToProps = (
                 )
 
                 dispatch(createEditableCampaign(`${id}`))
-                history.push(`${location.pathname}${params}`)
+
+                history.push(`/campaigns/wizard/${params}`)
             })
         },
         archiveCampaign: campaignId => {
