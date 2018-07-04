@@ -5,7 +5,6 @@ import {
 } from 'graphql'
 
 import Event from '../Event'
-import { requireAuthentication } from '../../resolvers'
 import ParseIp from '@rover-common/ip-parse'
 
 const trackEvents = {
@@ -15,7 +14,7 @@ const trackEvents = {
             type: new GraphQLNonNull(new GraphQLList(Event))
         }
     },
-    resolve: requireAuthentication(async (_, { events }, { headers, clients, authContext }) => {
+    resolve: async (_, { events }, { headers, clients, authContext }) => {
         const pipeline = clients.pipeline
         
         const batch = events.filter(event => {
@@ -44,7 +43,7 @@ const trackEvents = {
         }
         
         return 'success'
-    })
+    }
 }
 
 export default trackEvents

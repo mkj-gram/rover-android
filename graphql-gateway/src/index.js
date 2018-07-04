@@ -4,11 +4,13 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import morgan from 'morgan'
 import schema from './schema'
+import { applyMiddleware } from 'graphql-middleware';
 
 import RoverApis from '@rover/apis'
 import Auth from '@rover/auth-client'
 import EventPipeline from '@rover/events-pipeline-client'
 import { authClient } from './grpcClients'
+import permissions from './permissions'
 
 import persistedFragments from './persistedFragments'
 
@@ -80,7 +82,7 @@ async function main() {
     clients.pipeline = pipeline
 
     app.use('/graphql', cors(), authMiddleware, persistedFragments, graphqlHTTP(req => ({
-            schema,
+            schema: applyMiddleware(schema, permissions),
             graphiql: true,
             context: {
                 headers: req.headers,
