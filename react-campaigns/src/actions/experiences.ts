@@ -58,6 +58,10 @@ export const fetchExperiences: ActionCreator<
             })
         })
         .catch(errors =>
-            handleError('FETCH_EXPERIENCES_ERROR', dispatch, errors[0].message)
+            handleError(
+                'FETCH_EXPERIENCES_ERROR',
+                dispatch,
+                errors[0].message.toString()
+            )
         )
 }
