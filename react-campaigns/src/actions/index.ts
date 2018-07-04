@@ -299,7 +299,7 @@ export const fetchAudienceSizes = () => segmentsActions.fetchAudienceSizes()
 
 // Wizard Modal
 export const openWizardModal: ActionCreator<ThunkAction<void, State, void>> = (
-    stateType: UIStateType
+    stateType: UIStateType | formPage
 ) => (dispatch: Dispatch<State>): void => {
     dispatch({ type: 'START_OPENING_WIZARD_MODAL', stateType })
     setTimeout(() => {

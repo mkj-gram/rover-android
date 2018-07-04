@@ -39,16 +39,17 @@ import TapBehaviorLabel from './TapBehaviorLabel'
 import TapBehaviorContainer from '../wizards/notification/TapBehaviorContainer'
 
 import MessageAndMedia from '../wizards/notification/MessageAndMedia'
+import MessageAndMediaLabel from './MessageAndMediaLabel'
 
 export interface SettingsContainerStateProps {
     editableCampaign: ScheduledCampaign | AutomatedNotificationCampaign
-    currentWizard: UIStateType
+    currentWizard: UIStateType | formPage
     getCampaign: (campaignId: string) => Campaign
 }
 
 export interface SettingsContainerDispatchProps {
     createEditableCampaign: (campaignId: string) => void
-    openWizardModal: (stateType: UIStateType) => void
+    openWizardModal: (stateType: UIStateType | formPage) => void
     updateScheduledDeliverySettings: () => void
     updateNotificationSettings: () => void
     openSettingsPagePhonePreview: () => void
@@ -74,7 +75,7 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
         createEditableCampaign(campaignId)
     }
 
-    openSelectedWizard(wizard: UIStateType) {
+    openSelectedWizard(wizard: formPage) {
         const {
             editableCampaign,
             openWizardModal,
@@ -89,7 +90,8 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
             openWizardModal(wizard)
 
             switch (wizard) {
-                case 'Tap Behavior':
+                case 'tapBehavior':
+                case 'messageAndMedia':
                     openSettingsPagePhonePreview()
                     break
                 default:
@@ -105,11 +107,11 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
         const { Fragment } = React
 
         switch (currentWizard) {
-            case 'Date and Time':
+            case 'dateAndTime':
                 return (
                     <DateAndTime device={device} wizardSection="dateAndTime" />
                 )
-            case 'Tap Behavior':
+            case 'tapBehavior':
                 return (
                     <Fragment>
                         <TapBehaviorContainer
@@ -140,6 +142,14 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                             )}
                     </Fragment>
                 )
+            case 'messageAndMedia':
+                return (
+                    <MessageAndMedia
+                        device={device}
+                        wizardSection="messageAndMedia"
+                        isCurrentPage={true}
+                    />
+                )
             default:
                 return null
         }
@@ -153,9 +163,10 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
         } = this.props
 
         switch (currentWizard) {
-            case 'Date and Time':
+            case 'dateAndTime':
                 return updateScheduledDeliverySettings
-            case 'Tap Behavior':
+            case 'tapBehavior':
+            case 'messageAndMedia':
                 return updateNotificationSettings
             default:
                 return null
@@ -163,7 +174,7 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
     }
 
     render() {
-        const { device, currentWizard } = this.props
+        const { device, currentWizard, editableCampaign } = this.props
 
         const { campaignId } = parse(location.search.substring(1))
 
@@ -191,9 +202,7 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                         />
                         <Row
                             onClick={() =>
-                                this.openSelectedWizard(
-                                    'Date and Time' as UIStateType
-                                )
+                                this.openSelectedWizard('dateAndTime')
                             }
                         >
                             <InverseLabel title="Date and Time">
@@ -211,9 +220,46 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                         />
                         <Row
                             onClick={() =>
-                                this.openSelectedWizard(
-                                    'Tap Behavior' as UIStateType
-                                )
+                                this.openSelectedWizard('messageAndMedia')
+                            }
+                        >
+                            <InverseLabel title="Message and Media">
+                                <MessageAndMediaLabel />
+                            </InverseLabel>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                {editableCampaign &&
+                                    editableCampaign.notificationAttachment &&
+                                    editableCampaign.notificationAttachment
+                                        .type === 'IMAGE' && (
+                                        <img
+                                            src={
+                                                editableCampaign
+                                                    .notificationAttachment.url
+                                            }
+                                            style={{
+                                                height: 48,
+                                                width: 48,
+                                                borderRadius: 4,
+                                                flex: 'none',
+                                                marginRight:
+                                                    device !== 'Mobile'
+                                                        ? 16
+                                                        : null
+                                            }}
+                                        />
+                                    )}
+                                <EditButton />
+                            </div>
+                        </Row>
+                        <Row
+                            onClick={() =>
+                                this.openSelectedWizard('tapBehavior')
                             }
                         >
                             <InverseLabel title="Tap Behavior">

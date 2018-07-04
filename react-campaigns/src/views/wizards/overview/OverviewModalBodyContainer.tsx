@@ -12,7 +12,7 @@ import { getCurrentWizard, getTypeProgress } from '../../../reducers'
 import { openWizardModal } from '../../../actions'
 
 export interface StateProps {
-    currentWizard: UIStateType
+    currentWizard: UIStateType | formPage
     notificationProgress: number
     scheduledDeliveryProgress: number
 }

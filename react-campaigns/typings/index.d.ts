@@ -42,8 +42,6 @@ type UIStateType =
     | 'experience'
     | 'scheduleddelivery'
     | 'automateddelivery'
-    | 'Date and Time'
-    | 'Tap Behavior'
 
 type UIStateField = {
     seen: boolean
@@ -268,7 +266,7 @@ type Segment = {
 type SegmentsState = StringMap<Segment>
 
 type WizardModal = {
-    readonly currentWizard: UIStateType
+    readonly currentWizard: UIStateType | formPage
     readonly isWizardModalOpen: boolean
     readonly isWizardModalClosing: boolean
 }
