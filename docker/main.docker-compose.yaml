@@ -198,22 +198,23 @@ services:
 
   notification-service:
     ports: [5080]
-    image: golang:1.10-alpine
+    image: roverio/golang-rdkafka:1.10-alpine
     working_dir: /go/src/github.com/roverplatform/rover
     depends_on:
       - postgres
       - scylla
       - pubsub
+      - kafka
     command: ./docker/notification/cmd migrate run
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     environment:
-      CGO_ENABLED: 0
-
+      CGO_ENABLED: 1
       POSTGRES_DSN: "postgres://postgres:@postgres:5432/notification_dev?sslmode=disable"
       TEST_POSTGRES_DSN: "postgres://postgres:@postgres:5432/notification_test?sslmode=disable"
       SCYLLA_DSN: "scylla://scylla:9042/notification_dev"
       TEST_SCYLLA_DSN: "scylla://scylla:9042/notification_test?timeout=5s"
+      KAFKA_DSN: "kafka:9092"
       GCP_PROJECT_ID: "rover-development"
       PUBSUB_EMULATOR_HOST: "pubsub:8085"
       PUBSUB_TOPIC: "notification-service-dev-topic"

@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package rover.notification.v1.events;
+
+option go_package = "events";
+
+
+import "google/protobuf/timestamp.proto";
+import "protobuf/wrappers.proto";
+
+message Event {
+	oneof type {
+		PushNotificationSent push_notification_sent = 1;
+		NotificationAddedToNotificationCenter notification_added_to_notification_center = 2;
+		PushTokenUnregistered push_token_unregistered = 3;
+	}
+}
+
+message PushNotificationSent {
+	enum Result {
+		DELIVERED   = 0;
+		UNREACHABLE = 1;
+		INVALID     = 2;
+	}
+
+	google.protobuf.Timestamp timestamp = 1;
+
+	int32  account_id  = 2;
+	int32  campaign_id = 3;
+	string device_id   = 4;
+	Result result      = 5;
+
+	// selectively
+	rover.protobuf.Int32Value badge_number = 14;
+}
+
+// Whenever there is a new notification added to the notification center
+message NotificationAddedToNotificationCenter {
+	google.protobuf.Timestamp timestamp = 1;
+
+	int32  account_id  = 2;
+	int32  campaign_id = 3;
+	string device_id   = 4;
+}
+
+
+message PushTokenUnregistered {
+	google.protobuf.Timestamp unregistered_at = 1;
+
+	int32  account_id  = 2;
+	string device_id   = 3;
+	string push_token  = 4;
+
+
+	// optional
+	string updated_push_token = 5;
+}

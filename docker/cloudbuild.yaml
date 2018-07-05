@@ -415,9 +415,23 @@ steps:
       - PROJECT_ROOT=github.com/roverplatform/rover
     args:
       - install
-      - ./notification/cmd/...
+      - ./notification/cmd/notification-service
       - ./go/cmd/postgres-cli
       - ./go/cmd/scylla-cli
+    waitFor:
+      - 'test-complete'
+
+  - id: 'build-notification-push-worker'
+    name: 'gcr.io/$PROJECT_ID/golang-rdkafka:1.10-alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -tags
+      - static_all
+      - -o
+      - docker/notification/build/bin/notification-push-worker
+      - github.com/roverplatform/rover/notification/cmd/notification-push-worker
     waitFor:
       - 'test-complete'
 
@@ -436,6 +450,7 @@ steps:
         cp -r ./gopath/bin/scylla-cli $$DEST/bin/
     waitFor:
       - 'build-notification-executables'
+      - 'build-notification-push-worker'
 
   - id: "build-notification-image"
     name: 'gcr.io/cloud-builders/docker'

@@ -13,6 +13,7 @@ import (
 
 	gerrors "cloud.google.com/go/errors"
 	"cloud.google.com/go/pubsub"
+	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/karlseguin/ccache"
 	"github.com/namsral/flag"
 	"github.com/pkg/errors"
@@ -62,6 +63,9 @@ var (
 
 	// Scylla
 	scyllaDSN = flag.String("scylla-dsn", "", "scylla DSN")
+
+	// Kafka
+	kafkaDSN = flag.String("kafka-dsn", "", "kafka bootstrap address")
 )
 
 var (
@@ -182,6 +186,30 @@ func main() {
 	livenessProbes = append(livenessProbes, scyllaProbe)
 
 	//
+	// Kafka
+	//
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{
+		"bootstrap.servers":      *kafkaDSN,
+		"session.timeout.ms":     6000,
+		"queue.buffering.max.ms": 10,
+		"default.topic.config": kafka.ConfigMap{
+			"compression.codec":     "snappy",
+			"request.required.acks": -1,
+		},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer producer.Flush(10 * 1000)
+
+	kafkaProbe := func(ctx context.Context) error {
+		_, err := producer.GetMetadata(&push.EventTopic, true, 5000)
+		return errors.Wrap(err, "kafka: producer")
+	}
+	readinessProbes = append(readinessProbes, kafkaProbe)
+	livenessProbes = append(livenessProbes, kafkaProbe)
+
+	//
 	// Platform Cache
 	//
 
@@ -214,9 +242,13 @@ func main() {
 
 		instrumentedHandler = withPanicReporter(
 			push.WithLogging(log.WithFields(rlog.Fields{"method": "notification/push.(*Handler).Handle"}),
-				push.WithMetrics(
-					push.HandlerFunc(handler.Handle),
-				)))
+				push.WithEventTracking(producer, log,
+					push.WithMetrics(
+						push.HandlerFunc(handler.Handle),
+					),
+				),
+			),
+		)
 
 		receiver = notification_pubsub.ReceiverFunc(func(ctx context.Context, m notification_pubsub.Message) error {
 			_, err := instrumentedHandler(ctx, m)

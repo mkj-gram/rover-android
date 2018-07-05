@@ -146,11 +146,11 @@ func (w *Handler) Handle(ctx context.Context, m notification_pubsub.Message) (*R
 			}
 
 			resp, err := sendFCMRequest(ctx, client, req)
+			response.FCM.Response = resp
+
 			if err != nil {
 				return errors.Wrap(err, "fcm.SendPushMessage")
 			}
-
-			response.FCM.Response = resp
 
 			return nil
 
@@ -169,11 +169,11 @@ func (w *Handler) Handle(ctx context.Context, m notification_pubsub.Message) (*R
 			}
 
 			resp, err := sendAPNSRequest(ctx, client, req)
+			response.APNS.Response = resp
+
 			if err != nil {
 				return errors.Wrap(err, "apns.SendPushMessage")
 			}
-
-			response.APNS.Response = resp
 
 			return nil
 

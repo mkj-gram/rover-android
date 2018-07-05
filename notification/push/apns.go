@@ -40,7 +40,7 @@ type (
 
 // see https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html#//apple_ref/doc/uid/TP40008194-CH17-SW1
 func ToAPNSRequest(m notification_pubsub.Message, settings *scylla.NotificationSettings, note *scylla.Notification) *apns2.Notification {
-	type M map[string]interface{}
+	type M = map[string]interface{}
 
 	var (
 		boolToInt = func(b bool) int {
