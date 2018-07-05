@@ -1,7 +1,6 @@
 const RoverApis = require('@rover/apis')
 const Client = RoverApis.analytics.Services.AnalyticsClient
 const grpc = require('grpc')
-const Config = require('./config')
 const promisify = require('@rover-common/grpc-promisify')
 
 const client = function(opts) {
@@ -9,10 +8,7 @@ const client = function(opts) {
         opts = {}
     }
 
-    const host = opts.host || Config.host
-    const port = opts.port || Config.port
-
-    const connection = `${host}:${port}`
+    const connection = process.env.ANALYTICS_SERVICE_DSN
 
     console.info('Analytics new Client: ' + connection)
 
