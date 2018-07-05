@@ -16,6 +16,7 @@ import ProgressBarThin from './ProgressBarThin'
 import RadioButton from './RadioButton'
 import SegmentControl from './SegmentControl'
 import SliderComponent from './SliderComponent'
+import Statistic from './Statistic'
 import Switch from './Switch'
 import Tab from './Tab'
 import TabBar from './TabBar'
@@ -54,6 +55,7 @@ import {
     semibold,
     bold,
     large,
+    light,
     medium,
     small
 } from '../styles/typography'
@@ -132,6 +134,7 @@ export {
     semibold,
     bold,
     large,
+    light,
     medium,
     small,
     Alert,
@@ -197,6 +200,7 @@ export {
     SearchIcon,
     SettingsIcon,
     StudioIcon,
+    Statistic,
     UserIcon,
     PopoverFormInput,
     VideoIcon,

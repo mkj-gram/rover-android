@@ -12,8 +12,12 @@ import {
 import { GraphQLDateTime } from 'graphql-iso-date'
 import GraphQLJSON from 'graphql-type-json'
 
-import { NotificationAttachment } from './Notification'
-import { PredicateAggregate } from './Predicate'
+import notificationDeliveredReport from './notificationDeliveredReport'
+import notificationOpenedReport from './notificationOpenedReport'
+import notificationOpenedByDateReportConnection from './notificationOpenedByDateReportConnection'
+
+import { NotificationAttachment } from '../Notification'
+import { PredicateAggregate } from '../Predicate'
 
 export const AutomatedNotificationCampaign = new GraphQLObjectType({
     name: 'AutomatedNotificationCampaign',
@@ -49,6 +53,10 @@ export const AutomatedNotificationCampaign = new GraphQLObjectType({
             type: GraphQLDateTime,
             description: 'Campaign latest update date'
         },
+        // REPORT
+        notificationDeliveredReport,
+        notificationOpenedReport,
+        notificationOpenedByDateReportConnection,
         // NOTIFICATION ATTRIBUTES
         notificationBody: {
             type: new GraphQLNonNull(GraphQLString),
@@ -342,7 +350,11 @@ const NotificationCampaign = new GraphQLInterfaceType({
             type: new GraphQLNonNull(GraphQLBoolean),
             description:
                 'Badge number is increased on delivery when notificationAlertOptionNotificationCenter is true'
-        }
+        },
+        // REPORT
+        notificationDeliveredReport,
+        notificationOpenedReport,
+        notificationOpenedByDateReportConnection
     })
 })
 
@@ -409,6 +421,10 @@ export const ScheduledNotificationCampaign = new GraphQLObjectType({
             type: GraphQLDateTime,
             description: 'Campaign latest update date'
         },
+        // REPORT
+        notificationDeliveredReport,
+        notificationOpenedReport,
+        notificationOpenedByDateReportConnection,
         // NOTIFICATION ATTRIBUTES
         notificationBody: {
             type: new GraphQLNonNull(GraphQLString),

@@ -53,7 +53,7 @@ class SelectableList extends React.Component<
                                 device !== 'Mobile'
                                     ? beige
                                     : white,
-                            height: device !== 'Mobile' ? 56 : 72
+                            minHeight: device !== 'Mobile' ? 56 : 72
                         }}
                         onMouseOver={() =>
                             device === 'Desktop' && this.handleHover(child.key)

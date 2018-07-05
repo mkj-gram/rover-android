@@ -34,7 +34,7 @@ const campaigns = {
         request.setKeyword(keyword)
         request.setPage(pageNumber)
         request.setPageSize(50)
-      
+
         const response = await campaignsClient.list(request)
         return response.getCampaignsList().map(campaign => {
             if (campaign.hasAutomatedNotificationCampaign())

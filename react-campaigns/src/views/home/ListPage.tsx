@@ -20,7 +20,7 @@ import {
     fetchTestDevices,
     handleOpenOverviewModalDisplay
 } from '../../actions'
-import { getAllCampaigns, getIsError } from '../../reducers'
+import { getAllCampaigns, getCampaignExists, getIsError } from '../../reducers'
 
 import NavBar from './NavBar'
 import CampaignsList from './CampaignsList'
@@ -29,6 +29,7 @@ import ResponsiveContainer from '../utils/ResponsiveContainer'
 import ToolBar from './ToolBar'
 import { getCampaign } from '../../reducers/campaigns'
 import SettingsContainer from '../settings/SettingsContainer'
+import NotificationOpenedReport from '../report/NotificationOpenedReport'
 
 export interface RouterProps {
     history: H.History
@@ -48,6 +49,7 @@ export interface DispatchProps {
 
 export interface StateProps {
     campaigns: StringMap<Campaign>
+    getCampaignExists: (id: string) => boolean
     isError: StringMap<boolean | string>
 }
 
@@ -62,8 +64,7 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
     constructor(props: ListPageProps) {
         super(props)
         this.createNewCampaign = this.createNewCampaign.bind(this)
-        this.pushToOverview = this.pushToOverview.bind(this)
-        this.pushToSettings = this.pushToSettings.bind(this)
+        this.pushToModal = this.pushToModal.bind(this)
     }
 
     componentWillMount() {
@@ -170,7 +171,7 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
             campaignId
         })
 
-        history.replace(`/campaigns/wizard/?${newQuery}`)
+        history.replace(`/campaigns/report/?${newQuery}`)
         this.props.handleOpenOverviewModalDisplay()
     }
 
@@ -183,13 +184,32 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
             campaignId
         })
 
-        history.replace(`/campaigns/settings?${newQuery}`)
+        history.replace(`/campaigns/settings/?${newQuery}`)
         this.props.handleOpenOverviewModalDisplay()
+    }
+
+    pushToModal(campaignId: string, route: string) {
+        const { handleOpenOverviewModalDisplay, history } = this.props
+        const params = this.getQueryParams()
+
+        const newQuery = stringify({
+            ...params,
+            campaignId
+        })
+
+        history.replace(`/campaigns/${route}/?${newQuery}`)
+        handleOpenOverviewModalDisplay()
     }
 
     render() {
         const { Fragment } = React
-        const { campaigns, device, history, location } = this.props
+        const {
+            campaigns,
+            getCampaignExists,
+            device,
+            history,
+            location
+        } = this.props
         const {
             campaignStatus = 'all',
             campaignType = 'all',
@@ -199,10 +219,14 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
         } = this.getQueryParams()
         const shouldShowWizard =
             location.pathname === '/campaigns/wizard/' &&
-            Object.keys(campaigns).includes(campaignId)
+            getCampaignExists(campaignId)
+
+        const shouldShowReport =
+            location.pathname === '/campaigns/report/' &&
+            getCampaignExists(campaignId)
 
         const shouldShowSettings =
-            location.pathname === '/campaigns/settings' &&
+            location.pathname === '/campaigns/settings/' &&
             Object.keys(campaigns).includes(campaignId)
         return (
             <Route
@@ -215,6 +239,10 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
                         {shouldShowSettings && (
                             <SettingsContainer device={device} />
                         )}
+                        {shouldShowReport && (
+                            <NotificationOpenedReport device={device} />
+                        )}
+
                         <div
                             style={{
                                 width: '100vw',
@@ -245,13 +273,10 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
                             <CampaignsList
                                 media={device}
                                 campaigns={this.props.campaigns}
-                                pushToOverview={this.pushToOverview}
-                                style={{
-                                    flex: '1 1 auto'
-                                }}
+                                pushToModal={this.pushToModal}
+                                style={{ flex: '1 1 auto' }}
                                 campaignType={campaignType}
                                 campaignStatus={campaignStatus}
-                                pushToSettings={this.pushToSettings}
                             />
                             <ToolBar
                                 currentPage={parseInt(pageNumber, 10)}
@@ -386,6 +411,7 @@ const mapDispatchToProps = (
 }
 const mapStateToProps = (state: State): StateProps => ({
     campaigns: state.campaigns,
+    getCampaignExists: (id: string) => getCampaignExists(state, id),
     isError: getIsError(state)
 })
 

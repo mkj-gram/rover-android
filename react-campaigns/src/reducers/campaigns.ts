@@ -89,3 +89,7 @@ export const getDuplicateCampaignName = (campaign: Campaign) => {
         }
     }
 }
+export const getCampaignExists = (
+    state: StringMap<Campaign>,
+    id: string
+): boolean => getCampaign(state, id) !== null

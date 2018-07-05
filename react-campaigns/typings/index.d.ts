@@ -12,6 +12,30 @@ type NotificationAttachment = {
     url: string
 }
 
+type NotificationOpenedReport = {
+    total: number | null
+    unique: number | null
+    notificationCenterTotal: number | null
+    notificationCenterUnique: number | null
+    pushDirectTotal: number | null
+    pushDirectUnique: number | null
+    pushInfluencedTotal: number | null
+    pushInfluencedUnique: number | null
+}
+
+type NotificationDeliveredReport = {
+    totalDelivered: number | null
+    uniqueDelivered: number | null
+    notificationCenterAttempted: number | null
+    notificationCenterDelivered: number | null
+    notificationCenterUnreachable: number | null
+    notificationCenterInvalid: number | null
+    pushAttempted: number | null
+    pushDelivered: number | null
+    pushUnreachable: number | null
+    pushInvalid: number | null
+}
+
 type NotificationTapBehaviorType =
     | 'UNKNOWN'
     | 'OPEN_APP'
@@ -93,6 +117,8 @@ interface ScheduledCampaign extends Campaign {
     notificationAlertOptionPushNotification: boolean
     notificationAlertOptionNotificationCenter: boolean
     notificationAlertOptionBadgeNumber: boolean
+    notificationOpenedReport: NotificationOpenedReport
+    notificationDeliveredReport: NotificationDeliveredReport
     scheduledType: ScheduledType
     scheduledDate: string
     scheduledTime: number
@@ -124,6 +150,8 @@ interface AutomatedNotificationCampaign extends Campaign {
     notificationAlertOptionPushNotification: boolean
     notificationAlertOptionNotificationCenter: boolean
     notificationAlertOptionBadgeNumber: boolean
+    notificationOpenedReport: NotificationOpenedReport
+    notificationDeliveredReport: NotificationDeliveredReport
     automatedMonday: boolean
     automatedTuesday: boolean
     automatedWednesday: boolean
@@ -150,9 +178,30 @@ type State = {
     readonly editableUIState: editableUIState
     readonly experiences: Array<Experience>
     readonly modal: StringMap<string | boolean>
+    readonly reports: ReportConnection
     readonly segments: SegmentsState
     readonly testDevices: TestDeviceState
     readonly user: User
+}
+
+type ReportConnection = {
+    readonly reports: StringMap<NotificationOpenedByDateReport>
+    readonly pageInfo: PageInfo
+}
+
+type NotificationOpenedByDateReport = {
+    cursor: string
+    id: string
+    notificationCenter: number
+    pushDirect: number
+    pushInfluenced: number
+}
+
+type PageInfo = {
+    readonly hasNextPage?: boolean
+    readonly hasPreviousPage?: boolean
+    readonly startCursor?: string
+    readonly endCursor?: string
 }
 
 type TestDeviceState = {

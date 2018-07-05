@@ -88,6 +88,21 @@ export const updateScheduledDeliverySettings = () =>
 export const publishCampaign = (campaignId: number) =>
     campaignsActions.publishCampaign(campaignId)
 
+export const fetchReportConnection = (
+    campaignId: string,
+    after: string,
+    before: string,
+    first: number,
+    last: number
+) =>
+    campaignsActions.fetchReportConnection(
+        campaignId,
+        after,
+        before,
+        first,
+        last
+    )
+
 export const sendTest = (campaignId: number, deviceIds: string[]) =>
     sendTestActions.sendTest(campaignId, deviceIds)
 

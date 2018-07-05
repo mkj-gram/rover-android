@@ -7,6 +7,7 @@ import campaigns, * as campaignsSelector from './campaigns'
 import editableCampaign, * as editableCampaignSelector from './editableCampaign'
 import editableUIState, * as editableUIStateSelector from './editableUIState'
 import experiences, * as experiencesSelector from './experiences'
+import reports, * as reportsSelector from './reports'
 import segments, * as segmentsSelector from './segments'
 import testDevices, * as testDevicesSelector from './testDevices'
 import user, * as userSelector from './user'
@@ -17,6 +18,7 @@ export default combineReducers({
     editableCampaign,
     editableUIState,
     experiences,
+    reports,
     segments,
     testDevices,
     user
@@ -126,6 +128,9 @@ export const getFilteredCampaigns = (state: State, filter: CampaignStatus) =>
 
 export const getCampaignDisplayTime = (state: Campaign, timeField: string) =>
     campaignsSelector.getDisplayTime(state, timeField)
+
+export const getCampaignExists = (state: State, id: string) =>
+    campaignsSelector.getCampaignExists(state.campaigns, id)
 
 export const getCampaignFormatDate = (state: Campaign, dateField: string) =>
     campaignsSelector.getFormatDate(state, dateField)
@@ -306,3 +311,16 @@ export const getIsStageValid = (
             return false
     }
 }
+// Reports
+
+export const getFormattedReport = (state: State) =>
+    reportsSelector.getFormattedReport(state.reports)
+
+export const getReportHasNextPage = (state: State) =>
+    reportsSelector.getReportHasNextPage(state.reports)
+export const getReportHasPreviousPage = (state: State) =>
+    reportsSelector.getReportHasPreviousPage(state.reports)
+export const getReportStartCursor = (state: State) =>
+    reportsSelector.getReportStartCursor(state.reports)
+export const getReportEndCursor = (state: State) =>
+    reportsSelector.getReportEndCursor(state.reports)

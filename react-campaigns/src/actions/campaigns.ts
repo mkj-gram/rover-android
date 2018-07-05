@@ -105,6 +105,28 @@ export const updateScheduledDeliverySettings: ActionCreator<
                     notificationAlertOptionPushNotification
                     notificationAlertOptionNotificationCenter
                     notificationAlertOptionBadgeNumber
+                    notificationOpenedReport {
+                        total
+                        unique
+                        notificationCenterTotal
+                        notificationCenterUnique
+                        pushDirectTotal
+                        pushDirectUnique
+                        pushInfluencedTotal
+                        pushInfluencedUnique
+                    }
+                    notificationDeliveredReport {
+                        totalDelivered
+                        uniqueDelivered
+                        notificationCenterAttempted
+                        notificationCenterDelivered
+                        notificationCenterUnreachable
+                        notificationCenterInvalid
+                        pushAttempted
+                        pushDelivered
+                        pushUnreachable
+                        pushInvalid
+                    }
                 }
                 ... on ScheduledNotificationCampaign {
                     scheduledType
@@ -265,6 +287,28 @@ export const updateNotificationSettings: ActionCreator<
                     notificationAlertOptionPushNotification
                     notificationAlertOptionNotificationCenter
                     notificationAlertOptionBadgeNumber
+                    notificationOpenedReport {
+                        total
+                        unique
+                        notificationCenterTotal
+                        notificationCenterUnique
+                        pushDirectTotal
+                        pushDirectUnique
+                        pushInfluencedTotal
+                        pushInfluencedUnique
+                    }
+                    notificationDeliveredReport {
+                        totalDelivered
+                        uniqueDelivered
+                        notificationCenterAttempted
+                        notificationCenterDelivered
+                        notificationCenterUnreachable
+                        notificationCenterInvalid
+                        pushAttempted
+                        pushDelivered
+                        pushUnreachable
+                        pushInvalid
+                    }
                 }
                 ... on ScheduledNotificationCampaign {
                     scheduledType
@@ -348,6 +392,7 @@ export const fetchCampaign: ActionCreator<
     dispatch: Dispatch<State>,
     getState: () => State
 ): Promise<Action | void | {}> => {
+    dispatch({ type: 'FETCH_CAMPAIGNS_REQUEST' })
     const query: DocumentNode = gql`
         query FetchCampaign($campaignId: Int!) {
             campaign(campaignId: $campaignId) {
@@ -380,6 +425,28 @@ export const fetchCampaign: ActionCreator<
                     notificationAlertOptionPushNotification
                     notificationAlertOptionNotificationCenter
                     notificationAlertOptionBadgeNumber
+                    notificationOpenedReport {
+                        total
+                        unique
+                        notificationCenterTotal
+                        notificationCenterUnique
+                        pushDirectTotal
+                        pushDirectUnique
+                        pushInfluencedTotal
+                        pushInfluencedUnique
+                    }
+                    notificationDeliveredReport {
+                        totalDelivered
+                        uniqueDelivered
+                        notificationCenterAttempted
+                        notificationCenterDelivered
+                        notificationCenterUnreachable
+                        notificationCenterInvalid
+                        pushAttempted
+                        pushDelivered
+                        pushUnreachable
+                        pushInvalid
+                    }
                 }
                 ... on ScheduledNotificationCampaign {
                     scheduledType
@@ -489,6 +556,28 @@ export const duplicateListViewCampaign: ActionCreator<
                     notificationAlertOptionPushNotification
                     notificationAlertOptionNotificationCenter
                     notificationAlertOptionBadgeNumber
+                    notificationOpenedReport {
+                        total
+                        unique
+                        notificationCenterTotal
+                        notificationCenterUnique
+                        pushDirectTotal
+                        pushDirectUnique
+                        pushInfluencedTotal
+                        pushInfluencedUnique
+                    }
+                    notificationDeliveredReport {
+                        totalDelivered
+                        uniqueDelivered
+                        notificationCenterAttempted
+                        notificationCenterDelivered
+                        notificationCenterUnreachable
+                        notificationCenterInvalid
+                        pushAttempted
+                        pushDelivered
+                        pushUnreachable
+                        pushInvalid
+                    }
                 }
                 ... on ScheduledNotificationCampaign {
                     scheduledType
@@ -599,6 +688,28 @@ export const duplicateCampaign: ActionCreator<
                     notificationAlertOptionPushNotification
                     notificationAlertOptionNotificationCenter
                     notificationAlertOptionBadgeNumber
+                    notificationOpenedReport {
+                        total
+                        unique
+                        notificationCenterTotal
+                        notificationCenterUnique
+                        pushDirectTotal
+                        pushDirectUnique
+                        pushInfluencedTotal
+                        pushInfluencedUnique
+                    }
+                    notificationDeliveredReport {
+                        totalDelivered
+                        uniqueDelivered
+                        notificationCenterAttempted
+                        notificationCenterDelivered
+                        notificationCenterUnreachable
+                        notificationCenterInvalid
+                        pushAttempted
+                        pushDelivered
+                        pushUnreachable
+                        pushInvalid
+                    }
                 }
                 ... on ScheduledNotificationCampaign {
                     scheduledType
@@ -917,7 +1028,7 @@ export const fetchCampaigns: ActionCreator<
     pageNumber: number,
     keyword: string
 ) => (dispatch: Dispatch<State>): Promise<Action | void> => {
-    // dispatch({ type: 'FETCH_CAMPAIGNS_REQUEST' })
+    dispatch({ type: 'FETCH_CAMPAIGNS_REQUEST' })
     const query: DocumentNode = gql`
         query FetchCampaigns(
             $campaignStatus: String
@@ -960,6 +1071,28 @@ export const fetchCampaigns: ActionCreator<
                     notificationAlertOptionPushNotification
                     notificationAlertOptionNotificationCenter
                     notificationAlertOptionBadgeNumber
+                    notificationOpenedReport {
+                        total
+                        unique
+                        notificationCenterTotal
+                        notificationCenterUnique
+                        pushDirectTotal
+                        pushDirectUnique
+                        pushInfluencedTotal
+                        pushInfluencedUnique
+                    }
+                    notificationDeliveredReport {
+                        totalDelivered
+                        uniqueDelivered
+                        notificationCenterAttempted
+                        notificationCenterDelivered
+                        notificationCenterUnreachable
+                        notificationCenterInvalid
+                        pushAttempted
+                        pushDelivered
+                        pushUnreachable
+                        pushInvalid
+                    }
                 }
                 ... on ScheduledNotificationCampaign {
                     scheduledType
@@ -1078,6 +1211,28 @@ export const createCampaign: ActionCreator<
                     notificationAlertOptionPushNotification
                     notificationAlertOptionNotificationCenter
                     notificationAlertOptionBadgeNumber
+                    notificationOpenedReport {
+                        total
+                        unique
+                        notificationCenterTotal
+                        notificationCenterUnique
+                        pushDirectTotal
+                        pushDirectUnique
+                        pushInfluencedTotal
+                        pushInfluencedUnique
+                    }
+                    notificationDeliveredReport {
+                        totalDelivered
+                        uniqueDelivered
+                        notificationCenterAttempted
+                        notificationCenterDelivered
+                        notificationCenterUnreachable
+                        notificationCenterInvalid
+                        pushAttempted
+                        pushDelivered
+                        pushUnreachable
+                        pushInvalid
+                    }
                 }
                 ... on ScheduledNotificationCampaign {
                     scheduledType
@@ -1151,5 +1306,111 @@ export const createCampaign: ActionCreator<
                 result.errors[0].message
             )
         }
+    )
+}
+
+export const fetchReportConnection: ActionCreator<
+    ThunkAction<Promise<Action | void | {}>, State, void>
+> = (
+    campaignId: number,
+    after: string,
+    before: string,
+    first: number,
+    last: number
+) => (
+    dispatch: Dispatch<State>,
+    getState: () => State
+): Promise<Action | void | {}> => {
+    dispatch({ type: 'FETCH_REPORT_CONNECTION_REQUEST' })
+    const query: DocumentNode = gql`
+        query FetchCampaign(
+            $campaignId: Int!
+            $after: ID
+            $before: ID
+            $first: Int
+            $last: Int
+        ) {
+            campaign(campaignId: $campaignId) {
+                ... on NotificationCampaign {
+                    notificationOpenedByDateReportConnection(
+                        after: $after
+                        before: $before
+                        first: $first
+                        last: $last
+                    ) {
+                        edges {
+                            node {
+                                id
+                                pushDirect
+                                pushInfluenced
+                                notificationCenter
+                            }
+                            cursor
+                        }
+                        pageInfo {
+                            hasNextPage
+                            hasPreviousPage
+                            startCursor
+                            endCursor
+                        }
+                    }
+                }
+            }
+        }
+    `
+    const request = {
+        query,
+        variables: {
+            after,
+            before,
+            campaignId,
+            first,
+            last
+        }
+    }
+    return Environment(request).then(
+        ({ data, errors }) => {
+            return new Promise((resolve, reject) => {
+                if (errors) {
+                    return handleError(
+                        'FETCH_REPORT_CONNECTION_FAILURE',
+                        dispatch,
+                        errors[0].message
+                    )
+                }
+                const {
+                    edges,
+                    pageInfo
+                }: {
+                    edges: Array<{
+                        node: NotificationOpenedByDateReport
+                        cursor: string
+                    }>
+                    pageInfo: PageInfo
+                } = data.campaign.notificationOpenedByDateReportConnection
+                const reports: StringMap<
+                    NotificationOpenedByDateReport
+                > = edges.reduce(
+                    (prev, { cursor, node }) => ({
+                        ...prev,
+                        [cursor]: node
+                    }),
+                    {}
+                )
+                dispatch({
+                    type: 'FETCH_REPORT_CONNECTION_SUCCESS',
+                    reportConnection: {
+                        reports,
+                        pageInfo
+                    }
+                })
+            })
+        },
+        ({ result }) =>
+            handleError(
+                'FETCH_REPORT_CONNECTION_FAILURE',
+                dispatch,
+                result.errors[0].message
+            )
     )
 }

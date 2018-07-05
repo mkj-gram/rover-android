@@ -11,7 +11,7 @@ help:
 	@echo
 
 run:
-	${SERVICE_RUN}
+	 ${SERVICE_RUN}
 
 shell:
 	${SERVICE_RUN} ./docker/analytics/service/cmd shell

@@ -8,6 +8,8 @@ import {
     ScheduledNotificationCampaign
 } from './Campaign'
 
+import { Node, PageInfo } from './Connection'
+
 import {
     BarcodeBlock,
     ButtonBlock,
@@ -52,6 +54,7 @@ const schema = new GraphQLSchema({
         GoToScreenBlockTapBehavior,
         ImageBlock,
         NoneBlockTapBehavior,
+        Node,
         NumberPredicate,
         OpenAppNotificationTapBehavior,
         OpenURLBlockTapBehavior,
