@@ -238,7 +238,7 @@ export const getTypeProgress = (
 export const getIsStageValid = (
     campaign: AutomatedNotificationCampaign | ScheduledCampaign,
     uiState: editableUIState,
-    stage: keyof editableUIState
+    stage: keyof editableUIState | formPage
 ): boolean => {
     switch (stage) {
         // Notification Settings

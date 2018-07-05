@@ -6,6 +6,8 @@ import {
     isAutomatedNotificationCampaign
 } from '../views/utils/getCampaignType'
 
+import { getIsStageValid, getCurrentWizard } from './index'
+
 import { formatDisplayTime, formatDate } from '../views/utils/formatDateTime'
 
 const isEqual = require('lodash/isEqual')
@@ -69,6 +71,19 @@ export const getShouldShowSaveAndClose = (state: State) => {
                 ((UIState as string).length === 0 ||
                     !JSON.parse(UIState as string)[page].seen)
         )
+
+    const isPublishedCampaignSettingsValid = () => {
+        if (editableCampaign.campaignStatus !== 'PUBLISHED') {
+            return true
+        }
+        const currentWizard = getCurrentWizard(state) as formPage
+
+        return getIsStageValid(editableCampaign, editableUIState, currentWizard)
+    }
+
+    if (!isPublishedCampaignSettingsValid()) {
+        return false
+    }
 
     return (
         !isEqual(editableCampaignFields, campaignFields) ||
