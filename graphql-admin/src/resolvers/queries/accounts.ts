@@ -1,6 +1,6 @@
+import * as promisify from '@rover-common/grpc-promisify'
 import * as RoverApis from '@rover/apis'
 import getAccountFromProto from '../../grpc/getAccountFromProto'
-import * as promisify from '@rover-common/grpc-promisify'
 import { authClient } from '../grpcClients'
 promisify(authClient)
 

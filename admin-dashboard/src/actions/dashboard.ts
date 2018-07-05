@@ -2,17 +2,17 @@ import { ActionCreator, AnyAction, Dispatch } from 'redux'
 import { ThunkAction } from 'redux-thunk'
 import { State } from '../../typings'
 
-export const tabSwitch: ActionCreator<
+export const viewSwitch: ActionCreator<
     ThunkAction<void, State, void, AnyAction>
-> = (tab: string) => (dispatch: Dispatch<AnyAction>): void => {
-    if (tab === 'dashboard') {
+> = (view: string) => (dispatch: Dispatch<AnyAction>): void => {
+    if (view === 'accounts') {
         dispatch({
-            type: 'TAB_DASHBOARD'
+            type: 'VIEW_ACCOUNTS'
         })
     }
-    if (tab === 'create account') {
+    if (view === 'create account') {
         dispatch({
-            type: 'TAB_CREATE_ACCOUNT'
+            type: 'VIEW_CREATE_ACCOUNT'
         })
     }
 }

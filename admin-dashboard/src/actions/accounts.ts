@@ -3,8 +3,9 @@ import { DocumentNode } from 'graphql'
 import gql from 'graphql-tag'
 import { Action, ActionCreator, AnyAction, Dispatch } from 'redux'
 import { ThunkAction } from 'redux-thunk'
-import { State, Account } from '../../typings'
+import { Account, State } from '../../typings'
 import Environment from '../Environment'
+import handleError from '../Environment/handleError'
 import { getUser } from '../reducers'
 
 export const fetchAccounts: ActionCreator<
@@ -18,6 +19,7 @@ export const fetchAccounts: ActionCreator<
         query {
             accounts {
                 name
+                accountname
                 id
                 createdAt
                 updatedAt
@@ -31,25 +33,95 @@ export const fetchAccounts: ActionCreator<
     const user = getUser(getState())
 
     return user.getIdToken().then(token => {
-        return Environment(token, request).then(({ data, errors }) => {
-            if (errors) {
-                return dispatch({
-                    type: 'FETCH_ACCOUNTS_FAILUREß'
-                })
-            } else {
-                let accounts = null
-                accounts = data.accounts.reduce(
-                    (prev: Account, next: Account) => {
-                        return { [next.id]: next, ...prev }
-                    },
-                    {}
-                )
+        Environment(token, request)
+            .then(({ data, errors }) => {
+                if (errors) {
+                    return handleError(
+                        'FETCH_ACCOUNTS_FAILURE',
+                        dispatch,
+                        errors[0].message
+                    )
+                } else {
+                    let accounts = null
+                    accounts = data.accounts.reduce(
+                        (prev: Account, next: Account) => {
+                            return { [next.id]: next, ...prev }
+                        },
+                        {}
+                    )
 
-                return dispatch({
-                    type: 'FETCH_CAMPAIGNS_SUCCESS',
-                    accounts
-                })
-            }
-        })
+                    return dispatch({
+                        type: 'FETCH_ACCOUNTS_SUCCESS',
+                        accounts
+                    })
+                }
+            })
+            .catch(error => {
+                handleError(
+                    'NETWORK_FAILURE',
+                    dispatch,
+                    'Network error, please try again'
+                )
+            })
     })
+}
+
+export const createAccount: ActionCreator<
+    ThunkAction<Promise<Action | void>, State, void, AnyAction>
+> = (name: string, accountname: string) => (
+    dispatch: Dispatch<AnyAction>,
+    getState: () => State
+): Promise<Action | void> => {
+    const query: DocumentNode = gql`
+        mutation createAccount($name: String!, $accountname: String!) {
+            createAccount(name: $name, accountname: $accountname) {
+                name
+                accountname
+                id
+                createdAt
+                updatedAt
+            }
+        }
+    `
+    const request: GraphQLRequest = {
+        query: query,
+        variables: {
+            name,
+            accountname
+        }
+    }
+
+    const user = getUser(getState())
+    return user
+        .getIdToken()
+        .then(token => {
+            Environment(token, request).then(({ data, errors }) => {
+                if (errors) {
+                    handleError(
+                        'CREATE_ACCOUNT_FAILURE',
+                        dispatch,
+                        errors[0].message
+                    )
+                } else {
+                    const accounts = {
+                        ...getState().accounts,
+                        [data.createAccount.id]: {
+                            ...data.createAccount
+                        }
+                    }
+                    dispatch({
+                        type: 'CREATE_ACCOUNT_SUCCESS',
+                        accounts
+                    })
+                }
+                dispatch({ type: 'VIEW_ACCOUNTS' })
+            })
+        })
+        .catch(error => {
+            handleError(
+                'NETWORK_FAILURE',
+                dispatch,
+                'Network error, please try again'
+            )
+        })
 }

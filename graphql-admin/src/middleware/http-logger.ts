@@ -1,5 +1,5 @@
-import { Logger } from './../logger/index';
-import { Response, Request, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
+import { Logger } from './../logger/index'
 /* tslint:disable no-any */
 
 export const HTTPLoggerMiddleware = function(logger: Logger) {

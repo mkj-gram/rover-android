@@ -1,5 +1,5 @@
-import { Response, Request, NextFunction } from 'express'
 import { createNamespace, getNamespace } from 'continuation-local-storage'
+import { NextFunction, Request, Response } from 'express'
 import { v1 } from 'uuid'
 
 const NAMESPACE: string = 'admin request'
@@ -18,7 +18,7 @@ export function ContextMiddleware(
 
 /**
  * Gets a value from the current context by key.
- * Will return undefined if the context has not yet been initialized 
+ * Will return undefined if the context has not yet been initialized
  * for this request or if a value is not found for the specified key.
  * @param {string} key
  */

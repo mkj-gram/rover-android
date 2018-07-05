@@ -32,7 +32,7 @@ class FirebaseAuth extends React.Component<FirebaseAuthProps, {}> {
                 {
                     provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
                     // Required to enable this provider in One-Tap Sign-up.
-                    authMethod: 'https://accounts.google.com',
+                    authMethod: 'https://accounts.google.com'
                 }
             ]
         }

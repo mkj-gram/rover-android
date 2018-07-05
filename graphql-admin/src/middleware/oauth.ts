@@ -1,4 +1,4 @@
-import { Response, Request, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import * as admin from 'firebase-admin'
 import * as httpContext from './http-context'
 

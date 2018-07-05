@@ -1,8 +1,6 @@
 import { execute, GraphQLRequest, makePromise } from 'apollo-link'
 import { HttpLink } from 'apollo-link-http'
-import firebase from 'firebase/app'
-import 'firebase/auth'
-import { StringMap } from '../typings'
+import { StringMap } from '../../typings'
 
 const environments: StringMap<string> = {
     production: 'https://api.rover.io/admin',

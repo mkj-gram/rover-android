@@ -1,16 +1,17 @@
 import { AnyAction, combineReducers } from 'redux'
 import { DashboardState } from '../../typings'
 
-const activeTab = (state: string = 'dashboard', action: AnyAction) => {
+const activeView = (state: string = 'accounts', action: AnyAction) => {
     switch (action.type) {
-        case 'TAB_DASHBOARD':
-            return 'dashboard'
-        case 'TAB_CREATE_ACCOUNT':
+        case 'VIEW_ACCOUNTS':
+            return 'accounts'
+        case 'VIEW_CREATE_ACCOUNT':
             return 'create account'
         default:
             return state
     }
 }
+
 const isFetching = (state = false, action: AnyAction) => {
     switch (action.type) {
         case 'FETCH_ACCOUNTS_REQUEST':
@@ -24,9 +25,9 @@ const isFetching = (state = false, action: AnyAction) => {
 
 export const getIsFetching = (state: DashboardState) => state.isFetching
 
-export const getActiveTab = (state: DashboardState) => state.activeTab
+export const getActiveView = (state: DashboardState) => state.activeView
 
 export default combineReducers({
-    activeTab,
+    activeView,
     isFetching
 })
