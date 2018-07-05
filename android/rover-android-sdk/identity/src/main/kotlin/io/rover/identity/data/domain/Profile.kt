@@ -1,6 +1,6 @@
 package io.rover.identity.data.domain
 
-import io.rover.rover.core.data.domain.Attributes
+import io.rover.core.data.domain.Attributes
 
 data class Profile(
     val identifier: String?,

@@ -1,6 +1,6 @@
 package io.rover.experiences.ui.navigation
 
-import io.rover.rover.core.routing.Router
+import io.rover.core.routing.Router
 import java.net.URI
 
 /**

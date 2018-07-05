@@ -3,8 +3,8 @@ package io.rover.experiences.ui.blocks.concerns.text
 import android.text.Spanned
 import io.rover.experiences.ui.blocks.concerns.layout.Measurable
 import io.rover.experiences.ui.blocks.text.TextBlockViewModel
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.BindableViewModel
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.BindableViewModel
 
 interface ViewTextInterface: BindableView<TextViewModelInterface>
 

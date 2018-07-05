@@ -14,9 +14,9 @@ import io.rover.experiences.ui.blocks.concerns.layout.LayoutableView
 import io.rover.experiences.ui.blocks.concerns.layout.ViewBlock
 import io.rover.experiences.ui.blocks.concerns.text.AndroidRichTextToSpannedTransformer
 import io.rover.experiences.ui.blocks.concerns.text.ViewText
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.logging.log
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.ViewModelBinding
 
 // API compatibility is managed at runtime in a way that Android lint's static analysis is not able
 // to pick up.

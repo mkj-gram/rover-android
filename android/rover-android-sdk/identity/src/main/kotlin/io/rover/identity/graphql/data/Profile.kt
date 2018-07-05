@@ -1,10 +1,10 @@
 package io.rover.identity.graphql.data
 
 import io.rover.identity.data.domain.Profile
-import io.rover.rover.core.data.graphql.operations.data.encodeJson
-import io.rover.rover.core.data.graphql.operations.data.toFlatAttributesHash
-import io.rover.rover.core.data.graphql.putProp
-import io.rover.rover.core.data.graphql.safeOptString
+import io.rover.core.data.graphql.operations.data.encodeJson
+import io.rover.core.data.graphql.operations.data.toFlatAttributesHash
+import io.rover.core.data.graphql.putProp
+import io.rover.core.data.graphql.safeOptString
 import org.json.JSONObject
 
 internal fun Profile.Companion.decodeJson(jsonObject: JSONObject): Profile {

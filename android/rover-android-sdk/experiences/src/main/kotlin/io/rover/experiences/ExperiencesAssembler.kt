@@ -3,7 +3,33 @@ package io.rover.experiences
 import android.content.Context
 import android.os.Parcelable
 import android.util.DisplayMetrics
-import io.rover.experiences.routing.ExperienceEnabledTopLevelNavigation
+import io.rover.core.assets.AssetService
+import io.rover.core.assets.ImageOptimizationServiceInterface
+import io.rover.core.container.Assembler
+import io.rover.core.container.Container
+import io.rover.core.container.Resolver
+import io.rover.core.container.Scope
+import io.rover.core.data.domain.Background
+import io.rover.core.data.domain.Barcode
+import io.rover.core.data.domain.BarcodeBlock
+import io.rover.core.data.domain.Block
+import io.rover.core.data.domain.Border
+import io.rover.core.data.domain.ButtonBlock
+import io.rover.core.data.domain.Experience
+import io.rover.core.data.domain.Image
+import io.rover.core.data.domain.ImageBlock
+import io.rover.core.data.domain.RectangleBlock
+import io.rover.core.data.domain.Row
+import io.rover.core.data.domain.Screen
+import io.rover.core.data.domain.Text
+import io.rover.core.data.domain.TextBlock
+import io.rover.core.data.domain.WebViewBlock
+import io.rover.core.data.graphql.GraphQlApiServiceInterface
+import io.rover.core.events.EventQueueServiceInterface
+import io.rover.core.routing.Router
+import io.rover.core.streams.Scheduler
+import io.rover.core.tracking.SessionTrackerInterface
+import io.rover.experiences.routing.routes.PresentExperienceIntents
 import io.rover.experiences.routing.routes.PresentExperienceRoute
 import io.rover.experiences.ui.ExperienceViewModel
 import io.rover.experiences.ui.ExperienceViewModelInterface
@@ -50,33 +76,6 @@ import io.rover.experiences.ui.navigation.ExperienceNavigationViewModelInterface
 import io.rover.experiences.ui.toolbar.ExperienceToolbarViewModel
 import io.rover.experiences.ui.toolbar.ExperienceToolbarViewModelInterface
 import io.rover.experiences.ui.toolbar.ToolbarConfiguration
-import io.rover.rover.core.assets.AssetService
-import io.rover.rover.core.assets.ImageOptimizationServiceInterface
-import io.rover.rover.core.container.Assembler
-import io.rover.rover.core.container.Container
-import io.rover.rover.core.container.Resolver
-import io.rover.rover.core.container.Scope
-import io.rover.rover.core.data.domain.Background
-import io.rover.rover.core.data.domain.Barcode
-import io.rover.rover.core.data.domain.BarcodeBlock
-import io.rover.rover.core.data.domain.Block
-import io.rover.rover.core.data.domain.Border
-import io.rover.rover.core.data.domain.ButtonBlock
-import io.rover.rover.core.data.domain.Experience
-import io.rover.rover.core.data.domain.Image
-import io.rover.rover.core.data.domain.ImageBlock
-import io.rover.rover.core.data.domain.RectangleBlock
-import io.rover.rover.core.data.domain.Row
-import io.rover.rover.core.data.domain.Screen
-import io.rover.rover.core.data.domain.Text
-import io.rover.rover.core.data.domain.TextBlock
-import io.rover.rover.core.data.domain.WebViewBlock
-import io.rover.rover.core.data.graphql.GraphQlApiServiceInterface
-import io.rover.rover.core.events.EventQueueServiceInterface
-import io.rover.rover.core.routing.Router
-import io.rover.rover.core.routing.TopLevelNavigation
-import io.rover.rover.core.streams.Scheduler
-import io.rover.rover.core.tracking.SessionTrackerInterface
 
 /**
  * This is the Rover User Experience plugin.  It contains the entire Rover Experiences system.
@@ -104,12 +103,11 @@ class ExperiencesAssembler: Assembler {
             )
         }
 
-        // overriding core's top level navigation
         container.register(
             Scope.Singleton,
-            TopLevelNavigation::class.java
+            PresentExperienceIntents::class.java
         ) { resolver ->
-            ExperienceEnabledTopLevelNavigation(
+            PresentExperienceIntents(
                 resolver.resolveSingletonOrFail(Context::class.java)
             )
         }
@@ -416,7 +414,7 @@ class ExperiencesAssembler: Assembler {
             registerRoute(
                 PresentExperienceRoute(
                     resolver.resolveSingletonOrFail(String::class.java, "deepLinkScheme"),
-                    resolver.resolveSingletonOrFail(TopLevelNavigation::class.java)
+                    resolver.resolveSingletonOrFail(PresentExperienceIntents::class.java)
                 )
             )
         }

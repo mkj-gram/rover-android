@@ -2,28 +2,28 @@ package io.rover.notifications
 
 import android.app.Application
 import android.content.Context
+import android.content.Intent
 import android.support.annotation.DrawableRes
+import io.rover.core.assets.AssetService
+import io.rover.core.container.Assembler
+import io.rover.core.container.Container
+import io.rover.core.container.Resolver
+import io.rover.core.container.Scope
+import io.rover.core.data.state.StateManagerServiceInterface
+import io.rover.core.events.ContextProvider
+import io.rover.core.events.EventQueueServiceInterface
+import io.rover.core.events.PushTokenTransmissionChannel
+import io.rover.core.events.contextproviders.FirebasePushTokenContextProvider
+import io.rover.core.platform.DateFormattingInterface
+import io.rover.core.platform.LocalStorage
+import io.rover.core.routing.Router
+import io.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
+import io.rover.core.streams.Scheduler
+import io.rover.core.tracking.SessionTrackerInterface
 import io.rover.notifications.routing.routes.PresentNotificationCenterRoute
 import io.rover.notifications.ui.NotificationCenterListViewModel
 import io.rover.notifications.ui.concerns.NotificationCenterListViewModelInterface
 import io.rover.notifications.ui.concerns.NotificationsRepositoryInterface
-import io.rover.rover.core.assets.AssetService
-import io.rover.rover.core.container.Assembler
-import io.rover.rover.core.container.Container
-import io.rover.rover.core.container.Resolver
-import io.rover.rover.core.container.Scope
-import io.rover.rover.core.data.state.StateManagerServiceInterface
-import io.rover.rover.core.events.ContextProvider
-import io.rover.rover.core.events.EventQueueServiceInterface
-import io.rover.rover.core.events.PushTokenTransmissionChannel
-import io.rover.rover.core.events.contextproviders.FirebasePushTokenContextProvider
-import io.rover.rover.core.routing.Router
-import io.rover.rover.core.routing.TopLevelNavigation
-import io.rover.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
-import io.rover.rover.core.streams.Scheduler
-import io.rover.rover.core.tracking.SessionTrackerInterface
-import io.rover.rover.platform.DateFormattingInterface
-import io.rover.rover.platform.LocalStorage
 import java.util.concurrent.Executor
 
 class NotificationsAssembler @JvmOverloads constructor(
@@ -46,6 +46,13 @@ class NotificationsAssembler @JvmOverloads constructor(
     private val smallIconDrawableLevel: Int = 0,
 
     private val defaultChannelId: String = "rover",
+
+
+    // TODO: default to a builtin intent a hosted notification center, possibly.
+    /**
+     * Provide an intent for opening your Notification Center, if you have created one.
+     */
+    private val notificationCenterIntent: Intent? = null,
 
     /**
      * While normally your `FirebaseInstanceIdService` class will be responsible for being
@@ -112,7 +119,7 @@ class NotificationsAssembler @JvmOverloads constructor(
                 resolver.resolveSingletonOrFail(DateFormattingInterface::class.java),
                 resolver.resolveSingletonOrFail(EventQueueServiceInterface::class.java),
                 resolver.resolveSingletonOrFail(Router::class.java),
-                resolver.resolveSingletonOrFail(TopLevelNavigation::class.java),
+                resolver.resolveSingletonOrFail(Intent::class.java, "openApp"),
                 resolver.resolveSingletonOrFail(EmbeddedWebBrowserDisplayInterface::class.java)
             )
         }
@@ -182,7 +189,7 @@ class NotificationsAssembler @JvmOverloads constructor(
             registerRoute(
                 PresentNotificationCenterRoute(
                     resolver.resolveSingletonOrFail(String::class.java, "deepLinkScheme"),
-                    resolver.resolveSingletonOrFail(TopLevelNavigation::class.java)
+                    notificationCenterIntent
                 )
             )
         }

@@ -7,10 +7,9 @@ import android.view.Menu
 import android.view.MenuItem
 import io.rover.account.AuthService
 import io.rover.account.ui.LoginActivity
-import io.rover.app.inbox.R
-import io.rover.rover.Rover
+import io.rover.core.Rover
 import io.rover.notifications.ui.NotificationCenterListView
-import io.rover.rover.platform.DeviceIdentificationInterface
+import io.rover.core.platform.DeviceIdentificationInterface
 import kotlinx.android.synthetic.main.activity_main.demoNotificationCentre
 import kotlinx.android.synthetic.main.activity_main.deviceIdentifier
 import kotlinx.android.synthetic.main.activity_main.toolbar
@@ -27,10 +26,9 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
 
-        demoNotificationCentre.notificationCenterHost = object : NotificationCenterListView.NotificationCenterHost {
-            override val provideActivity: AppCompatActivity
-                get() = this@MainActivity
-        }
+        (findViewById(R.id.demoNotificationCentre) as NotificationCenterListView).activity = this
+
+        demoNotificationCentre.activity = this
 
         // if not logged in:
         if (!authService.isLoggedIn) {

@@ -31,7 +31,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.android.support:support-vector-drawable:27.1.1'
 
-    implementation project(":rover-android-sdk:rover")
+    implementation project(':rover-android-sdk:core')
     implementation project(":rover-android-sdk:experiences")
 
     // implementation 'com.github.roverplatform:rover-android:2.0-dev-SNAPSHOT'

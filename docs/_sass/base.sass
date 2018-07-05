@@ -1,0 +1,158 @@
+@import "colors"
+
+*
+    box-sizing: border-box
+
+body
+    color: $titanium
+    font-family: 'Source Sans Pro', sans-serif
+    font-size: 17px
+    font-weight: 300
+    line-height: 24px
+
+a
+    color: $turquoise
+    font-weight: 400
+    text-decoration: none
+
+.missing a
+    color: red
+    background-color: black
+
+a:active
+    color: $aquamarine
+
+p, ul, ol
+    margin-bottom: 16px
+
+ul
+    list-style-type: square
+    padding-left: 32px
+
+ol
+    padding-left: 32px
+
+h1, h2, h3, h4, h5, h6
+    color: white
+
+h1
+    font-size: 32px
+    line-height: 40px
+    margin-bottom: 24px
+
+h1 + p
+    font-size: 19px
+    line-height: 32px
+
+h2
+    font-size: 25px
+    line-height: 32px
+    margin-bottom: 16px
+
+h3
+    font-size: 19px
+    margin-bottom: 16px
+
+hr
+    display: block
+    height: 1px
+    border: 0
+    border-top: 1px solid rgba(255, 255, 255, 0.1)
+    margin: 32px 0 31px 0
+    padding: 0
+
+pre
+    padding: 8px 16px
+    margin-bottom: 24px
+    overflow-x: auto
+
+p + h2, p + h3, p + h4, 
+ul + h2, ul + h3, ul + h4,
+ol + h2, ol + h3, ol + h4,
+pre + h2, pre + h3, pre + h4, 
+.highlighter-rouge + h2, .highlighter-rouge + h3, .highlighter-rouge + h4, 
+aside + h2, aside + h3, aside + h4,
+table + h2, table + h3, table + h4
+    margin-top: 48px
+
+p > img
+        display: block
+        margin: 48px 48px 96px 48px
+        box-shadow: 0 20px 48px rgba(0, 0, 0, .7)
+        border-radius: 4px
+        padding-top: 24px
+        background: linear-gradient(#e1dfe1, #d5d3d5 95.83333333%, #b5b3b5)
+        background-size: auto 24px
+        border: 1px solid #f2f1f2
+        width: calc(100% - 96px)
+
+aside
+    color: white
+    padding: 16px 16px 16px 12px
+    margin-bottom: 24px
+
+aside::before
+    display: block
+    font-weight: 600
+    margin-bottom: 8px
+
+aside.important
+    background-color: rgba($yellow, 0.3)
+    border-left: 4px solid $yellow
+
+aside.important::before
+    content: "Important"
+
+aside.advanced
+    background-color: rgba($lavender, 0.3)
+    border-left: 4px solid $lavender
+
+aside.advanced::before
+    content: "Advanced"
+
+aside.further-reading
+    background-color: rgba($lavender, 0.3)
+    border-left: 4px solid $lavender
+
+aside.further-reading::before
+    content: "Further Reading"
+
+aside.info
+    background-color: rgba($steel, 0.3)
+    border-left: 4px solid $steel
+
+table, tr, th, td
+    border-color: $steel
+    border-style: solid
+
+table
+    border-width: 1px 1px 0 0
+
+th, td
+    padding: 16px
+    border-width: 0 0 0 1px
+
+tr
+    border-width: 0 0 1px 0
+
+.deprecated
+    color: #E37A48
+    font-size: 80%
+    font-weight: bold
+    text-transform: uppercase
+
+aside.important .deprecated
+    color: #E8E071
+
+p.read-more
+    padding-left: 28px
+    position: relative
+
+    svg 
+        fill: $yellow
+        height: 20px
+        left: 0
+        position: absolute
+        top: 4px
+        width: 20px
+        

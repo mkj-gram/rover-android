@@ -9,10 +9,10 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import io.rover.rover.R
-import io.rover.rover.core.streams.androidLifecycleDispose
-import io.rover.rover.core.streams.subscribe
-import io.rover.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.R
+import io.rover.core.streams.androidLifecycleDispose
+import io.rover.core.streams.subscribe
+import io.rover.core.ui.concerns.ViewModelBinding
 import io.rover.notifications.ui.concerns.NotificationItemViewModelInterface
 
 /**

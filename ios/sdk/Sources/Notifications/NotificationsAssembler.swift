@@ -10,18 +10,16 @@ import UIKit
 import UserNotifications
 
 public struct NotificationsAssembler: Assembler {
-    public var appGroup: String
+    public var appGroup: String?
     public var influenceTime: Int
     public var isInfluenceTrackingEnabled: Bool
     public var maxNotifications: Int
-    public var storeSize:Int
     
-    public init(appGroup: String, isInfluenceTrackingEnabled: Bool = true, influenceTime: Int = 120, maxNotifications: Int = 200, storeSize: Int = 150) {
+    public init(appGroup: String? = nil, isInfluenceTrackingEnabled: Bool = true, influenceTime: Int = 120, maxNotifications: Int = 200) {
         self.appGroup = appGroup
         self.influenceTime = influenceTime
         self.isInfluenceTrackingEnabled = isInfluenceTrackingEnabled
         self.maxNotifications = maxNotifications
-        self.storeSize = storeSize
     }
     
     public func assemble(container: Container) {

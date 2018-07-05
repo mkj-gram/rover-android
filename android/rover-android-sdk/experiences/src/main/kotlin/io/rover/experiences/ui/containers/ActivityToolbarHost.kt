@@ -5,8 +5,8 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.Window
-import io.rover.rover.core.streams.PublishSubject
-import io.rover.rover.core.streams.share
+import io.rover.core.streams.PublishSubject
+import io.rover.core.streams.share
 import io.rover.experiences.ui.ExperienceView
 import org.reactivestreams.Publisher
 

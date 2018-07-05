@@ -12,21 +12,21 @@ public struct DataAssembler: Assembler {
     public var accountToken: String
     public var endpoint: URL
     
-    public var flushAt: Int
-    public var flushInterval: Double
-    public var maxBatchSize: Int
-    public var maxQueueSize: Int
+    public var flushEventsAt: Int
+    public var flushEventsInterval: Double
+    public var maxEventBatchSize: Int
+    public var maxEventQueueSize: Int
     
     public var isAutoFetchEnabled: Bool
     
-    public init(accountToken: String, endpoint: URL = URL(string: "https://api.rover.io/graphql")!, flushAt: Int = 20, flushInterval: Double = 30.0, maxBatchSize: Int = 100, maxQueueSize: Int = 1000, isAutoFetchEnabled: Bool = true) {
+    public init(accountToken: String, endpoint: URL = URL(string: "https://api.rover.io/graphql")!, flushEventsAt: Int = 20, flushEventsInterval: Double = 30.0, maxEventBatchSize: Int = 100, maxEventQueueSize: Int = 1000, isAutoFetchEnabled: Bool = true) {
         self.accountToken = accountToken
         self.endpoint = endpoint
         
-        self.flushAt = flushAt
-        self.flushInterval = flushInterval
-        self.maxBatchSize = maxBatchSize
-        self.maxQueueSize = maxQueueSize
+        self.flushEventsAt = flushEventsAt
+        self.flushEventsInterval = flushEventsInterval
+        self.maxEventBatchSize = maxEventBatchSize
+        self.maxEventQueueSize = maxEventQueueSize
         
         self.isAutoFetchEnabled = isAutoFetchEnabled
     }
@@ -119,10 +119,15 @@ public struct DataAssembler: Assembler {
         
         // MARK: EventQueue
         
-        container.register(EventQueue.self) { [flushAt, flushInterval, maxBatchSize, maxQueueSize] resolver in
-            let client = resolver.resolve(GraphQLClient.self)!
-            let logger = resolver.resolve(Logger.self)!
-            return EventQueueService(client: client, flushAt: flushAt, flushInterval: flushInterval, logger: logger, maxBatchSize: maxBatchSize, maxQueueSize: maxQueueSize)
+        container.register(EventQueue.self) { [flushEventsAt, flushEventsInterval, maxEventBatchSize, maxEventQueueSize] resolver in
+            return EventQueueService(
+                client: resolver.resolve(GraphQLClient.self)!,
+                flushAt: flushEventsAt,
+                flushInterval: flushEventsInterval,
+                logger: resolver.resolve(Logger.self)!,
+                maxBatchSize: maxEventBatchSize,
+                maxQueueSize: maxEventQueueSize
+            )
         }
         
         // MARK: StateFetcher

@@ -5,9 +5,9 @@ import android.app.Application
 import android.content.Intent
 import android.os.Bundle
 import io.rover.notifications.domain.Notification
-import io.rover.rover.core.logging.log
-import io.rover.rover.platform.LocalStorage
-import io.rover.rover.platform.whenNotNull
+import io.rover.core.logging.log
+import io.rover.core.platform.LocalStorage
+import io.rover.core.platform.whenNotNull
 
 class InfluenceTrackerService(
     private val application: Application,

@@ -3,8 +3,8 @@ package io.rover.account
 import com.google.gson.annotations.SerializedName
 import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.rover.rover.core.data.AuthenticationContext
-import io.rover.rover.platform.LocalStorage
+import io.rover.core.data.AuthenticationContext
+import io.rover.core.platform.LocalStorage
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory

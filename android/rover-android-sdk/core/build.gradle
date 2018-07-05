@@ -1,0 +1,140 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'org.jetbrains.dokka-android'
+apply plugin: 'maven-publish'
+
+apply plugin: "de.mannodermaus.android-junit5"
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 27
+        versionCode 2
+        versionName rover_sdk_version
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+}
+
+androidExtensions {
+    // So we can use @Parcelize.  This does not expose risk to consumers; this is a build time-only
+    // consideration.
+    experimental = true
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    // TODO: should these use 'api' instead of compile? Unclear on guidance on transitive AndroidX
+    // dependencies within libraries.
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
+    implementation 'com.android.support:transition:27.1.1'
+    // Until java.util.concurrent.Flow appears in Android SDK, import:
+    api 'org.reactivestreams:reactive-streams:1.0.2'
+
+    api 'android.arch.lifecycle:extensions:1.1.1'
+
+    implementation 'com.android.support:customtabs:27.1.1'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.jetbrains.spek:spek-api:1.1.5'
+    testImplementation 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
+    testImplementation 'com.natpryce:hamkrest:1.4.2.0'
+    testImplementation 'org.amshove.kluent:kluent:1.30'
+    testImplementation 'org.amshove.kluent:kluent-android:1.30'
+    testImplementation 'org.skyscreamer:jsonassert:1.5.0'
+
+    // JUnit 5 support.  Needed for Spek.
+    testImplementation junit5.unitTests()
+    // (Optional) If you need "parameterized tests"
+    testImplementation junit5.parameterized()
+    // (Optional) For running tests inside Android Studio 3.x (needed as of at least beta 7)
+    testCompileOnly junit5.unitTestsRuntime()
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+//    implementation 'com.facebook.stetho:stetho:1.5.0'
+//    // so we can inject Stetho HTTP monitoring into the Rover SDK
+//    implementation 'com.facebook.stetho:stetho-urlconnection:1.5.0'
+//    // so we can inject Stetho HTTP monitoring into the Retrofit requests made by the Experiences app.
+//    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+
+// The following needed for ktlint:
+configurations {
+    ktlint
+}
+dependencies {
+    ktlint "com.github.shyiko:ktlint:0.15.0"
+    // additional 3rd party ruleset(s) can be specified here
+    // just add them to the classpath (e.g. ktlint 'groupId:artifactId:version') and
+    // ktlint will pick them up
+}
+task ktlint(type: JavaExec, group: "verification") {
+    description = "Check Kotlin code style."
+    classpath = configurations.ktlint
+    main = "com.github.shyiko.ktlint.Main"
+    args "src/**/*.kt"
+    // to generate report in checkstyle format prepend following args:
+    // "--reporter=plain", "--reporter=checkstyle,output=${buildDir}/ktlint.xml"
+    // see https://github.com/shyiko/ktlint#usage for more
+}
+check.dependsOn ktlint
+task ktlintFormat(type: JavaExec, group: "formatting") {
+    description = "Fix Kotlin code style deviations."
+    classpath = configurations.ktlint
+    main = "com.github.shyiko.ktlint.Main"
+    args "--android", "-F", "src/**/*.kt"
+}
+
+// TODO: I hope I can make more than one dokka entry so I can run my docs for the jekyll website as
+// well as for the docsJar.
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/javadoc"
+}
+
+task webDocsDokka (type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) {
+    outputFormat = 'jekyll'
+    outputDirectory = "$buildDir/jekylldoc"
+
+    // Suppress a package
+    packageOptions {
+        prefix = "io.rover.shaded"
+        suppress = true
+    }
+
+    // Suppress a package
+    packageOptions {
+        prefix = "android"
+        suppress = true
+    }
+}
+
+apply from: 'deploy.gradle'

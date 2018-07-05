@@ -3,7 +3,7 @@ package io.rover.androidtestapp
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import io.rover.notifications.PushReceiverInterface
-import io.rover.rover.Rover
+import io.rover.core.Rover
 
 /**
  * Receive callbacks from Firebase FCM.

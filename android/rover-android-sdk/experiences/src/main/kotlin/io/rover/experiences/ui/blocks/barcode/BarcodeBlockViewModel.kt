@@ -1,6 +1,5 @@
 package io.rover.experiences.ui.blocks.barcode
 
-import io.rover.rover.core.ui.Rect
 import io.rover.experiences.ui.layout.ViewType
 import io.rover.experiences.ui.blocks.concerns.background.BackgroundViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.BlockViewModelInterface

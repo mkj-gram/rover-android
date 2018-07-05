@@ -3,8 +3,8 @@ package io.rover.experiences.ui.blocks.barcode
 import io.rover.experiences.ui.blocks.concerns.background.BackgroundViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.border.BorderViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.*
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.BindableViewModel
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.BindableViewModel
 
 interface ViewBarcodeInterface: BindableView<BarcodeViewModelInterface>
 

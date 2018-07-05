@@ -1,8 +1,6 @@
 package io.rover.experiences.ui.toolbar
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.support.v7.app.ActionBar
@@ -13,14 +11,13 @@ import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.view.Gravity
 import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.Window
-import io.rover.rover.R
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.streams.androidLifecycleDispose
-import io.rover.rover.core.streams.doOnUnsubscribe
-import io.rover.rover.core.streams.subscribe
+import io.rover.core.R
+import io.rover.core.logging.log
+import io.rover.core.streams.androidLifecycleDispose
+import io.rover.core.streams.doOnUnsubscribe
+import io.rover.core.streams.subscribe
 import io.rover.experiences.ui.ExperienceView
 import org.reactivestreams.Subscription
 

@@ -1,0 +1,176 @@
+@import "colors"
+
+html
+    height: 100%
+
+body
+    display: flex
+    flex-direction: column
+    height: 100%
+    background-color: $black
+
+nav a
+    color: white
+
+nav.primary
+    align-items: center
+    background-color: $dark
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,0.15)
+    display: flex
+    flex: 0 0 auto
+    height: 56px
+    padding-right: 24px    
+
+    > div
+        display: flex
+        align-items: center
+
+    > div:first-child
+        width: 264px
+        padding-left: 24px
+
+        > a:first-child
+            margin-right: 16px
+        
+        > a:last-child
+            color: $silver
+
+    > div:nth-child(2)
+        flex: 1 0 0
+        font-size: 15px
+        padding-left: 24px
+        
+        > a
+            align-items: center
+            display: flex
+            margin-right: 48px
+
+            svg
+                fill: $silver
+                margin-left: 4px
+                margin-right: -20px
+                width: 16px
+                height: 16px
+
+    > div:last-child
+        > a:first-child
+            margin-right: 16px
+
+            svg
+                width: 20px
+                height: 20px
+                fill: $silver
+
+        > a:first-child:active
+            svg
+                fill: $steel
+    a
+        color: $white
+
+    svg
+        display: block
+
+.columns
+    display: flex
+    flex: 1 0 0
+    position: relative
+            
+.sidebar
+    background-color: rgba($dark, 0.5)
+    overflow: auto
+    width: 264px
+
+.search
+    font-size: 15px
+    padding: 24px
+    position: relative
+
+    svg
+        display: block
+        height: 16px
+        fill: $steel
+        left: 28px
+        position: absolute
+        top: 28px
+        width: 16px
+
+    > div
+        background-color: rgba(white, 0.1)
+        border-radius: 12px
+        height: 24px
+        line-height: 24px
+        outline: none
+        overflow: hidden
+        padding: 0 4px 0 24px   
+        
+
+    > div:empty
+        color: $steel
+
+    > div:empty:before
+        content: attr(data-placeholder)
+
+nav.secondary
+    .section
+        > span
+            color: $mercury
+            display: block
+            font-size: 13px
+            font-weight: 400
+            margin-bottom: 8px
+            padding-left: 16px
+            text-transform: uppercase
+        
+        a 
+            padding-left: 32px
+
+        a:last-child
+            margin-bottom: 16px
+
+    a
+        align-items: center
+        color: $titanium
+        display: flex
+        font-size: 15px
+        font-weight: 300
+        margin-bottom: 8px
+        padding: 0 16px
+
+        svg
+            fill: $steel
+            height: 16px
+            margin-right: 8px
+            width: 16px
+
+    a:hover, a.is-active
+        background-color: $black
+
+main
+    flex: 1 0 0
+    overflow: auto
+    padding: 24px 240px 96px 32px
+
+
+.pageinfo
+    font-size: 15px
+    overflow: auto
+    position: absolute
+    right: 24px
+    top: 88px
+    width: 168px
+
+    h6
+        line-height: 32px
+
+    ul 
+        list-style-type: none
+        margin-bottom: 48px
+        padding-left: 0
+
+    a
+        color: $turquoise
+        display: block
+        line-height: 32px
+        overflow: hidden
+        text-overflow: ellipsis
+        white-space: nowrap

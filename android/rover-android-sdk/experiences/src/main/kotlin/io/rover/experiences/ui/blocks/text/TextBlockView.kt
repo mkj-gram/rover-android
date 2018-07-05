@@ -5,7 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.support.v7.widget.AppCompatTextView
 import android.util.AttributeSet
-import io.rover.rover.core.logging.log
+import io.rover.core.logging.log
 import io.rover.experiences.ui.blocks.concerns.layout.LayoutableView
 import io.rover.experiences.ui.blocks.concerns.background.ViewBackground
 import io.rover.experiences.ui.blocks.concerns.layout.ViewBlock
@@ -13,8 +13,8 @@ import io.rover.experiences.ui.blocks.concerns.border.ViewBorder
 import io.rover.experiences.ui.blocks.concerns.text.AndroidRichTextToSpannedTransformer
 import io.rover.experiences.ui.blocks.concerns.text.ViewText
 import io.rover.experiences.ui.blocks.concerns.ViewComposition
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.ViewModelBinding
 
 class TextBlockView : AppCompatTextView, LayoutableView<TextBlockViewModelInterface> {
     constructor(context: Context?) : super(context)

@@ -1,0 +1,12 @@
+{% if page.tertiary_navigation %}
+    <nav class="tertiary">
+        <h6>On This Page</h6>
+        <ul>
+            {% for item in page.tertiary_navigation %}
+                <li>
+                    <a href="#{{item.anchor}}" title="{{ item.name }}">{{item.name}}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+{% endif %}

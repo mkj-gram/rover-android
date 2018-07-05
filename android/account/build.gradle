@@ -32,7 +32,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation project(":rover-android-sdk:rover")
+    implementation project(':rover-android-sdk:core')
     implementation project(":rover-android-sdk:experiences")
     implementation "io.reactivex.rxjava2:rxjava:2.1.6"
 

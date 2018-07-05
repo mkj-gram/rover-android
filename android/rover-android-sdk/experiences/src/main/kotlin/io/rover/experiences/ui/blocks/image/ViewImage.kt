@@ -2,10 +2,10 @@ package io.rover.experiences.ui.blocks.image
 
 import android.support.v7.widget.AppCompatImageView
 import android.widget.ImageView
-import io.rover.rover.core.streams.androidLifecycleDispose
-import io.rover.rover.core.streams.subscribe
-import io.rover.rover.core.ui.concerns.ViewModelBinding
-import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.core.streams.androidLifecycleDispose
+import io.rover.core.streams.subscribe
+import io.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.ui.concerns.BindableView
 
 /**
  * Mixin that binds an image block view model to the relevant parts of an [ImageView].

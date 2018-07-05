@@ -6,14 +6,14 @@ import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.messages.MessagesClient
-import io.rover.rover.core.container.Assembler
-import io.rover.rover.core.container.Container
-import io.rover.rover.core.container.Resolver
-import io.rover.rover.core.container.Scope
-import io.rover.rover.core.data.state.StateManagerServiceInterface
-import io.rover.rover.core.events.EventQueueServiceInterface
-import io.rover.rover.core.permissions.PermissionsNotifierInterface
-import io.rover.rover.core.streams.Scheduler
+import io.rover.core.container.Assembler
+import io.rover.core.container.Container
+import io.rover.core.container.Resolver
+import io.rover.core.container.Scope
+import io.rover.core.data.state.StateManagerServiceInterface
+import io.rover.core.events.EventQueueServiceInterface
+import io.rover.core.permissions.PermissionsNotifierInterface
+import io.rover.core.streams.Scheduler
 
 /**
  * Location Assembler contains the Rover SDK subsystems for Geofence, Beacon, and location tracking.

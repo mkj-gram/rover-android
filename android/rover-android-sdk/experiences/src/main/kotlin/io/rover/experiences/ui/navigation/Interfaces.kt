@@ -7,7 +7,7 @@ import io.rover.experiences.ui.blocks.concerns.layout.BlockViewModel
 import io.rover.experiences.ui.layout.screen.ScreenViewModel
 import io.rover.experiences.ui.layout.screen.ScreenViewModelInterface
 import io.rover.experiences.ui.toolbar.ExperienceToolbarViewModelInterface
-import io.rover.rover.core.ui.concerns.BindableViewModel
+import io.rover.core.ui.concerns.BindableViewModel
 import org.reactivestreams.Publisher
 import java.net.URI
 

@@ -12,9 +12,9 @@ import io.rover.experiences.ui.blocks.rectangle.RectangleBlockView
 import io.rover.experiences.ui.blocks.text.TextBlockView
 import io.rover.experiences.ui.blocks.web.WebBlockView
 import io.rover.experiences.ui.layout.row.RowView
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.MeasuredSize
-import io.rover.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.MeasuredSize
+import io.rover.core.ui.concerns.ViewModelBinding
 
 /**
  * The RecyclerView adapter for Experience layouts.

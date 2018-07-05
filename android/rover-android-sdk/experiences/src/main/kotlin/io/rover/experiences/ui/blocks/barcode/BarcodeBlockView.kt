@@ -4,13 +4,13 @@ import android.content.Context
 import android.graphics.Canvas
 import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
-import io.rover.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.ui.concerns.ViewModelBinding
 import io.rover.experiences.ui.blocks.concerns.layout.LayoutableView
 import io.rover.experiences.ui.blocks.concerns.background.ViewBackground
 import io.rover.experiences.ui.blocks.concerns.layout.ViewBlock
 import io.rover.experiences.ui.blocks.concerns.border.ViewBorder
 import io.rover.experiences.ui.blocks.concerns.ViewComposition
-import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.BindableView
 
 class BarcodeBlockView : AppCompatImageView, LayoutableView<BarcodeBlockViewModelInterface> {
     constructor(context: Context?) : super(context)

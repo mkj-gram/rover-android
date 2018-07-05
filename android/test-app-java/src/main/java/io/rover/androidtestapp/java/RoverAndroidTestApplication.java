@@ -5,8 +5,8 @@ import android.graphics.Color;
 
 import com.facebook.stetho.Stetho;
 
-import io.rover.rover.Rover;
-import io.rover.rover.core.CoreAssembler;
+import io.rover.core.Rover;
+import io.rover.core.CoreAssembler;
 import timber.log.Timber;
 
 public class RoverAndroidTestApplication extends Application {

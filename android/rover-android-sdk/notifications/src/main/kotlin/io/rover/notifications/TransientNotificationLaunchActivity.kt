@@ -6,11 +6,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import io.rover.rover.Rover
-import io.rover.rover.core.logging.log
+import io.rover.core.Rover
+import io.rover.core.logging.log
 import io.rover.notifications.domain.Notification
 import io.rover.notifications.graphql.encodeJson
-import io.rover.rover.platform.DateFormattingInterface
+import io.rover.core.platform.DateFormattingInterface
 
 /**
  * When the user taps a Rover notification created for the app by

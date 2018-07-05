@@ -7,16 +7,15 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
-import android.graphics.Rect
 import android.graphics.RectF
 import android.view.View
-import io.rover.rover.platform.whenNotNull
-import io.rover.rover.core.ui.dpAsPx
+import io.rover.core.platform.whenNotNull
+import io.rover.core.ui.dpAsPx
 import io.rover.experiences.ui.blocks.concerns.layout.PaddingContributor
 import io.rover.experiences.ui.blocks.concerns.ViewCompositionInterface
 import io.rover.experiences.ui.blocks.concerns.layout.Padding
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.ViewModelBinding
 
 class ViewBorder(
     override val view: View,

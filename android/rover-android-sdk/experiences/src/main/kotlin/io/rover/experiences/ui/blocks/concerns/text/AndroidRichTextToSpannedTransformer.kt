@@ -3,7 +3,7 @@ package io.rover.experiences.ui.blocks.concerns.text
 import android.graphics.Typeface
 import android.text.Spanned
 import android.text.style.StyleSpan
-import io.rover.rover.platform.roverTextHtmlAsSpanned
+import io.rover.core.platform.roverTextHtmlAsSpanned
 
 class AndroidRichTextToSpannedTransformer : RichTextToSpannedTransformer {
     override fun transform(string: String, boldRelativeToBlockWeight: Font): Spanned {

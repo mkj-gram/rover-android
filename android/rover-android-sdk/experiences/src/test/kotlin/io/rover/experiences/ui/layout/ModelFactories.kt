@@ -1,23 +1,23 @@
 package io.rover.experiences.ui.layout
 
-import io.rover.rover.core.data.domain.Background
-import io.rover.rover.core.data.domain.BackgroundContentMode
-import io.rover.rover.core.data.domain.BackgroundScale
-import io.rover.rover.core.data.domain.Border
-import io.rover.rover.core.data.domain.Color
-import io.rover.rover.core.data.domain.Height
-import io.rover.rover.core.data.domain.HorizontalAlignment
-import io.rover.rover.core.data.domain.ID
-import io.rover.rover.core.data.domain.Insets
-import io.rover.rover.core.data.domain.Position
-import io.rover.rover.core.data.domain.RectangleBlock
-import io.rover.rover.core.data.domain.Row
-import io.rover.rover.core.data.domain.Screen
-import io.rover.rover.core.data.domain.StatusBar
-import io.rover.rover.core.data.domain.StatusBarStyle
-import io.rover.rover.core.data.domain.TitleBar
-import io.rover.rover.core.data.domain.TitleBarButtons
-import io.rover.rover.core.data.domain.VerticalAlignment
+import io.rover.core.data.domain.Background
+import io.rover.core.data.domain.BackgroundContentMode
+import io.rover.core.data.domain.BackgroundScale
+import io.rover.core.data.domain.Border
+import io.rover.core.data.domain.Color
+import io.rover.core.data.domain.Height
+import io.rover.core.data.domain.HorizontalAlignment
+import io.rover.core.data.domain.ID
+import io.rover.core.data.domain.Insets
+import io.rover.core.data.domain.Position
+import io.rover.core.data.domain.RectangleBlock
+import io.rover.core.data.domain.Row
+import io.rover.core.data.domain.Screen
+import io.rover.core.data.domain.StatusBar
+import io.rover.core.data.domain.StatusBarStyle
+import io.rover.core.data.domain.TitleBar
+import io.rover.core.data.domain.TitleBarButtons
+import io.rover.core.data.domain.VerticalAlignment
 
 class ModelFactories {
     companion object {

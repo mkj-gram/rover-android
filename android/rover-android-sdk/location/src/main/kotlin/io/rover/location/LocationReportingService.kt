@@ -1,9 +1,9 @@
 package io.rover.location
 
 import io.rover.location.domain.Region
-import io.rover.rover.core.data.domain.AttributeValue
-import io.rover.rover.core.events.EventQueueServiceInterface
-import io.rover.rover.core.events.domain.Event
+import io.rover.core.data.domain.AttributeValue
+import io.rover.core.events.EventQueueServiceInterface
+import io.rover.core.events.domain.Event
 
 class LocationReportingService(
     private val eventQueueService: EventQueueServiceInterface

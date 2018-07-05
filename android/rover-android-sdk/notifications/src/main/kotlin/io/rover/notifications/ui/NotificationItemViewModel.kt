@@ -1,14 +1,14 @@
 package io.rover.notifications.ui
 
 import android.graphics.Bitmap
-import io.rover.rover.core.logging.log
+import io.rover.core.logging.log
 import org.reactivestreams.Publisher
-import io.rover.rover.core.streams.flatMap
-import io.rover.rover.core.data.NetworkResult
+import io.rover.core.streams.flatMap
+import io.rover.core.data.NetworkResult
 import io.rover.notifications.domain.Notification
 import io.rover.notifications.domain.NotificationAttachment
-import io.rover.rover.core.assets.AssetService
-import io.rover.rover.core.streams.Publishers
+import io.rover.core.assets.AssetService
+import io.rover.core.streams.Publishers
 import io.rover.notifications.ui.concerns.NotificationItemViewModelInterface
 
 class NotificationItemViewModel(

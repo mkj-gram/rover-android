@@ -3,8 +3,8 @@ package io.rover.debug.routes
 import android.content.Context
 import android.content.Intent
 import io.rover.debug.RoverDebugActivity
-import io.rover.rover.core.routing.Route
-import io.rover.rover.platform.whenNotNull
+import io.rover.core.routing.Route
+import io.rover.core.platform.whenNotNull
 import java.net.URI
 
 class DebugRoute(
@@ -12,7 +12,7 @@ class DebugRoute(
 ) : Route {
     override fun resolveUri(uri: URI?): Intent? {
         return uri.whenNotNull { uri ->
-            if(uri.authority == "presentDebugger") {
+            if(uri.authority == "presentSettings") {
                 Intent(
                     context,
                     RoverDebugActivity::class.java

@@ -5,7 +5,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.text.TextPaint
 import android.text.style.TypefaceSpan
-import io.rover.rover.core.logging.log
+import io.rover.core.logging.log
 
 /**
  * A span that specifies a given fontFamily and fontStyle.  Unlike [TypefaceSpan] which only takes a

@@ -9,8 +9,8 @@ import android.view.View
 import io.rover.experiences.ui.blocks.concerns.ViewComposition
 import io.rover.experiences.ui.blocks.concerns.background.ViewBackground
 import io.rover.experiences.ui.blocks.concerns.layout.LayoutableView
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.ViewModelBinding
 
 class RowView : View, LayoutableView<RowViewModelInterface> {
     constructor(context: Context?) : super(context)

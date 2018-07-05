@@ -3,8 +3,8 @@ package io.rover.experiences.ui
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
-import io.rover.rover.Rover
-import io.rover.rover.core.logging.log
+import io.rover.core.Rover
+import io.rover.core.logging.log
 import java.net.URI
 
 /**

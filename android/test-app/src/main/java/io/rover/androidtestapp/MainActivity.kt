@@ -13,9 +13,8 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
-import io.rover.rover.Rover
+import io.rover.core.Rover
 import io.rover.experiences.ui.containers.StandaloneExperienceHostActivity
-import io.rover.notifications.ui.NotificationCenterListView
 import kotlinx.android.synthetic.main.activity_main.demoExperienceView
 import kotlinx.android.synthetic.main.activity_main.demoNotificationCentre
 import kotlinx.android.synthetic.main.activity_main.message
@@ -54,10 +53,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
-        demoNotificationCentre.notificationCenterHost = object : NotificationCenterListView.NotificationCenterHost {
-            override val provideActivity: AppCompatActivity
-                get() = this@MainActivity
-        }
+        demoNotificationCentre.activity = this
 
         if(this.intent?.extras?.getBoolean("SHOW_NOTIFICATION_CENTER", false) ?: true) {
              navigation.selectedItemId = R.id.navigation_notifications

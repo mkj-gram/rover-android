@@ -1,0 +1,22 @@
+---
+layout: default
+---
+<div class="sidebar">
+    {% include layout/search.html %}
+    {% include layout/secondary-nav.html %}
+</div>
+
+<main>
+    {{ content }}
+    <div class="pageinfo">
+        {% if page.required_modules %}
+            <h6>Required Modules</h6>
+            <ul>
+                {% for item in page.required_modules %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% include layout/tertiary-nav.html %}
+    </div>        
+</main>

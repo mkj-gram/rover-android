@@ -12,15 +12,15 @@ import io.rover.experiences.ui.ExperienceView
 import io.rover.experiences.ui.ExperienceViewModel
 import io.rover.experiences.ui.ExperienceViewModelInterface
 import io.rover.experiences.ui.navigation.ExperienceExternalNavigationEvent
-import io.rover.rover.R
-import io.rover.rover.Rover
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.routing.Router
-import io.rover.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
-import io.rover.rover.core.streams.androidLifecycleDispose
-import io.rover.rover.core.streams.subscribe
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.platform.whenNotNull
+import io.rover.core.R
+import io.rover.core.Rover
+import io.rover.core.logging.log
+import io.rover.core.routing.Router
+import io.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
+import io.rover.core.streams.androidLifecycleDispose
+import io.rover.core.streams.subscribe
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.platform.whenNotNull
 
 /**
  * This can display a Rover experience in an Activity, self-contained.

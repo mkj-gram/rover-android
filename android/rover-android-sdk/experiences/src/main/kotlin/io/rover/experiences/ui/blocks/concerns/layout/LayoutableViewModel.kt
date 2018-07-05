@@ -1,12 +1,12 @@
 package io.rover.experiences.ui.blocks.concerns.layout
 
-import io.rover.rover.core.ui.RectF
+import io.rover.core.ui.RectF
 import io.rover.experiences.ui.layout.ViewType
-import io.rover.rover.core.ui.concerns.BindableViewModel
+import io.rover.core.ui.concerns.BindableViewModel
 import io.rover.experiences.ui.layout.BlockAndRowRecyclerAdapter
 import io.rover.experiences.ui.layout.row.RowViewModel
 import io.rover.experiences.ui.layout.screen.ScreenViewModel
-import io.rover.rover.core.ui.Rect
+import io.rover.core.ui.Rect
 
 /**
  * Any View Model that implements this interface can be laid out in in the vertically

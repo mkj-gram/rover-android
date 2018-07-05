@@ -60,7 +60,7 @@ public struct ExperiencesAssembler: Assembler {
         }
         
         container.register(UIViewController.self, name: "experience", scope: .transient) { (resolver, experience: Experience) in
-            return NavigationExperienceController(
+            return ExperienceViewController(
                 rootViewController: resolver.resolve(UIViewController.self, name: "screen", arguments: experience, experience.homeScreen)!,
                 experience: experience,
                 eventQueue: resolver.resolve(EventQueue.self)!,

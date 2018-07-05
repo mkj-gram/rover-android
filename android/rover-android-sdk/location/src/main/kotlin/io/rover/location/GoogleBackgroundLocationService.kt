@@ -10,10 +10,10 @@ import android.os.Build
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import io.rover.rover.Rover
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.permissions.PermissionsNotifierInterface
-import io.rover.rover.core.streams.subscribe
+import io.rover.core.Rover
+import io.rover.core.logging.log
+import io.rover.core.permissions.PermissionsNotifierInterface
+import io.rover.core.streams.subscribe
 
 /**
  * Subscribes to Location Updates from FusedLocationManager and emits location reporting events.

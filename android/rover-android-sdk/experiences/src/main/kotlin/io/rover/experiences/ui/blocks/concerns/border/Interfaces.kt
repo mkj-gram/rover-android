@@ -1,9 +1,9 @@
 package io.rover.experiences.ui.blocks.concerns.border
 
-import io.rover.rover.core.data.domain.Border
+import io.rover.core.data.domain.Border
 import io.rover.experiences.ui.blocks.concerns.layout.LayoutPaddingDeflection
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.BindableViewModel
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.BindableViewModel
 
 /**
  * Binds [BorderViewModelInterface] properties to that of a view.

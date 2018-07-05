@@ -7,8 +7,7 @@ import io.rover.experiences.ui.blocks.concerns.border.BorderViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.BlockViewModel
 import io.rover.experiences.ui.blocks.concerns.layout.CompositeBlockViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.text.TextViewModelInterface
-import io.rover.rover.core.ui.concerns.BindableViewModel
-import org.reactivestreams.Publisher
+import io.rover.core.ui.concerns.BindableViewModel
 
 /**
  * View Model for block content that contains a button (but only the presentation aspects thereof).

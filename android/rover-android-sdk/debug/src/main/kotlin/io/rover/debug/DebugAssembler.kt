@@ -2,13 +2,13 @@ package io.rover.debug
 
 import android.content.Context
 import io.rover.debug.routes.DebugRoute
-import io.rover.rover.core.container.Assembler
-import io.rover.rover.core.container.Container
-import io.rover.rover.core.container.Resolver
-import io.rover.rover.core.container.Scope
-import io.rover.rover.core.events.EventQueueServiceInterface
-import io.rover.rover.core.routing.Router
-import io.rover.rover.platform.DeviceIdentificationInterface
+import io.rover.core.container.Assembler
+import io.rover.core.container.Container
+import io.rover.core.container.Resolver
+import io.rover.core.container.Scope
+import io.rover.core.events.EventQueueServiceInterface
+import io.rover.core.routing.Router
+import io.rover.core.platform.DeviceIdentificationInterface
 
 /**
  * The Debug module adds certain useful bits of debug functionality to the Rover SDK.

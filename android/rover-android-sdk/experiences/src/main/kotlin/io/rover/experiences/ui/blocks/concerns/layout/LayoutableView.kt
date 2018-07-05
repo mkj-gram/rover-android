@@ -1,7 +1,7 @@
 package io.rover.experiences.ui.blocks.concerns.layout
 
 import android.view.View
-import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.BindableView
 
 /**
  * Wraps a Rover Android [View] that can be laid out along with a possible view model that is bound

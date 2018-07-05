@@ -3,16 +3,15 @@ package io.rover.notifications
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import io.rover.core.data.domain.AttributeValue
+import io.rover.core.events.EventQueueService
+import io.rover.core.events.EventQueueServiceInterface
+import io.rover.core.events.domain.Event
+import io.rover.core.platform.DateFormattingInterface
+import io.rover.core.routing.Router
+import io.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
 import io.rover.notifications.domain.Notification
 import io.rover.notifications.graphql.decodeJson
-import io.rover.rover.core.data.domain.AttributeValue
-import io.rover.rover.core.events.EventQueueService
-import io.rover.rover.core.events.EventQueueServiceInterface
-import io.rover.rover.core.events.domain.Event
-import io.rover.rover.core.routing.Router
-import io.rover.rover.core.routing.TopLevelNavigation
-import io.rover.rover.core.routing.website.EmbeddedWebBrowserDisplayInterface
-import io.rover.rover.platform.DateFormattingInterface
 import org.json.JSONObject
 
 /**
@@ -23,7 +22,7 @@ open class NotificationOpen(
     private val dateFormatting: DateFormattingInterface,
     private val eventsService: EventQueueServiceInterface,
     private val router: Router,
-    private val topLevelNavigation: TopLevelNavigation,
+    private val openAppIntent: Intent,
     private val embeddedWebBrowserDisplay: EmbeddedWebBrowserDisplayInterface
 ): NotificationOpenInterface {
     override fun pendingIntentForAndroidNotification(notification: Notification): PendingIntent {
@@ -35,7 +34,8 @@ open class NotificationOpen(
 
     private fun intentForNotification(notification: Notification): Intent {
         return when(notification.tapBehavior) {
-            is Notification.TapBehavior.OpenApp -> topLevelNavigation.openAppIntent()
+            // TODO: will inject this an Intent with a name!
+            is Notification.TapBehavior.OpenApp -> openAppIntent
             is Notification.TapBehavior.OpenUri -> router.route(
                 notification.tapBehavior.uri,
                 false

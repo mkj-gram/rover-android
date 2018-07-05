@@ -17,12 +17,10 @@ class AuthorizeNotificationsViewController: UIViewController {
     var completionHandler: (() -> Void)?
     
     @IBAction func requestAuthorization() {
-        if #available(iOS 10.0, *) {
-            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .sound, .alert]) { [weak self] granted, error in
-                DispatchQueue.main.async {
-                    UserDefaults.standard.set(true, forKey: "isNotificationsAuthorized")
-                    self?.completionHandler?()
-                }
+        UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .sound, .alert]) { [weak self] granted, error in
+            DispatchQueue.main.async {
+                UserDefaults.standard.set(true, forKey: "isNotificationsAuthorized")
+                self?.completionHandler?()
             }
         }
     }

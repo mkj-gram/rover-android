@@ -2,7 +2,7 @@ package io.rover.experiences.ui.layout
 
 import io.rover.experiences.ui.blocks.concerns.layout.LayoutableViewModel
 import io.rover.experiences.ui.layout.screen.ScreenViewModel
-import io.rover.rover.core.ui.RectF
+import io.rover.core.ui.RectF
 
 /**
  * A sequence of [LayoutableViewModel]s in two-dimensional space, with optional clips,

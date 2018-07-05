@@ -3,8 +3,8 @@ package io.rover.experiences.ui.blocks.web
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.ViewModelBinding
 
 @SuppressLint("SetJavaScriptEnabled")
 class ViewWeb(

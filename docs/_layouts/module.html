@@ -1,0 +1,44 @@
+---
+layout: default
+---
+<div class="sidebar">
+    {% include layout/search.html %}
+    {% include layout/secondary-nav.html %}
+</div>
+
+<main>
+    {{ content }}
+    <div class="pageinfo">
+        {% if page.system_frameworks %}
+            <h6>System Frameworks</h6>
+            <ul>
+                {% for item in page.system_frameworks %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if page.dependencies %}
+            <h6>Dependencies</h6>
+            <ul>
+                {% for item in page.dependencies %}
+                    <li>
+                        <a href="{{ site.baseurl }}{{ item.url }}">{{ item.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <nav class="tertiary">
+            <h6>On This Page</h6>
+            <ul>
+                <li>
+                    <a href="#assembler" title="Assembler">Assembler</a>
+                </li>
+                <li>
+                    <a href="#services" title="Services">Services</a>
+                </li>
+            </ul>
+        </nav>
+    </div>        
+</main>

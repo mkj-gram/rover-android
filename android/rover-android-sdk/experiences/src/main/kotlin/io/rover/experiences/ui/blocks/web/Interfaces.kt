@@ -5,8 +5,8 @@ import io.rover.experiences.ui.blocks.concerns.border.BorderViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.BlockViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.CompositeBlockViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.LayoutableViewModel
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.BindableViewModel
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.BindableViewModel
 import java.net.URL
 
 interface ViewWebInterface: BindableView<WebViewModelInterface>

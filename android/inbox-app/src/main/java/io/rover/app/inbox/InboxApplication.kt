@@ -11,18 +11,16 @@ import com.microsoft.appcenter.crashes.model.ErrorReport
 import com.microsoft.appcenter.distribute.Distribute
 import io.rover.account.AccountAssembler
 import io.rover.account.AuthService
-import io.rover.app.inbox.BuildConfig
-import io.rover.app.inbox.R
 import io.rover.debug.DebugAssembler
 import io.rover.experiences.ExperiencesAssembler
 import io.rover.location.LocationAssembler
-import io.rover.rover.Rover
-import io.rover.rover.core.CoreAssembler
-import io.rover.rover.core.data.AuthenticationContext
-import io.rover.rover.core.events.domain.Event
+import io.rover.core.Rover
+import io.rover.core.CoreAssembler
+import io.rover.core.data.AuthenticationContext
+import io.rover.core.events.domain.Event
 import io.rover.notifications.NotificationsAssembler
-import io.rover.rover.core.logging.GlobalStaticLogHolder
-import io.rover.rover.core.logging.LogBuffer
+import io.rover.core.logging.GlobalStaticLogHolder
+import io.rover.core.logging.LogBuffer
 import timber.log.Timber
 
 
@@ -66,14 +64,15 @@ class InboxApplication : Application() {
 
         Rover.initialize(
             CoreAssembler(
-                accountToken  = "",
+                accountToken = "",
                 application = this,
                 deepLinkSchemeSlug = "inbox",
                 endpoint = "$roverBaseUrl/graphql"
             ),
             NotificationsAssembler(
                 applicationContext = this,
-                smallIconResId = R.mipmap.rover_notification_icon
+                smallIconResId = R.mipmap.rover_notification_icon,
+                notificationCenterIntent = Intent(applicationContext, MainActivity::class.java)
             ) {
                 FirebaseInstanceId.getInstance().deleteInstanceId()
                 FirebaseInstanceId.getInstance().token

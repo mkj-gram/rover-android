@@ -1,9 +1,9 @@
 package io.rover.location.graphql.data
 
 import io.rover.location.domain.Region
-import io.rover.rover.core.data.graphql.optIntOrNull
-import io.rover.rover.core.data.graphql.putProp
-import io.rover.rover.core.data.graphql.safeGetString
+import io.rover.core.data.graphql.optIntOrNull
+import io.rover.core.data.graphql.putProp
+import io.rover.core.data.graphql.safeGetString
 import org.json.JSONObject
 import java.util.UUID
 

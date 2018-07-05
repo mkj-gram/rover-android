@@ -2,9 +2,9 @@ package io.rover.experiences.ui.blocks.concerns.layout
 
 import android.view.MotionEvent
 import android.view.View
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.ViewModelBinding
-import io.rover.rover.core.ui.dpAsPx
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.ui.dpAsPx
 
 class ViewBlock(
     override val view: View,

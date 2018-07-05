@@ -24,7 +24,6 @@
 		DB4831B620DC38D8003DBF1B /* VersionTrackerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4831B520DC38D8003DBF1B /* VersionTrackerService.swift */; };
 		DB4831B820DC38F6003DBF1B /* VersionTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4831B720DC38F6003DBF1B /* VersionTracker.swift */; };
 		DB4831BA20DC5D18003DBF1B /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB4831B920DC5D18003DBF1B /* Session.swift */; };
-		DB496F5320DBECD800DF5949 /* NotificationSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB496F5220DBECD800DF5949 /* NotificationSource.swift */; };
 		DB6ADD6320B33EC0002F226C /* RoverUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB6ADD5A20B33EC0002F226C /* RoverUI.framework */; };
 		DB6ADD6820B33EC0002F226C /* RoverUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB6ADD6720B33EC0002F226C /* RoverUITests.swift */; };
 		DB6ADD6A20B33EC0002F226C /* RoverUI.h in Headers */ = {isa = PBXBuildFile; fileRef = DB6ADD5C20B33EC0002F226C /* RoverUI.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -78,6 +77,7 @@
 		DBB89BE820D0415600DD797A /* Rover.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBF49DF2203DE18500B54652 /* Rover.swift */; };
 		DBB89C4920D07F6600DD797A /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
 		DBB89C4C20D084D600DD797A /* RoverFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = DBB89C4A20D083AF00DD797A /* RoverFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DBC9544A20EA86E600AA3AD9 /* NotificationSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB496F5220DBECD800DF5949 /* NotificationSource.swift */; };
 		DBD88A7C20C1B21700085AE0 /* RoverData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DBD88A7320C1B21700085AE0 /* RoverData.framework */; };
 		DBD88A8120C1B21700085AE0 /* RoverDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBD88A8020C1B21700085AE0 /* RoverDataTests.swift */; };
 		DBD88A8320C1B21700085AE0 /* RoverData.h in Headers */ = {isa = PBXBuildFile; fileRef = DBD88A7520C1B21700085AE0 /* RoverData.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -195,7 +195,7 @@
 		DBFDF47520AC854F0031EF47 /* ExperienceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1B0E209CAD9600E99F9F /* ExperienceStore.swift */; };
 		DBFDF47620AC854F0031EF47 /* ExperienceStoreService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBFB1ACB209BB3D200E99F9F /* ExperienceStoreService.swift */; };
 		DBFDF47720AC85560031EF47 /* ExperienceContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBEDF2055964E00E5C77F /* ExperienceContainer.swift */; };
-		DBFDF47820AC85560031EF47 /* NavigationExperienceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBEDE2055964E00E5C77F /* NavigationExperienceController.swift */; };
+		DBFDF47820AC85560031EF47 /* ExperienceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBEDE2055964E00E5C77F /* ExperienceViewController.swift */; };
 		DBFDF47920AC855E0031EF47 /* BarcodeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB00FDDF208A4961008D1A57 /* BarcodeCell.swift */; };
 		DBFDF47A20AC855E0031EF47 /* BlockCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBEEE2055964E00E5C77F /* BlockCell.swift */; };
 		DBFDF47B20AC855E0031EF47 /* ButtonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB9DBEED2055964E00E5C77F /* ButtonCell.swift */; };
@@ -329,7 +329,7 @@
 		DB7BA92A20D9811100968A30 /* NotificationHandlerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationHandlerService.swift; sourceTree = "<group>"; };
 		DB7BA92E20D982BE00968A30 /* NotificationCenterRouteHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationCenterRouteHandler.swift; sourceTree = "<group>"; };
 		DB9469382051E58400C8C3AE /* LoggerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggerService.swift; sourceTree = "<group>"; };
-		DB9DBEDE2055964E00E5C77F /* NavigationExperienceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationExperienceController.swift; sourceTree = "<group>"; };
+		DB9DBEDE2055964E00E5C77F /* ExperienceViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExperienceViewController.swift; sourceTree = "<group>"; };
 		DB9DBEDF2055964E00E5C77F /* ExperienceContainer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExperienceContainer.swift; sourceTree = "<group>"; };
 		DB9DBEE02055964E00E5C77F /* ScreenViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenViewController.swift; sourceTree = "<group>"; };
 		DB9DBEE32055964E00E5C77F /* ScreenViewLayout.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenViewLayout.swift; sourceTree = "<group>"; };
@@ -664,26 +664,6 @@
 			path = Router;
 			sourceTree = "<group>";
 		};
-		DB00FE28208FAF88008D1A57 /* ScreenViewController */ = {
-			isa = PBXGroup;
-			children = (
-				DB9DBEE52055964E00E5C77F /* Views */,
-				DB9DBEE02055964E00E5C77F /* ScreenViewController.swift */,
-				DB9DBEE32055964E00E5C77F /* ScreenViewLayout.swift */,
-				DB00FDD92087E09F008D1A57 /* ScreenViewLayoutAttributes.swift */,
-			);
-			path = ScreenViewController;
-			sourceTree = "<group>";
-		};
-		DB00FE2A208FAFC0008D1A57 /* ExperienceViewController */ = {
-			isa = PBXGroup;
-			children = (
-				DB9DBEDF2055964E00E5C77F /* ExperienceContainer.swift */,
-				DB9DBEDE2055964E00E5C77F /* NavigationExperienceController.swift */,
-			);
-			path = ExperienceViewController;
-			sourceTree = "<group>";
-		};
 		DB0C8E3C2055C61400E0D860 /* InfluenceTracker */ = {
 			isa = PBXGroup;
 			children = (
@@ -747,6 +727,7 @@
 		DB1FBEDF2062C0B600850D59 /* Bluetooth */ = {
 			isa = PBXGroup;
 			children = (
+				DB1FBF262062CFEC00850D59 /* ContextProviders */,
 				DB1FBF252062CFE600850D59 /* Services */,
 				DB1FBEFB2062C5EF00850D59 /* BluetoothAssembler.swift */,
 				DB1FBEE02062C0B600850D59 /* RoverBluetooth.h */,
@@ -767,18 +748,17 @@
 		DB1FBF252062CFE600850D59 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				DB1FBF262062CFEC00850D59 /* BluetoothContextProvider */,
 				DB1FBF272062CFF600850D59 /* BluetoothManager */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		DB1FBF262062CFEC00850D59 /* BluetoothContextProvider */ = {
+		DB1FBF262062CFEC00850D59 /* ContextProviders */ = {
 			isa = PBXGroup;
 			children = (
 				DB1FBEF82062C14400850D59 /* BluetoothContextProvider.swift */,
 			);
-			path = BluetoothContextProvider;
+			path = ContextProviders;
 			sourceTree = "<group>";
 		};
 		DB1FBF272062CFF600850D59 /* BluetoothManager */ = {
@@ -862,12 +842,12 @@
 			path = ImageStore;
 			sourceTree = "<group>";
 		};
-		DB7BA91C20D96C8B00968A30 /* ExperienceRouteHandler */ = {
+		DB7BA91C20D96C8B00968A30 /* RouteHandlers */ = {
 			isa = PBXGroup;
 			children = (
 				DB7BA91D20D96C9900968A30 /* ExperienceRouteHandler.swift */,
 			);
-			path = ExperienceRouteHandler;
+			path = RouteHandlers;
 			sourceTree = "<group>";
 		};
 		DB7BA92020D9703300968A30 /* NotificationHandler */ = {
@@ -887,12 +867,12 @@
 			path = Actions;
 			sourceTree = "<group>";
 		};
-		DB7BA92D20D9829D00968A30 /* NotificationCenterRouteHandler */ = {
+		DB7BA92D20D9829D00968A30 /* RouteHandlers */ = {
 			isa = PBXGroup;
 			children = (
 				DB7BA92E20D982BE00968A30 /* NotificationCenterRouteHandler.swift */,
 			);
-			path = NotificationCenterRouteHandler;
+			path = RouteHandlers;
 			sourceTree = "<group>";
 		};
 		DB9DBEBA205595F100E5C77F /* Frameworks */ = {
@@ -922,11 +902,9 @@
 				DB7BA92420D9725E00968A30 /* Actions */,
 				DB9DBF97205597C300E5C77F /* ContextProviders */,
 				DBADA82920A9EE9700225C80 /* Models */,
-				DB0C8E3C2055C61400E0D860 /* InfluenceTracker */,
-				DBFDF42B20AC7AF90031EF47 /* NotificationCenter */,
-				DB7BA92D20D9829D00968A30 /* NotificationCenterRouteHandler */,
-				DB7BA92020D9703300968A30 /* NotificationHandler */,
-				DBFDF42F20AC7B620031EF47 /* NotificationStore */,
+				DB7BA92D20D9829D00968A30 /* RouteHandlers */,
+				DBF31B5620E41A90005D7C34 /* Services */,
+				DBF31B5920E41C35005D7C34 /* UI */,
 				DB9DBF8E205597C300E5C77F /* NotificationsAssembler.swift */,
 				DB9DBF782055974B00E5C77F /* RoverNotifications.h */,
 				DB9DBF792055974B00E5C77F /* Info.plist */,
@@ -954,8 +932,8 @@
 		DB9DBFB62055980800E5C77F /* Location */ = {
 			isa = PBXGroup;
 			children = (
-				DBFB1AD3209C9A8F00E99F9F /* Extensions */,
 				DBFB1ADA209C9B0000E99F9F /* ContextProviders */,
+				DBFB1AD3209C9A8F00E99F9F /* Extensions */,
 				DBFDF43B20AC82BB0031EF47 /* Models */,
 				DBFDF43720AC82610031EF47 /* Services */,
 				DB9DBFCD2055983700E5C77F /* LocationAssembler.swift */,
@@ -983,28 +961,12 @@
 			path = DeviceAttributes;
 			sourceTree = "<group>";
 		};
-		DBADA7EE20A4F32500225C80 /* Actions */ = {
-			isa = PBXGroup;
-			children = (
-				DBADA80020A4F37C00225C80 /* Dispatcher */,
-				DBADA7F320A4F32500225C80 /* Observers */,
-				DBADA7F220A4F32500225C80 /* Action.swift */,
-			);
-			path = Actions;
-			sourceTree = "<group>";
-		};
-		DBADA7F320A4F32500225C80 /* Observers */ = {
-			isa = PBXGroup;
-			children = (
-				DBADA7F420A4F32500225C80 /* ActionObserver.swift */,
-				DBADA7F520A4F32500225C80 /* BlockObserver.swift */,
-			);
-			path = Observers;
-			sourceTree = "<group>";
-		};
 		DBADA80020A4F37C00225C80 /* Dispatcher */ = {
 			isa = PBXGroup;
 			children = (
+				DBADA7F220A4F32500225C80 /* Action.swift */,
+				DBADA7F420A4F32500225C80 /* ActionObserver.swift */,
+				DBADA7F520A4F32500225C80 /* BlockObserver.swift */,
 				DBADA80120A4F37C00225C80 /* Dispatcher.swift */,
 				DBADA80220A4F37C00225C80 /* DispatcherService.swift */,
 			);
@@ -1059,7 +1021,7 @@
 				DBF31B4320E17D36005D7C34 /* ContextProviders */,
 				DBF31B4B20E1966B005D7C34 /* RouteHandlers */,
 				DBF31B5020E196D5005D7C34 /* Services */,
-				DBF31B5120E196EA005D7C34 /* UI */,
+				DBF31B5820E41C1F005D7C34 /* UI */,
 				DBF31B2F20E17216005D7C34 /* DebugAssembler.swift */,
 				DBF31B1820E17176005D7C34 /* RoverDebug.h */,
 				DBF31B1920E17176005D7C34 /* Info.plist */,
@@ -1093,14 +1055,6 @@
 			path = ContextProviders;
 			sourceTree = "<group>";
 		};
-		DBF31B4720E193A3005D7C34 /* SettingsViewController */ = {
-			isa = PBXGroup;
-			children = (
-				DBF31B4820E193BA005D7C34 /* SettingsViewController.swift */,
-			);
-			path = SettingsViewController;
-			sourceTree = "<group>";
-		};
 		DBF31B4B20E1966B005D7C34 /* RouteHandlers */ = {
 			isa = PBXGroup;
 			children = (
@@ -1117,10 +1071,59 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		DBF31B5120E196EA005D7C34 /* UI */ = {
+		DBF31B5320E419D1005D7C34 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				DBF31B4720E193A3005D7C34 /* SettingsViewController */,
+				DBADA80020A4F37C00225C80 /* Dispatcher */,
+				DBF49E08203DE1E800B54652 /* Logger */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		DBF31B5420E41A38005D7C34 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				DBFB1B09209CACAC00E99F9F /* ExperienceStore */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		DBF31B5620E41A90005D7C34 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				DB0C8E3C2055C61400E0D860 /* InfluenceTracker */,
+				DB7BA92020D9703300968A30 /* NotificationHandler */,
+				DBFDF42F20AC7B620031EF47 /* NotificationStore */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		DBF31B5820E41C1F005D7C34 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				DBF31B4820E193BA005D7C34 /* SettingsViewController.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		DBF31B5920E41C35005D7C34 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				DB00FE2F208FB285008D1A57 /* NotificationCell.swift */,
+				DB9DBF90205597C300E5C77F /* NotificationCenterViewController.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		DBF31B5A20E41C5A005D7C34 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				DB9DBEE52055964E00E5C77F /* Views */,
+				DB9DBEDF2055964E00E5C77F /* ExperienceContainer.swift */,
+				DB9DBEDE2055964E00E5C77F /* ExperienceViewController.swift */,
+				DB9DBEE02055964E00E5C77F /* ScreenViewController.swift */,
+				DB9DBEE32055964E00E5C77F /* ScreenViewLayout.swift */,
+				DB00FDD92087E09F008D1A57 /* ScreenViewLayoutAttributes.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -1163,10 +1166,9 @@
 		DBF49DD5203DE00F00B54652 /* Foundation */ = {
 			isa = PBXGroup;
 			children = (
-				DBADA7EE20A4F32500225C80 /* Actions */,
 				DBFDF52220AE2B0B0031EF47 /* Extensions */,
 				DBF49DF7203DE1CF00B54652 /* Container */,
-				DBF49E08203DE1E800B54652 /* Logger */,
+				DBF31B5320E419D1005D7C34 /* Services */,
 				DBFB1A63209B8CC500E99F9F /* Types */,
 				DBB89C4A20D083AF00DD797A /* RoverFoundation.h */,
 				DBF49DF3203DE18500B54652 /* FoundationAssembler.swift */,
@@ -1360,15 +1362,6 @@
 			path = ScreenViewController;
 			sourceTree = "<group>";
 		};
-		DBFDF42B20AC7AF90031EF47 /* NotificationCenter */ = {
-			isa = PBXGroup;
-			children = (
-				DB00FE2F208FB285008D1A57 /* NotificationCell.swift */,
-				DB9DBF90205597C300E5C77F /* NotificationCenterViewController.swift */,
-			);
-			path = NotificationCenter;
-			sourceTree = "<group>";
-		};
 		DBFDF42F20AC7B620031EF47 /* NotificationStore */ = {
 			isa = PBXGroup;
 			children = (
@@ -1429,10 +1422,9 @@
 			children = (
 				DBFB1B64209CD7E400E99F9F /* Extensions */,
 				DBFDF43520AC81CD0031EF47 /* Models */,
-				DB7BA91C20D96C8B00968A30 /* ExperienceRouteHandler */,
-				DBFB1B09209CACAC00E99F9F /* ExperienceStore */,
-				DB00FE2A208FAFC0008D1A57 /* ExperienceViewController */,
-				DB00FE28208FAF88008D1A57 /* ScreenViewController */,
+				DB7BA91C20D96C8B00968A30 /* RouteHandlers */,
+				DBF31B5420E41A38005D7C34 /* Services */,
+				DBF31B5A20E41C5A005D7C34 /* UI */,
 				DBFB1B62209CD46200E99F9F /* ExperiencesAssembler.swift */,
 				DBFDF44420AC84430031EF47 /* RoverExperiences.h */,
 				DBFDF44520AC84430031EF47 /* Info.plist */,
@@ -2212,6 +2204,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DBC9544A20EA86E600AA3AD9 /* NotificationSource.swift in Sources */,
 				DB9DBFA2205597C300E5C77F /* NotificationsAssembler.swift in Sources */,
 				DB7BA93020D982C200968A30 /* NotificationCenterRouteHandler.swift in Sources */,
 				DBFDF42D20AC7B1E0031EF47 /* NotificationCenterViewController.swift in Sources */,
@@ -2357,7 +2350,6 @@
 				DBF49E0C203DE1F600B54652 /* Logger.swift in Sources */,
 				DBB89BE820D0415600DD797A /* Rover.swift in Sources */,
 				DBF49DF6203DE18500B54652 /* FoundationAssembler.swift in Sources */,
-				DB496F5320DBECD800DF5949 /* NotificationSource.swift in Sources */,
 				DBF49E0B203DE1F600B54652 /* LogLevel.swift in Sources */,
 				DBF49E07203DE1DE00B54652 /* ServiceScope.swift in Sources */,
 				DB9469392051E58400C8C3AE /* LoggerService.swift in Sources */,
@@ -2389,7 +2381,7 @@
 				DBFDF47F20AC855E0031EF47 /* WebViewCell.swift in Sources */,
 				DBFDF46820AC85430031EF47 /* TextBlock.swift in Sources */,
 				DBFDF46B20AC85430031EF47 /* Insets.swift in Sources */,
-				DBFDF47820AC85560031EF47 /* NavigationExperienceController.swift in Sources */,
+				DBFDF47820AC85560031EF47 /* ExperienceViewController.swift in Sources */,
 				DBFDF45A20AC84B30031EF47 /* ExperiencesAssembler.swift in Sources */,
 				DBFDF46120AC85430031EF47 /* Background.swift in Sources */,
 				DBFDF46020AC85430031EF47 /* RectangleBlock.swift in Sources */,

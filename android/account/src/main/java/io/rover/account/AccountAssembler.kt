@@ -4,12 +4,12 @@ import android.app.Application
 import android.content.Intent
 import io.reactivex.schedulers.Schedulers
 import io.rover.account.ui.LoginActivity
-import io.rover.rover.core.container.Assembler
-import io.rover.rover.core.container.Container
-import io.rover.rover.core.container.Scope
-import io.rover.rover.core.data.AuthenticationContext
-import io.rover.rover.platform.LocalStorage
-import io.rover.rover.platform.SharedPreferencesLocalStorage
+import io.rover.core.container.Assembler
+import io.rover.core.container.Container
+import io.rover.core.container.Scope
+import io.rover.core.data.AuthenticationContext
+import io.rover.core.platform.LocalStorage
+import io.rover.core.platform.SharedPreferencesLocalStorage
 
 class AccountAssembler(
     private val application: Application,

@@ -6,8 +6,7 @@ import io.rover.experiences.ui.navigation.ExperienceExternalNavigationEvent
 import io.rover.experiences.ui.navigation.ExperienceNavigationViewModelInterface
 import io.rover.experiences.ui.toolbar.ExperienceToolbarViewModelInterface
 import io.rover.experiences.ui.toolbar.ViewExperienceToolbar
-import io.rover.rover.core.data.domain.Experience
-import io.rover.rover.core.ui.concerns.BindableViewModel
+import io.rover.core.ui.concerns.BindableViewModel
 import org.reactivestreams.Publisher
 
 /**

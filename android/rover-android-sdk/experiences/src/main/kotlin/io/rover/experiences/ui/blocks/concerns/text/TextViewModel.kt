@@ -2,13 +2,13 @@ package io.rover.experiences.ui.blocks.concerns.text
 
 import android.graphics.Paint
 import android.graphics.Typeface
-import io.rover.rover.core.data.domain.FontWeight
-import io.rover.rover.core.data.domain.Text
-import io.rover.rover.core.data.domain.TextAlignment
+import io.rover.core.data.domain.FontWeight
+import io.rover.core.data.domain.Text
+import io.rover.core.data.domain.TextAlignment
 import io.rover.experiences.MeasurementService
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.ui.RectF
-import io.rover.rover.core.ui.asAndroidColor
+import io.rover.core.logging.log
+import io.rover.core.ui.RectF
+import io.rover.core.ui.asAndroidColor
 
 /**
  * Text styling and size concerns.

@@ -5,7 +5,6 @@ import android.content.Intent
 import com.microsoft.appcenter.AppCenter
 import com.microsoft.appcenter.crashes.AbstractCrashesListener
 import com.microsoft.appcenter.crashes.Crashes
-import com.microsoft.appcenter.crashes.CrashesListener
 import com.microsoft.appcenter.crashes.ingestion.models.ErrorAttachmentLog
 import com.microsoft.appcenter.crashes.model.ErrorReport
 import com.microsoft.appcenter.distribute.Distribute
@@ -15,13 +14,12 @@ import io.rover.account.AuthService
 import io.rover.app.experiences.services.ExperienceRepository
 import io.rover.app.experiences.services.V1ApiNetworkClient
 import io.rover.experiences.ExperiencesAssembler
-import io.rover.rover.Rover
-import io.rover.rover.core.CoreAssembler
-import io.rover.rover.core.data.AuthenticationContext
-import io.rover.rover.core.logging.GlobalStaticLogHolder
-import io.rover.rover.core.logging.LogBuffer
+import io.rover.core.Rover
+import io.rover.core.CoreAssembler
+import io.rover.core.data.AuthenticationContext
+import io.rover.core.logging.GlobalStaticLogHolder
+import io.rover.core.logging.LogBuffer
 import timber.log.Timber
-import io.rover.rover.platform.SharedPreferencesLocalStorage
 
 /**
  * Android entry point for the Rover Android Experiences app.

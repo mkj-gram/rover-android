@@ -3,12 +3,12 @@ package io.rover.experiences.ui.layout
 import android.support.v7.widget.RecyclerView
 import android.util.DisplayMetrics
 import android.view.View
-import io.rover.rover.core.data.domain.Block
-import io.rover.rover.core.data.domain.Row
-import io.rover.rover.core.data.domain.Screen
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.ui.dpAsPx
-import io.rover.rover.core.ui.pxAsDp
+import io.rover.core.data.domain.Block
+import io.rover.core.data.domain.Row
+import io.rover.core.data.domain.Screen
+import io.rover.core.logging.log
+import io.rover.core.ui.dpAsPx
+import io.rover.core.ui.pxAsDp
 import io.rover.experiences.ui.layout.screen.ScreenViewModelInterface
 
 /**

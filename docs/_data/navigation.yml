@@ -1,0 +1,116 @@
+ios:
+  - name: Getting Started
+    guides:
+      - name: Installation and Initialization
+        url: /ios/
+      - name: APNS Setup
+        url: /ios/apns-setup/
+      - name: Push Notifications
+        url: /ios/push-notifications/
+      # - name: Notification Center
+      #   url: /ios/notification-center/
+      # - name: Deep and Universal Links
+      #   url: /ios/deep-universal-links/
+      # - name: Location and Proximity
+      #   url: /ios/location-proximity/
+      # - name: Syncing Data
+      #   url: /ios/syncing-data/
+  - name: Modules
+    guides:
+      - name: Overview
+        url: /ios/modules/
+      - name: RoverFoundation
+        url: /ios/modules/foundation/
+      - name: RoverData
+        url: /ios/modules/data/
+      - name: RoverUI
+        url: /ios/modules/ui/
+      - name: RoverExperiences
+        url: /ios/modules/experiences/
+      - name: RoverNotifications
+        url: /ios/modules/notifications/
+      - name: RoverLocation
+        url: /ios/modules/location/
+      - name: RoverBluetooth
+        url: /ios/modules/bluetooth/
+      - name: RoverDebug
+        url: /ios/modules/debug/
+  # - name: Services
+  #   url: /ios/services/
+  # - name: Advanced Use Cases
+  #   url: /ios/advanced/
+android:
+  - name: Getting Started
+    guides:
+      - name: Installation and Initialization
+        url: /android/
+      - name: FCM Setup
+        url: /android/fcm-setup
+      - name: Push Notifications
+        url: /android/push-notifications
+      - name: Notification Center
+        url: /android/notification-center
+      - name: Deep and Universal Links
+        url: /android/deep-universal-links
+      - name: Experiences
+        url: /android/experiences
+      - name: Location and Proximity
+        url: /android/location-proximity
+      - name: API Reference
+        url: /android/api
+  - name: Modules
+    guides:
+      - name: Overview
+        url: /android/modules/
+      - name: Core
+        url: /android/modules/core
+big-query: 
+  - name: Overview
+    url: /big-query/
+  - name: Experience Events
+    guides:
+      - name: Block Tapped
+        url: /big-query/block-tapped/
+      - name: Experience Dismissed
+        url: /big-query/experience-dismissed/
+      - name: Experience Launched
+        url: /big-query/experience-launched/
+      - name: Screen Viewed
+        url: /big-query/screen-viewed/
+  - name: General Events
+    guides:
+      - name: App Opened
+        url: /big-query/app-opened/
+      - name: Device Updated
+        url: /big-query/device-updated/
+  - name: Location Events
+    guides:
+      - name: Beacon Region Entered
+        url: /big-query/beacon-region-entered/
+      - name: Beacon Region Exited
+        url: /big-query/beacon-region-exited/
+      - name: Geofence Region Entered
+        url: /big-query/geofence-region-entered/
+      - name: Geofence Region Exited
+        url: /big-query/geofence-region-exited/
+  - name: Message Events
+    guides:
+      - name: Message Added to Inbox
+        url: /big-query/message-added-to-inbox/
+      - name: Message Opened
+        url: /big-query/message-opened/
+      - name: Notification Failed
+        url: /big-query/notification-failed/
+      - name: Notification Sent
+        url: /big-query/notification-sent/
+bulk:
+  - name: Overview
+    url: /bulk/
+  - name: Authentication
+    url: /bulk/authentication/
+  - name: Managing CSV Files
+    url: /bulk/managing-csv-files/
+  - name: Profile Data
+    url: /bulk/profile-data/
+  - name: Load Jobs
+    url: /bulk/load-jobs/

@@ -19,13 +19,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
-import io.rover.rover.R
-import io.rover.rover.Rover
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.streams.androidLifecycleDispose
-import io.rover.rover.core.streams.subscribe
-import io.rover.rover.core.ui.concerns.ViewModelBinding
-import io.rover.rover.platform.whenNotNull
+import io.rover.core.R
+import io.rover.core.Rover
+import io.rover.core.logging.log
+import io.rover.core.streams.androidLifecycleDispose
+import io.rover.core.streams.subscribe
+import io.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.platform.whenNotNull
 import io.rover.notifications.domain.Notification
 import io.rover.notifications.NotificationOpenInterface
 import io.rover.notifications.ui.concerns.NotificationCenterListViewModelInterface
@@ -65,20 +65,9 @@ open class NotificationCenterListView : CoordinatorLayout {
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle)
 
     /**
-     * Implement this (either directly or with an anonymous class) in your containing view for
-     * [NotificationCenterListView].  You will need to provide this before you bind the view model.
+     * You must provide an Activity here before binding the view model.
      */
-    interface NotificationCenterHost {
-        /**
-         * Provide access to the host Activity containing the notification center list view.
-         */
-        val provideActivity: AppCompatActivity
-    }
-
-    /**
-     * You must provide a [NotificationCenterHost] before binding the view model.
-     */
-    var notificationCenterHost: NotificationCenterHost? = null
+    var activity: AppCompatActivity? = null
 
     /**
      * This method will generate a row view.
@@ -133,7 +122,7 @@ open class NotificationCenterListView : CoordinatorLayout {
                             Snackbar.make(this, R.string.generic_problem, Snackbar.LENGTH_LONG).show()
                         }
                         is NotificationCenterListViewModelInterface.Event.Navigate -> {
-                            val host = (notificationCenterHost
+                            val hostActivity = (activity
                                 ?: throw RuntimeException("Please set notificationCenterHost on NotificationCenterListView.  Otherwise, navigation cannot work."))
 
                             // A view is not normally considered an appropriate place to do this
@@ -144,7 +133,7 @@ open class NotificationCenterListView : CoordinatorLayout {
                             if (intent != null) {
                                 try {
                                     log.v("Invoking tap behaviour for notification: ${event.notification.tapBehavior}")
-                                    host.provideActivity.startActivity(
+                                    hostActivity.startActivity(
                                         intent
                                     )
                                 } catch (e: ActivityNotFoundException) {

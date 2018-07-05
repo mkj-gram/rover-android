@@ -5,7 +5,7 @@ import io.rover.experiences.ui.blocks.concerns.layout.BlockViewModelInterface
 import io.rover.experiences.ui.blocks.concerns.layout.LayoutableViewModel
 import io.rover.experiences.ui.layout.DisplayItem
 import io.rover.experiences.ui.navigation.NavigateTo
-import io.rover.rover.core.ui.RectF
+import io.rover.core.ui.RectF
 import org.reactivestreams.Publisher
 
 /**

@@ -18,11 +18,11 @@ import com.google.android.gms.nearby.messages.MessageListener
 import com.google.android.gms.nearby.messages.Strategy
 import com.google.android.gms.nearby.messages.SubscribeOptions
 import io.rover.location.domain.Region
-import io.rover.rover.Rover
-import io.rover.rover.core.logging.log
-import io.rover.rover.core.permissions.PermissionsNotifierInterface
-import io.rover.rover.core.streams.subscribe
-import io.rover.rover.platform.whenNotNull
+import io.rover.core.Rover
+import io.rover.core.logging.log
+import io.rover.core.permissions.PermissionsNotifierInterface
+import io.rover.core.streams.subscribe
+import io.rover.core.platform.whenNotNull
 import java.util.UUID
 
 /**

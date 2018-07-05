@@ -8,11 +8,11 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.InsetDrawable
 import android.view.Gravity
 import android.view.View
-import io.rover.rover.core.streams.androidLifecycleDispose
-import io.rover.rover.core.streams.subscribe
-import io.rover.rover.platform.DrawableWrapper
-import io.rover.rover.core.ui.concerns.ViewModelBinding
-import io.rover.rover.core.ui.concerns.BindableView
+import io.rover.core.streams.androidLifecycleDispose
+import io.rover.core.streams.subscribe
+import io.rover.core.platform.DrawableWrapper
+import io.rover.core.ui.concerns.ViewModelBinding
+import io.rover.core.ui.concerns.BindableView
 
 class ViewBackground(
     override val view: View

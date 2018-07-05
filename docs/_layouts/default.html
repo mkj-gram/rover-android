@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{{ page.title }} | {{ site.name }}</title>
+        <link rel="stylesheet" href="{{ "/css/main.css" | relative_url }}">
+        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300i,400,400i,600" rel="stylesheet">
+    </head>
+    <body>
+        <nav class="primary">
+            <div>
+                <a href="{{ "/" | relative_url }}">
+                    {% include rover-logo.svg %}
+                </a>
+                <a href="{{ "/" | relative_url }}">
+                    Documentation
+                </a>
+            </div>
+            <div>
+                <a href="{{ site.baseurl }}{% link ios/installation-initialization.md %}">
+                    <span>iOS SDK</span>
+                    {% include icons/chevron-down.svg %}
+                </a>
+                <a href="{{ site.baseurl }}{% link android/installation-initialization.md %}">
+                    Android SDK
+                    {% include icons/chevron-down.svg %}
+                </a>
+                <a href="{{ site.baseurl }}{% link graphql/index.md %}">
+                    GraphQL API
+                </a>
+                <a href="{{ site.baseurl }}{% link big-query/overview.md %}">
+                    BigQuery
+                </a>
+                <a href="{{ site.baseurl }}{% link bulk/overview.md %}">
+                    Bulk API
+                </a>
+            </div>
+            <div>
+                <a href="{{ site.url }}">
+                    {% include icons/home.svg %}
+                </a>
+                <a class="button" href="mailto:support@rover.io">
+                    Support
+                </a>
+            </div>
+        </nav>
+        <div class="columns">
+            {{ content }}
+
+            
+            
+        </div>
+    </body>
+</html>

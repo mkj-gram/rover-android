@@ -1,16 +1,16 @@
 package io.rover.experiences.ui.blocks.image
 
-import io.rover.rover.core.logging.log
+import io.rover.core.logging.log
 import org.reactivestreams.Publisher
-import io.rover.rover.core.assets.AssetService
-import io.rover.rover.core.assets.ImageOptimizationServiceInterface
-import io.rover.rover.core.data.domain.Block
-import io.rover.rover.core.data.domain.Image
-import io.rover.rover.core.streams.*
-import io.rover.rover.core.ui.PixelSize
-import io.rover.rover.core.ui.RectF
-import io.rover.rover.core.ui.concerns.MeasuredSize
-import io.rover.rover.core.ui.dpAsPx
+import io.rover.core.assets.AssetService
+import io.rover.core.assets.ImageOptimizationServiceInterface
+import io.rover.core.data.domain.Block
+import io.rover.core.data.domain.Image
+import io.rover.core.streams.*
+import io.rover.core.ui.PixelSize
+import io.rover.core.ui.RectF
+import io.rover.core.ui.concerns.MeasuredSize
+import io.rover.core.ui.dpAsPx
 import java.util.concurrent.TimeUnit
 
 class ImageViewModel(

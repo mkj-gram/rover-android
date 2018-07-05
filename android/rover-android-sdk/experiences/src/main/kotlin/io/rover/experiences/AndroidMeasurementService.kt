@@ -11,8 +11,8 @@ import android.util.DisplayMetrics
 import io.rover.experiences.ui.blocks.concerns.text.RichTextToSpannedTransformer
 import io.rover.experiences.ui.blocks.concerns.text.Font
 import io.rover.experiences.ui.blocks.concerns.text.FontAppearance
-import io.rover.rover.core.ui.dpAsPx
-import io.rover.rover.core.ui.pxAsDp
+import io.rover.core.ui.dpAsPx
+import io.rover.core.ui.pxAsDp
 import io.rover.experiences.ui.blocks.barcode.BarcodeViewModelInterface
 import io.rover.shaded.zxing.com.google.zxing.BarcodeFormat
 import io.rover.shaded.zxing.com.google.zxing.EncodeHintType

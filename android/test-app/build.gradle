@@ -44,7 +44,7 @@ dependencies {
     // normal apps consuming Rover will specify org/artifact/version as normal, but here
     // we're doing the sibling-link method in order to build both the SDK and test app from
     // source together.
-    implementation project(":rover-android-sdk:rover")
+    implementation project(':rover-android-sdk:core')
     implementation project(":rover-android-sdk:notifications")
     implementation project(":rover-android-sdk:experiences")
     implementation project(":rover-android-sdk:location")

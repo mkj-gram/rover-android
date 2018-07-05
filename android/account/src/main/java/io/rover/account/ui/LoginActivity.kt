@@ -18,9 +18,13 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.rover.account.AuthResult
 import io.rover.account.AuthService
 import io.rover.account.R
-import io.rover.rover.Rover
-import io.rover.rover.core.data.AuthenticationContext
-import kotlinx.android.synthetic.main.activity_login.*
+import io.rover.core.Rover
+import io.rover.core.data.AuthenticationContext
+import kotlinx.android.synthetic.main.activity_login.email
+import kotlinx.android.synthetic.main.activity_login.email_sign_in_button
+import kotlinx.android.synthetic.main.activity_login.login_form
+import kotlinx.android.synthetic.main.activity_login.login_progress
+import kotlinx.android.synthetic.main.activity_login.password
 
 /**
  * A login screen that offers login via email/password.

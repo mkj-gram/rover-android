@@ -1,15 +1,13 @@
 package io.rover.experiences.ui.blocks.concerns.background
 
 import android.graphics.Bitmap
-import android.util.DisplayMetrics
 import org.reactivestreams.Publisher
-import io.rover.rover.core.data.domain.Background
-import io.rover.rover.core.ui.BackgroundImageConfiguration
-import io.rover.rover.core.ui.PixelSize
-import io.rover.rover.core.ui.concerns.BindableView
-import io.rover.rover.core.ui.concerns.BindableViewModel
-import io.rover.rover.core.ui.concerns.MeasuredSize
-import io.rover.rover.core.ui.concerns.PrefetchAfterMeasure
+import io.rover.core.data.domain.Background
+import io.rover.core.ui.BackgroundImageConfiguration
+import io.rover.core.ui.concerns.BindableView
+import io.rover.core.ui.concerns.BindableViewModel
+import io.rover.core.ui.concerns.MeasuredSize
+import io.rover.core.ui.concerns.PrefetchAfterMeasure
 
 /**
  * Binds [BackgroundViewModelInterface] properties to that of a view.

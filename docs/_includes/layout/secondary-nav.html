@@ -1,0 +1,22 @@
+<nav class="secondary">
+    {% for item in site.data.navigation[page.secondary_navigation] %}
+        {% if item.url %}
+            <a href="{{ site.baseurl }}{{ item.url }}" title="{{ item.name }}" class="{% if item.url == page.url %}is-active{% endif %}">
+                {% include icons/file.svg %}
+                <span>{{ item.name }}</span>
+            </a>
+        {% endif %}
+        
+        {% if item.guides %}
+            <div class="section">
+                <span>{{ item.name }}</span>
+                {% for guide in item.guides %}
+                    <a href="{{ site.baseurl }}{{ guide.url }}" title="{{ guide.name }}" class="{% if guide.url == page.url %}is-active{% endif %}">
+                        {% include icons/file.svg %}
+                        <span>{{ guide.name }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+</nav>

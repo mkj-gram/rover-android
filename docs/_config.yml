@@ -1,0 +1,13 @@
+name: Rover Documentation
+baseurl: /docs
+sass:
+  style: compact # possible values: nested expanded compact compressed
+defaults:
+  - 
+    scope: 
+      path: android/api
+    values:
+      layout: guide
+      secondary_navigation: android
+      # TODO set tertiary_navigation to a classes list (with appropriate headers
+      # if possible) for the API reference
