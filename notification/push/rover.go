@@ -3,8 +3,9 @@ package push
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/roverplatform/rover/notification/scylla"
 	"time"
+
+	"github.com/roverplatform/rover/notification/scylla"
 )
 
 type Attachment struct {
@@ -168,6 +169,10 @@ func ToLegacyRoverNotification(settings *scylla.NotificationSettings, note *scyl
 			Properties:       settings.Attributes,
 			ExperienceID:     settings.ExperienceId,
 		},
+	}
+
+	if pushNote.Attributes.Properties == nil {
+		pushNote.Attributes.Properties = make(map[string]string)
 	}
 
 	var attrs = &pushNote.Attributes

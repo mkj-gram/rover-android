@@ -5,7 +5,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gocql/gocql"
+
 	rtesting "github.com/roverplatform/rover/go/testing"
+	"github.com/roverplatform/rover/notification/scylla"
 )
 
 var (
@@ -176,6 +179,73 @@ func Test_RoverPayload_MarshalJSON(t *testing.T) {
 			var (
 				exp, expErr  = tc.exp, (error)(nil)
 				data, gotErr = json.Marshal(tc.in)
+				got          = string(data)
+			)
+
+			if diff := Diff(exp, got, expErr, gotErr); diff != nil {
+				t.Fatal("\nDiff:\n", Difff(diff))
+			}
+		})
+	}
+}
+
+func TestToLegacyRoverNotification(t *testing.T) {
+	var id, err = gocql.ParseUUID("f944c7b4-3dcd-11e8-b467-0ed5f89f718b")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var tests = []struct {
+		name     string
+		settings *scylla.NotificationSettings
+		note     *scylla.Notification
+		exp      string
+	}{
+
+		{
+			name: "returns empty properties object when attributes are nil",
+			settings: &scylla.NotificationSettings{
+				CampaignId:     1,
+				AccountID:      1,
+				ExperienceId:   "abc123",
+				AttachmentUrl:  "https://google.ca/cat.png",
+				AttachmentType: scylla.AttachmentType_IMAGE,
+
+				TapBehaviorType:             scylla.TapBehaviorType_OPEN_EXPERIENCE,
+				TapBehaviorUrl:              "rv-acct_1://presentExperience?campaignID=1",
+				TapBehaviorPresentationType: scylla.TapBehaviorPresentationType_UNKNOWN,
+
+				IosContentAvailable:           true,
+				IosMutableContent:             true,
+				IosSound:                      "sound-file.wav",
+				IosCategoryIdentifier:         "category",
+				IosThreadIdentifier:           "thread",
+				AndroidChannelId:              "channel-id",
+				AndroidSound:                  "sound-file.android",
+				AndroidTag:                    "android-tag",
+				Expiration:                    -1,
+				Attributes:                    nil,
+				AlertOptionPushNotification:   true,
+				AlertOptionNotificationCenter: false,
+				AlertOptionBadgeNumber:        true,
+			},
+			note: &scylla.Notification{
+				Id:         id,
+				AccountId:  1,
+				CampaignId: 1,
+				Title:      "title",
+				Body:       "body",
+				IsRead:     false,
+			},
+			exp: `{"id":"f944c7b4-3dcd-11e8-b467-0ed5f89f718b","type":"messages","attributes":{"notification-text":"body","ios-title":"title","android-title":"title","tags":[],"read":false,"saved-to-inbox":false,"content-type":"experience","website-url":"","deep-link-url":"","timestamp":"2018-04-11T21:19:09.44245Z","properties":{},"experience-id":"abc123"}}`,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var (
+				exp, expErr  = test.exp, (error)(nil)
+				data, gotErr = json.Marshal(ToLegacyRoverNotification(test.settings, test.note))
 				got          = string(data)
 			)
 
