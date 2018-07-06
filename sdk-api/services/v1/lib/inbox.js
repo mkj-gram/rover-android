@@ -72,7 +72,7 @@ function fetchNewInbox(server, device) {
                 return reject(err)
             }
 
-            const notifications = response.getNotificationsList().map(serialize)
+            const notifications = response.getNotificationsList().map(serialize).filter(m => m.saved_to_inbox)
 
             return resolve(notifications)
         })

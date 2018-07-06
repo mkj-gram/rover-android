@@ -26,7 +26,7 @@ function serializeMessage(message) {
             'saved-to-inbox': message.saved_to_inbox,
             'content-type': message.content_type,
             'website-url': message.website_url,
-            'deep-link-url': message.deeplink_url,
+            'deep-link-url': message.deep_link_url,
             'landing-page': dasherize(message.landing_page_template),
             'experience-id': message.experience_id,
             'properties': message.properties || {},

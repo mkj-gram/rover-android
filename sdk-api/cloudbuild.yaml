@@ -1,0 +1,43 @@
+steps:
+
+  - id: 'install-sdk-api'
+    name: 'node:6.9.1'
+    entrypoint: 'npm'
+    args:
+      - install
+      - --silent
+    dir: 'sdk-api'
+    env:
+      - 'NPM_TOKEN=dad33a01-0f48-47df-9797-9b36dd5f957c'
+
+  - id: 'test-sdk-api'
+    name: 'node:6.9.1'
+    entrypoint: 'npm'
+    args:
+      - test
+    dir: 'sdk-api'
+    waitFor:
+      - 'install-sdk-api'
+
+  - id: 'build-sdk-api'
+    name: 'node:6.9.1'
+    entrypoint: 'npm'
+    args: 
+      - prune
+      - --production
+      - --silent
+    dir: 'sdk-api'
+    waitFor:
+      - 'test-sdk-api'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - '--tag=gcr.io/$PROJECT_ID/sdk-api:$SHORT_SHA'
+      - 'sdk-api'
+    waitFor:
+      - 'build-sdk-api'
+  
+
+images:
+  - 'gcr.io/$PROJECT_ID/sdk-api:$SHORT_SHA'
