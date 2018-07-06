@@ -16,6 +16,10 @@ import persistedFragments from './persistedFragments'
 
 import 'babel-polyfill'
 
+// Default Prometheus metrics
+import Prometheus from 'prom-client'
+const metricsInterval = Prometheus.collectDefaultMetrics()
+
 dotenv.config()
 
 const state = { isShutdown: false }
@@ -56,6 +60,9 @@ process.on('SIGTERM', function() {
 
     state.isShutdown = true
 
+    // Stop collecting metrics
+    clearInterval(metricsInterval)
+
     // Wait for kubernetes to remove us from the load-balancer
     // Then do a full shutdown
     setTimeout(function() {
@@ -80,6 +87,11 @@ async function main() {
     }
 
     clients.pipeline = pipeline
+    
+    app.get('/metrics', (req, res) => {
+        res.set('Content-Type', Prometheus.register.contentType)
+        res.end(Prometheus.register.metrics())
+    })
 
     app.use('/graphql', cors(), authMiddleware, persistedFragments, graphqlHTTP(req => ({
             schema: applyMiddleware(schema, permissions),

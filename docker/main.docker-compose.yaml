@@ -248,7 +248,7 @@ services:
       - ../:/rover:delegated
     working_dir: /rover/graphql-gateway
     environment:
-      ANALYTICS_SERVICE_SERVICE_HOST: analytics-service
+      ANALYTICS_SERVICE_DSN: analytics-service:5100
       AUTH_V1_SERVICE_HOST: auth-service
       AUDIENCE_V1_SERVICE_HOST: audience-service
       CAMPAIGNS_V1_SERVICE_HOST: campaigns-service
