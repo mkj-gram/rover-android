@@ -75,8 +75,9 @@ const ScheduledDelivery: React.SFC<
             children.props.wizardSection ||
             children.props.children[0].props.wizardSection
         switch (wizardSection) {
-            case 'tapBehavior':
             case 'messageAndMedia':
+            case 'alertOptions':
+            case 'tapBehavior':
                 closeSettingsPagePhonePreview()
                 break
             default:

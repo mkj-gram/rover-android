@@ -40,6 +40,11 @@ import TapBehaviorContainer from '../wizards/notification/TapBehaviorContainer'
 
 import MessageAndMedia from '../wizards/notification/MessageAndMedia'
 import MessageAndMediaLabel from './MessageAndMediaLabel'
+import AlertOptionsLabel from './AlertOptionsLabel'
+import AlertOptionsContainer from '../wizards/notification/AlertOptionsContainer'
+import AudienceLabel from './AudienceLabel'
+import Audience from '../wizards/ScheduledDelivery/Audience'
+import AdvancedSettingsContainer from '../wizards/notification/AdvancedSettingsContainer'
 
 export interface SettingsContainerStateProps {
     editableCampaign: ScheduledCampaign | AutomatedNotificationCampaign
@@ -90,8 +95,9 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
             openWizardModal(wizard)
 
             switch (wizard) {
-                case 'tapBehavior':
                 case 'messageAndMedia':
+                case 'alertOptions':
+                case 'tapBehavior':
                     openSettingsPagePhonePreview()
                     break
                 default:
@@ -111,6 +117,27 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                 return (
                     <DateAndTime device={device} wizardSection="dateAndTime" />
                 )
+
+            case 'audience':
+                return <Audience device={device} wizardSection="audience" />
+
+            case 'messageAndMedia':
+                return (
+                    <MessageAndMedia
+                        device={device}
+                        wizardSection="messageAndMedia"
+                        isCurrentPage={true}
+                    />
+                )
+
+            case 'alertOptions':
+                return (
+                    <AlertOptionsContainer
+                        device={device}
+                        wizardSection="alertOptions"
+                    />
+                )
+
             case 'tapBehavior':
                 return (
                     <Fragment>
@@ -142,14 +169,14 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                             )}
                     </Fragment>
                 )
-            case 'messageAndMedia':
+            case 'advancedSettings':
                 return (
-                    <MessageAndMedia
+                    <AdvancedSettingsContainer
+                        wizardSection="advancedSettings"
                         device={device}
-                        wizardSection="messageAndMedia"
-                        isCurrentPage={true}
                     />
                 )
+
             default:
                 return null
         }
@@ -164,9 +191,12 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
 
         switch (currentWizard) {
             case 'dateAndTime':
+            case 'audience':
                 return updateScheduledDeliverySettings
-            case 'tapBehavior':
             case 'messageAndMedia':
+            case 'alertOptions':
+            case 'tapBehavior':
+            case 'advancedSettings':
                 return updateNotificationSettings
             default:
                 return null
@@ -207,6 +237,15 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                         >
                             <InverseLabel title="Date and Time">
                                 <DateAndTimeLabel />
+                            </InverseLabel>
+                            <EditButton />
+                        </Row>
+
+                        <Row
+                            onClick={() => this.openSelectedWizard('audience')}
+                        >
+                            <InverseLabel title="Audience">
+                                <AudienceLabel />
                             </InverseLabel>
                             <EditButton />
                         </Row>
@@ -257,6 +296,18 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                                 <EditButton />
                             </div>
                         </Row>
+
+                        <Row
+                            onClick={() =>
+                                this.openSelectedWizard('alertOptions')
+                            }
+                        >
+                            <InverseLabel title="Alert Options">
+                                <AlertOptionsLabel />
+                            </InverseLabel>
+                            <EditButton />
+                        </Row>
+
                         <Row
                             onClick={() =>
                                 this.openSelectedWizard('tapBehavior')
@@ -265,6 +316,15 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                             <InverseLabel title="Tap Behavior">
                                 <TapBehaviorLabel />
                             </InverseLabel>
+                            <EditButton />
+                        </Row>
+
+                        <Row
+                            onClick={() =>
+                                this.openSelectedWizard('advancedSettings')
+                            }
+                        >
+                            <InverseLabel title="Advanced Settings" />
                             <EditButton />
                         </Row>
                     </FormSection>

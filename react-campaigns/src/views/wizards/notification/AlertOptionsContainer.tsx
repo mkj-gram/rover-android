@@ -242,7 +242,7 @@ class AlertOptionsContainer extends React.Component<
                             device={device}
                             val={deviceInfoSelected}
                         />,
-                        document.getElementById('notificationContainer')
+                        document.getElementById('mainModalLeft')
                     )}
             </FormSection>
         )
@@ -253,4 +253,7 @@ const mapStateToProps = (state: State): StateProps => ({
     deviceInfoSelected: getIsAlertOptionsOpen(state)
 })
 
-export default connect(mapStateToProps, {})(AlertOptionsContainer)
+export default connect(
+    mapStateToProps,
+    {}
+)(AlertOptionsContainer)
