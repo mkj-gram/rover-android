@@ -531,6 +531,7 @@ const renderListButtons = (
             <CampaignsListShowMorePopover
                 campaign={campaign}
                 device="Desktop"
+                pushToModal={pushToModal}
             />
         </div>
     )

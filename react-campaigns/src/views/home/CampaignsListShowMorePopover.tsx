@@ -3,11 +3,17 @@ import * as React from 'react'
 import { connect, Dispatch } from 'react-redux'
 
 import {
-    PopoverContainer,
-    MoreIcon,
+    isScheduledCampaign,
+    isAutomatedNotificationCampaign
+} from '../utils/getCampaignType'
+
+import {
+    ArchiveIcon,
     charcoal,
     DuplicateIcon,
-    ArchiveIcon,
+    GearIcon,
+    MoreIcon,
+    PopoverContainer,
     steel,
     Text
 } from '@rover/ts-bootstrap/dist/src'
@@ -25,6 +31,7 @@ import SelectableList from '../utils/SelectableList'
 export interface Props {
     campaign: Campaign
     device: Media
+    pushToModal: (campaignId: string, route: string) => void
 }
 
 export interface CampaignsListShowMorePopoverProps {
@@ -49,7 +56,8 @@ const CampaignsListShowMorePopover: React.SFC<
     getDuplicateCampaignName,
     duplicateCampaign,
     archiveCampaign,
-    device
+    device,
+    pushToModal
 }) => {
     const currentPopover = `list-page-more-popover-${campaign.campaignId}`
     const { campaignId } = campaign
@@ -64,6 +72,123 @@ const CampaignsListShowMorePopover: React.SFC<
     const handleArchive = () => {
         archiveCampaign(parseCampaignId)
         updateActivePopover('')
+    }
+
+    const pushToSettings = () => {
+        pushToModal(campaignId, 'settings')
+        updateActivePopover('')
+    }
+    const getShouldShowSettings = (): boolean => {
+        if (isScheduledCampaign(campaign)) {
+            if (campaign.scheduledDeliveryStatus !== 'SCHEDULED') {
+                return true
+            }
+        }
+
+        if (isAutomatedNotificationCampaign(campaign)) {
+            // TODO: find a field that reliably determines that this campaign has started
+            if (campaign.automatedMonday) {
+                return true
+            }
+        }
+
+        return false
+    }
+
+    const getSettingsElement = () => (
+        <div
+            onClick={pushToSettings}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                height: 55
+            }}
+            key="settings-icon-list-view-popover"
+        >
+            <div
+                style={{
+                    marginRight: 8
+                }}
+            >
+                {GearIcon({
+                    width: '20',
+                    height: '20',
+                    viewBox: '0 0 24 24',
+                    fill: steel
+                })}
+            </div>
+            <Text text="Settings" size="medium" />
+        </div>
+    )
+
+    const getArchiveElement = () => (
+        <div
+            onClick={handleArchive}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                height: 56
+            }}
+            key="archive-icon-list-view-popover"
+        >
+            <div
+                style={{
+                    marginRight: 8
+                }}
+            >
+                {ArchiveIcon({
+                    width: '20',
+                    height: '20',
+                    viewBox: '0 0 24 24',
+                    fill: steel
+                })}
+            </div>
+            <Text text="Archive" size="medium" />
+        </div>
+    )
+    const getDuplicateElement = () => (
+        <div
+            onClick={handleDuplicate}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                height: 55
+            }}
+            key="duplicate-icon-list-view-popover"
+        >
+            <div
+                style={{
+                    marginRight: 8
+                }}
+            >
+                {DuplicateIcon({
+                    width: '20',
+                    height: '20',
+                    viewBox: '0 0 24 24',
+                    fill: steel
+                })}
+            </div>
+            <Text text="Duplicate" size="medium" />
+        </div>
+    )
+
+    const getListElements = () => {
+        if (getShouldShowSettings()) {
+            return (
+                <SelectableList device={device}>
+                    {getSettingsElement()}
+                    {getDuplicateElement()}
+                    {getArchiveElement()}
+                </SelectableList>
+            )
+        }
+
+        return (
+            <SelectableList device={device}>
+                {getDuplicateElement()}
+                {getArchiveElement()}
+            </SelectableList>
+        )
     }
 
     return (
@@ -93,55 +218,7 @@ const CampaignsListShowMorePopover: React.SFC<
                 }}
                 key="list-page-more-icon-2"
             >
-                <SelectableList device={device}>
-                    <div
-                        onClick={handleDuplicate}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            height: 55
-                        }}
-                        key="duplicate-icon-list-view-popover"
-                    >
-                        <div
-                            style={{
-                                marginRight: 8
-                            }}
-                        >
-                            {DuplicateIcon({
-                                width: '20',
-                                height: '20',
-                                viewBox: '0 0 24 24',
-                                fill: steel
-                            })}
-                        </div>
-                        <Text text="Duplicate" size="medium" />
-                    </div>
-
-                    <div
-                        onClick={handleArchive}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            height: 56
-                        }}
-                        key="archive-icon-list-view-popover"
-                    >
-                        <div
-                            style={{
-                                marginRight: 8
-                            }}
-                        >
-                            {ArchiveIcon({
-                                width: '20',
-                                height: '20',
-                                viewBox: '0 0 24 24',
-                                fill: steel
-                            })}
-                        </div>
-                        <Text text="Archive" size="medium" />
-                    </div>
-                </SelectableList>
+                {getListElements()}
             </div>
         </PopoverContainer>
     )
