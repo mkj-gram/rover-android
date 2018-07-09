@@ -56,8 +56,6 @@ android:
         url: /android/experiences
       - name: Location and Proximity
         url: /android/location-proximity
-      - name: API Reference
-        url: /android/api
   - name: Modules
     guides:
       - name: Overview

@@ -50,7 +50,7 @@ You will use the Android permissions framework to do this.
 Note that this serves as a check; if the permission has already been granted, it
 will not prompt again on subsequent invocations.  Note that it may be necessary
 to add it in more than one area: for instance, if you include it in a
-shown-only-once on boarding area, it may be necessary to add it to your Home
+shown-only-once on boarding area, it may be necessary to add it to your 'Home'
 screen as well.  This is to gracefully handle any changes in the permission
 granted to your app, for example if the user decides to clean up the apps
 allowed to access their location in their system-wide privacy settings.
@@ -119,7 +119,7 @@ gracefully handle the permission being removed, but it remains prudent to
 continue checking each time from your main home screen or somewhere similarly
 appropriate.
 
-<aside class="further-reading">
-    <a href="https://developer.android.com/training/permissions/requesting">Android documentation: Request App Permissions</a>
-</aside>
-
+<p class="read-more">
+    {% include icons/book.svg %}
+    More details on how to properly handle requesting app permissions can be found in the <a href="https://developer.android.com/training/permissions/requesting">Android documentation: Request App Permissions</a>.
+</p>

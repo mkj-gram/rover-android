@@ -10,7 +10,7 @@ tertiary_navigation:
     anchor: initialization
 ---
 
-# Getting Started
+# Installation and Initialization
 
 The Rover SDK is a collection of Android libraries written in Kotlin. Instead of
 a single monolithic library, the Rover SDK takes a modular approach, allowing
@@ -38,8 +38,9 @@ buildscript {
 }
 ```
 
-Then add the following to your application `build.gradle` file (not top level
-`build.gradle`, but rather your app-level one) in the `dependencies` block.
+Then add the following to your application-level `build.gradle` file (not the
+top level `build.gradle`, but rather your app-level one) in the `dependencies`
+block.
 
 ```groovy
 implementation project("io.rover:core:2.0.0")
@@ -53,7 +54,7 @@ It’s an a-la-carte selection; you can leave off modules (other than the first,
 `core`, which is always required) that you don’t need for your product.  There
 are various reasons why you may not want to include all the Rover libraries in
 your project.  For instance, you can save method count and APK size by leaving
-off libraries that you don't need.
+off Rover libraries that you don't need.
 
 ---
 
@@ -92,11 +93,13 @@ Rover.installSaneGlobalHttpCache(application)
 <aside class="info">
 
 Notice <code>Rover.installSaneGlobalHttpCache()</code>: to keep its footprint
-small Rover uses Android’s built-in HTTP client, HttpsUrlConnection, and its
-cache must be enabled or disabled globally. Rover asks you to invoke this method
-here to explicitly install the cache to ensure that you are not surprised by
-Rover changing global configuration.  Note that this will have no impact on the
-other components of your app if you use OkHttp/Retrofit or Volley.
+small Rover uses Android’s built-in HTTP client,
+<code>HttpsUrlConnection</code>, and a characteristic of that HTTP client is
+that its cache must be enabled or disabled globally. Rover requires a working
+HTTP client cache, and so asks you to invoke this method here to explicitly
+install a cache to ensure that you are not surprised by Rover changing global
+configuration.  Note that this will have no impact on the other components of
+your app if you use OkHttp/Retrofit or Volley.
 
 </aside>
 

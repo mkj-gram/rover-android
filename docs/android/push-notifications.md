@@ -25,7 +25,7 @@ We have designed the SDK to afford implementers with a high degree of control
 and a minimum of magic.  As such, there will be a little bit of boilerplate
 required below, but this approach will make it easier for you to debug problems
 and manage whatever unusual integration situations might arise in your app,
-particularly when dealing with Google libraries such as FCM.
+which is particularly handy when dealing with Google libraries such as FCM.
 </aside>
 
 ---

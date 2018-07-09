@@ -18,7 +18,8 @@ models and UI components.
 
 Each Rover module comes with an assembler. Before you can use a module in your
 app you need to pass its assembler to the `Rover.initialize` method when you
-initialize the Rover SDK. Below is an example of initializing the Rover SDK with just the Core module.
+initialize the Rover SDK. Below is an example of initializing the Rover SDK with
+just the Core module.
 
 ```kotlin
 Rover.initialize(
@@ -58,11 +59,13 @@ than returning <code>null</code>.
 
 ## Module Configuration
 
-Each module's assembler accepts a set of arguments that can be used to customize its behavior. Below is an example of customizing the RoverFoundation assembler to use a more verbose logging strategy.
+Each module's assembler accepts a set of arguments that can be used to customize
+its behavior. Below is an example of customizing the core assembler
+to use a more verbose logging strategy.
 
 ```kotlin
 Rover.initialize(
-    FoundationAssembler(
+    CoreAssembler(
         chromeTabBackgroundColor = Color.RED
     )
 )

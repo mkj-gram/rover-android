@@ -27,17 +27,17 @@ its "Server key" to Rover.
 
 Head to the [Firebase Console](https://console.firebase.google.com/) and ensure
 you are logged in with an appropriate Google account for your project.  Select
-'Add a new project', or, if you have already created one, select it.
+"Add a new project", or, if you have already created one, select it.
 ![Welcome to Firebase screen]({{ "/assets/android/fcm-setup/welcome-to-firebase.png" | absolute_url }})
 
-On the project "Getting Started" page, you can then select 'Add Firebase to your
-Android app'.
+On the project "Getting Started" page, you can then select "Add Firebase to your
+Android app".
 ![Getting Started screen on Firebase]({{ "/assets/android/fcm-setup/firebase-get-started.png" | absolute_url }})
 
 Fill in your app’s package name and visible name.
 ![Add Firebase to your Android app]({{ "/assets/android/fcm-setup/add-firebase-to-android.png" | absolute_url }})
 
-Press `Register App`.  Google will then direct you to download a
+Press "Register App".  Google will then direct you to download a
 `google-services.json` file, drop it into your Android project’s file tree, and
 then direct you to add the Firebase SDK to your app’s `build.gradle` files.
 
@@ -55,13 +55,13 @@ both.
 You will then need to retrieve the Firebase Web API key and set it on your Rover
 account so that Rover can push notifications through to your app via Firebase.
 
-Click on the gear icon adjacent to `Project Overview` and select Project Settings.
+Click on the gear icon adjacent to "Project Overview" and select Project Settings.
 ![Firebase Project Overview]({{ "/assets/android/fcm-setup/firebase-project-overview.png" | absolute_url }})
 
 Click the Cloud Messaging tab to view the Server Key. Copy it to your clipboard.
 ![Firebase Cloud Messaging Settings]({{ "/assets/android/fcm-setup/firebase-cloud-messaging-settings.png" | absolute_url }})
 
-Open your [Rover Dashboard](https://app.rover.io) and select `Settings`.
+Open your [Rover Dashboard](https://app.rover.io) and select "Settings".
 ![Rover]({{ "/assets/android/fcm-setup/rover-dashboard.png" | absolute_url }})
 
 Click the "Android" tile on the Account Settings screen.
@@ -73,8 +73,7 @@ From the Android Settings page click the plus (+) icon next to Firebase Cloud Me
 And set the Server Key you copied to your clipboard from Firebase in the second step.
 ![Set Server Key]({{ "/assets/android/fcm-setup/set-server-key.png" | absolute_url }})
 
-<aside class="advanced">
-If you require support for a non-Google push service such as those from Amazon,
-Tencent, Baidu, or others, please contact <a
-href="support@rover.io">support@rover.io</a>.
-</aside>
+At this point Rover can deliver push notifications meant for your app to FCM.
+However, to set up your app and the Rover SDK to receive and handle them, you
+will need to proceed to the next step, [Push
+Notifications]({{"/android/push-notifications/" | absolute_url }}).
