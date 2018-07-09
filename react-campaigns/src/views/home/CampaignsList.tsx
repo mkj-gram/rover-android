@@ -34,6 +34,7 @@ import {
 } from '../utils/getCampaignType'
 
 import CampaignsListShowMorePopover from './CampaignsListShowMorePopover'
+import getFormattedNumber from '../utils/getFormattedNumber'
 
 export interface Props {
     campaigns: StringMap<Campaign>
@@ -144,7 +145,15 @@ const renderCampaign = (
     media: Media,
     pushToModal: (campaignId: string, route: string) => void
 ) => {
-    const { campaignId, name, campaignStatus, campaignType } = campaign
+    const {
+        name,
+        notificationDeliveredReport,
+        notificationOpenedReport,
+        scheduledDeliveryStatus
+    } = campaign as ScheduledCampaign
+
+    // ToDo: AutomatedNotificationCampaign field to determine UI
+
     return (
         <div
             style={{
@@ -168,12 +177,22 @@ const renderCampaign = (
                     getTotalProgress
                 )}
             </div>
-            {media !== 'Mobile' &&
-                campaignStatus !== 'DRAFT' &&
-                renderStat(0, 'Delivered')}
-            {campaignStatus !== 'DRAFT' &&
+            {scheduledDeliveryStatus === 'FINISHED' &&
+                media !== 'Mobile' &&
+                renderStat(
+                    notificationDeliveredReport.uniqueDelivered
+                        ? notificationDeliveredReport.uniqueDelivered
+                        : 0,
+                    'Delivered'
+                )}
+            {scheduledDeliveryStatus === 'FINISHED' &&
                 media === 'Desktop' &&
-                renderStat(0, 'Opened')}
+                renderStat(
+                    notificationOpenedReport.unique
+                        ? notificationOpenedReport.unique
+                        : 0,
+                    'Opened'
+                )}
             {media === 'Desktop' ? (
                 renderListButtons(campaign, pushToModal)
             ) : (
@@ -537,28 +556,32 @@ const renderListButtons = (
     )
 }
 
-const renderStat = (value: number, description: string) => (
-    <div
-        style={{
-            width: 144,
-            flex: 'none',
-            display: 'flex',
-            flexDirection: 'column'
-        }}
-    >
-        <Text
-            size="large"
-            text={value.toString()}
-            textStyle={{ color: silver }}
-        />
-        <Text
-            size="small"
-            label={true}
-            text={description}
-            textStyle={{ color: silver }}
-        />
-    </div>
-)
+const renderStat = (value: number, description: string) => {
+    const color = value === 0 ? silver : charcoal
+
+    return (
+        <div
+            style={{
+                width: 144,
+                flex: 'none',
+                display: 'flex',
+                flexDirection: 'column'
+            }}
+        >
+            <Text
+                size="large"
+                text={getFormattedNumber(value)}
+                textStyle={{ color }}
+            />
+            <Text
+                size="small"
+                label={true}
+                text={description}
+                textStyle={{ color }}
+            />
+        </div>
+    )
+}
 
 const handleRowClick = (
     campaign: Campaign,
