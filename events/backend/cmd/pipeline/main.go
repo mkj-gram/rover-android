@@ -94,25 +94,29 @@ func main() {
 	// Kafka
 	//
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  *kafkaDSN,
-		"compression.codec":  "snappy",
-		"group.id":           "events:pipeline:consumer", // Must be stable cannot edit
-		"session.timeout.ms": 6000,
-		"auto.offset.reset":  "earliest",
-		"auto.commit.enable": false,
+		"bootstrap.servers":       *kafkaDSN,
+		"group.id":                "events:pipeline:consumer", // Must be stable cannot edit
+		"session.timeout.ms":      6000,
+		"socket.keepalive.enable": true,
+		"default.topic.config": kafka.ConfigMap{
+			"compression.codec":  "snappy",
+			"auto.commit.enable": false,
+			"auto.offset.reset":  "earliest",
+		},
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	producer, err := kafka.NewProducer(&kafka.ConfigMap{
-		"bootstrap.servers":     *kafkaDSN,
-		"compression.codec":     "snappy",
-		"group.id":              "events:pipeline:producer", // Must be stable cannot edit
-		"session.timeout.ms":    6000,
-		"request.required.acks": -1,
-		"auto.offset.reset":     "earliest",
-		"enable.auto.commit":    false,
+		"bootstrap.servers":       *kafkaDSN,
+		"session.timeout.ms":      6000,
+		"socket.keepalive.enable": true,
+		"default.topic.config": kafka.ConfigMap{
+			"compression.codec":     "snappy",
+			"request.required.acks": -1,
+			"auto.commit.enable":    false,
+		},
 	})
 	if err != nil {
 		log.Fatal(err)

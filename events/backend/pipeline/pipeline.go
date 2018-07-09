@@ -295,6 +295,10 @@ func (p *Pipeline) process(in *kafka.Message) (out *kafka.Message, err error) {
 		}
 	}()
 
+	metrics.kafkaConsumerOffset.
+		WithLabelValues(*in.TopicPartition.Topic, fmt.Sprint(in.TopicPartition.Partition), "events:pipeline:consumer").
+		Set(float64(in.TopicPartition.Offset))
+
 	// Parse the protobuf data
 	err = proto.Unmarshal(data, &input)
 	if err != nil {

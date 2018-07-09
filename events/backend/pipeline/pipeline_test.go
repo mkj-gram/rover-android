@@ -35,10 +35,14 @@ func TestPipeline_handle_produces_and_commits_on_success(t *testing.T) {
 		producer = mocks.Producer{}
 		consumer = mocks.Consumer{}
 
-		req = &kafka.Message{Value: serialize(t, &event.Event{Id: "id", Name: "name"}), Key: []byte("key")}
-		exp = &kafka.Message{
+		req = &kafka.Message{
+			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: 2, Offset: 33},
 			Key:            []byte("key"),
+			Value:          serialize(t, &event.Event{Id: "id", Name: "name"}),
+		}
+		exp = &kafka.Message{
 			TopicPartition: kafka.TopicPartition{Topic: &topic},
+			Key:            []byte("key"),
 			Timestamp:      now(),
 			Value: serialize(t, &event.Event{
 				Id:   "id",
@@ -81,7 +85,15 @@ func TestPipeline_handle_only_commits_on_error(t *testing.T) {
 		producer = mocks.Producer{}
 		consumer = mocks.Consumer{}
 
-		req = &kafka.Message{Value: serialize(t, &event.Event{Id: "id", Name: "name"}), Key: []byte("key")}
+		req = &kafka.Message{
+			TopicPartition: kafka.TopicPartition{
+				Topic:     &topic,
+				Partition: 2,
+				Offset:    33,
+			},
+			Key:   []byte("key"),
+			Value: serialize(t, &event.Event{Id: "id", Name: "name"}),
+		}
 
 		errorHandler = HandlerFunc(func(ctx Context, e *event.Event) error {
 			return errors.New("we can not continue")
@@ -111,10 +123,19 @@ func TestPipeline_handle_retries_on_error(t *testing.T) {
 	t.Parallel()
 
 	var (
+		topic    = "test"
 		producer = mocks.Producer{}
 		consumer = mocks.Consumer{}
 
-		req = &kafka.Message{Value: serialize(t, &event.Event{Id: "id", Name: "name"}), Key: []byte("key")}
+		req = &kafka.Message{
+			TopicPartition: kafka.TopicPartition{
+				Topic:     &topic,
+				Partition: 2,
+				Offset:    33,
+			},
+			Key:   []byte("key"),
+			Value: serialize(t, &event.Event{Id: "id", Name: "name"}),
+		}
 
 		handlerCalled = 0
 		countHandler  = HandlerFunc(func(ctx Context, e *event.Event) error {
@@ -126,7 +147,7 @@ func TestPipeline_handle_retries_on_error(t *testing.T) {
 			return nil
 		})
 
-		pipe = NewPipeline(&consumer, "test", &producer, "test", countHandler, WithBackoff(quickBackoff))
+		pipe = NewPipeline(&consumer, topic, &producer, topic, countHandler, WithBackoff(quickBackoff))
 	)
 
 	pipe.handle(req)
@@ -151,16 +172,25 @@ func TestPipeline_handle_panics_after_too_many_attempts(t *testing.T) {
 	t.Parallel()
 
 	var (
+		topic    = "test"
 		producer = mocks.Producer{}
 		consumer = mocks.Consumer{}
 
-		req = &kafka.Message{Value: serialize(t, &event.Event{Id: "id", Name: "name"}), Key: []byte("key")}
+		req = &kafka.Message{
+			TopicPartition: kafka.TopicPartition{
+				Topic:     &topic,
+				Partition: 2,
+				Offset:    33,
+			},
+			Key:   []byte("key"),
+			Value: serialize(t, &event.Event{Id: "id", Name: "name"}),
+		}
 
 		countHandler = HandlerFunc(func(ctx Context, e *event.Event) error {
 			return NewRetryableError(nil)
 		})
 
-		pipe = NewPipeline(&consumer, "test", &producer, "test", countHandler, WithBackoff(quickBackoff))
+		pipe = NewPipeline(&consumer, topic, &producer, topic, countHandler, WithBackoff(quickBackoff))
 	)
 
 	defer func() {
@@ -190,20 +220,29 @@ func TestPipeline_process(t *testing.T) {
 	}{
 		{
 			desc: "returns error when input is invalid protobuf",
-			in:   &kafka.Message{Value: []byte("e"), Key: []byte("a")},
+			in: &kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: 2, Offset: 33},
+				Key:            []byte("a"),
+				Value:          []byte("e"),
+			},
 
 			expErr: errors.New("proto.Unmarshal: unexpected EOF"),
 		},
 		{
 			desc: "returns error when input is an invalid event",
-			in:   &kafka.Message{Value: serialize(t, &event.Event{}), Key: []byte("a")},
+			in: &kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: 2, Offset: 33},
+				Key:            []byte("a"),
+				Value:          serialize(t, &event.Event{}),
+			},
 
 			expErr: errors.New("validation error: id is missing"),
 		},
 		{
 			desc: "embeds EventInput in Event",
 			in: &kafka.Message{
-				Key: []byte("a"),
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: 2, Offset: 33},
+				Key:            []byte("a"),
 				Value: serialize(t, &event.Event{
 					Id:   "ABC",
 					Name: "MyEvent",

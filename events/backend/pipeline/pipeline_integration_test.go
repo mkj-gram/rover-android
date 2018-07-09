@@ -125,6 +125,7 @@ func createProducer(id string, t *testing.T) *kafka.Producer {
 		"bootstrap.servers":  *tKafkaDsn,
 		"session.timeout.ms": 6000,
 		"auto.offset.reset":  "latest",
+		"message.timeout.ms": 3000,
 		"enable.auto.commit": false,
 	})
 

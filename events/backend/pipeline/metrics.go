@@ -8,6 +8,8 @@ var metrics = struct {
 	pipelineEventsProcessedDurationSeconds *prom.HistogramVec
 	pipelineEventsProcessedErrorsTotal     *prom.CounterVec
 	pipelineEventsProcessedTotal           *prom.CounterVec
+
+	kafkaConsumerOffset *prom.GaugeVec
 }{
 
 	//
@@ -29,10 +31,16 @@ var metrics = struct {
 		Name: "pipeline_events_errors_total",
 		Help: "total pipeline events processing errors including panics",
 	}, []string{"account_id", "namespace", "name", "error"}),
+
+	kafkaConsumerOffset: prom.NewGaugeVec(prom.GaugeOpts{
+		Name: "kafka_consumer_group_offset",
+		Help: "current consumer group offset",
+	}, []string{"topic", "partition", "group_id"}),
 }
 
 var PrometheusMetrics = []prom.Collector{
 	metrics.pipelineEventsProcessedTotal,
 	metrics.pipelineEventsProcessedDurationSeconds,
 	metrics.pipelineEventsProcessedErrorsTotal,
+	metrics.kafkaConsumerOffset,
 }
