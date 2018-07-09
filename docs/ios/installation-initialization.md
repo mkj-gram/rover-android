@@ -34,14 +34,14 @@ Alternatively you can specify the exact set of subspecs you want to include.
 
 ```ruby
 target 'MyAppTarget' do
-    pod 'Rover/Foundation',    '~> 2.0'
-    pod 'Rover/Data',          '~> 2.0'
-    pod 'Rover/UI',            '~> 2.0'
-    pod 'Rover/Experiences',   '~> 2.0'
-    pod 'Rover/Notifications', '~> 2.0'
-    pod 'Rover/Location',      '~> 2.0'
-    pod 'Rover/Bluetooth',     '~> 2.0'
-    pod 'Rover/Debug',         '~> 2.0'
+    pod 'Rover/Foundation',    '~> 2.0.0-beta.1'
+    pod 'Rover/Data',          '~> 2.0.0-beta.1'
+    pod 'Rover/UI',            '~> 2.0.0-beta.1'
+    pod 'Rover/Experiences',   '~> 2.0.0-beta.1'
+    pod 'Rover/Notifications', '~> 2.0.0-beta.1'
+    pod 'Rover/Location',      '~> 2.0.0-beta.1'
+    pod 'Rover/Bluetooth',     '~> 2.0.0-beta.1'
+    pod 'Rover/Debug',         '~> 2.0.0-beta.1'
 end
 ```
 
@@ -65,7 +65,6 @@ CocoaPods is the simplest approach to installing the Rover SDK but you can also 
 Add the following entry to your `Cartfile`:
 
 ```ruby
-github "RoverPlatform/rover-ios" ~> 2.0.0
 github "RoverPlatform/rover-ios" ~> 2.0.0-beta.1
 ```
 
