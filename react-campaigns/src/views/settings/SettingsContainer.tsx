@@ -223,111 +223,120 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                         campaignId={campaignId}
                         device={device}
                     />
-
-                    <FormSection device={device} style={{ marginTop: 24 }}>
-                        <Text
-                            text="Delivery"
-                            size="h2"
-                            textStyle={{ marginBottom: 8 }}
-                        />
-                        <Row
-                            onClick={() =>
-                                this.openSelectedWizard('dateAndTime')
-                            }
-                        >
-                            <InverseLabel title="Date and Time">
-                                <DateAndTimeLabel />
-                            </InverseLabel>
-                            <EditButton />
-                        </Row>
-
-                        <Row
-                            onClick={() => this.openSelectedWizard('audience')}
-                        >
-                            <InverseLabel title="Audience">
-                                <AudienceLabel />
-                            </InverseLabel>
-                            <EditButton />
-                        </Row>
-                    </FormSection>
-
-                    <FormSection device={device}>
-                        <Text
-                            text="Notification"
-                            size="h2"
-                            textStyle={{ marginBottom: 8 }}
-                        />
-                        <Row
-                            onClick={() =>
-                                this.openSelectedWizard('messageAndMedia')
-                            }
-                        >
-                            <InverseLabel title="Message and Media">
-                                <MessageAndMediaLabel />
-                            </InverseLabel>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                }}
+                    <div
+                        style={{
+                            height: '100%',
+                            overflowY: 'scroll'
+                        }}
+                    >
+                        <FormSection device={device} style={{ marginTop: 24 }}>
+                            <Text
+                                text="Delivery"
+                                size="h2"
+                                textStyle={{ marginBottom: 8 }}
+                            />
+                            <Row
+                                onClick={() =>
+                                    this.openSelectedWizard('dateAndTime')
+                                }
                             >
-                                {editableCampaign &&
-                                    editableCampaign.notificationAttachment &&
-                                    editableCampaign.notificationAttachment
-                                        .type === 'IMAGE' && (
-                                        <img
-                                            src={
-                                                editableCampaign
-                                                    .notificationAttachment.url
-                                            }
-                                            style={{
-                                                height: 48,
-                                                width: 48,
-                                                borderRadius: 4,
-                                                flex: 'none',
-                                                marginRight:
-                                                    device !== 'Mobile'
-                                                        ? 16
-                                                        : null
-                                            }}
-                                        />
-                                    )}
+                                <InverseLabel title="Date and Time">
+                                    <DateAndTimeLabel />
+                                </InverseLabel>
                                 <EditButton />
-                            </div>
-                        </Row>
+                            </Row>
 
-                        <Row
-                            onClick={() =>
-                                this.openSelectedWizard('alertOptions')
-                            }
-                        >
-                            <InverseLabel title="Alert Options">
-                                <AlertOptionsLabel />
-                            </InverseLabel>
-                            <EditButton />
-                        </Row>
+                            <Row
+                                onClick={() =>
+                                    this.openSelectedWizard('audience')
+                                }
+                            >
+                                <InverseLabel title="Audience">
+                                    <AudienceLabel />
+                                </InverseLabel>
+                                <EditButton />
+                            </Row>
+                        </FormSection>
 
-                        <Row
-                            onClick={() =>
-                                this.openSelectedWizard('tapBehavior')
-                            }
-                        >
-                            <InverseLabel title="Tap Behavior">
-                                <TapBehaviorLabel />
-                            </InverseLabel>
-                            <EditButton />
-                        </Row>
+                        <FormSection device={device}>
+                            <Text
+                                text="Notification"
+                                size="h2"
+                                textStyle={{ marginBottom: 8 }}
+                            />
+                            <Row
+                                onClick={() =>
+                                    this.openSelectedWizard('messageAndMedia')
+                                }
+                            >
+                                <InverseLabel title="Message and Media">
+                                    <MessageAndMediaLabel />
+                                </InverseLabel>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}
+                                >
+                                    {editableCampaign &&
+                                        editableCampaign.notificationAttachment &&
+                                        editableCampaign.notificationAttachment
+                                            .type === 'IMAGE' && (
+                                            <img
+                                                src={
+                                                    editableCampaign
+                                                        .notificationAttachment
+                                                        .url
+                                                }
+                                                style={{
+                                                    height: 48,
+                                                    width: 48,
+                                                    borderRadius: 4,
+                                                    flex: 'none',
+                                                    marginRight:
+                                                        device !== 'Mobile'
+                                                            ? 16
+                                                            : null
+                                                }}
+                                            />
+                                        )}
+                                    <EditButton />
+                                </div>
+                            </Row>
 
-                        <Row
-                            onClick={() =>
-                                this.openSelectedWizard('advancedSettings')
-                            }
-                        >
-                            <InverseLabel title="Advanced Settings" />
-                            <EditButton />
-                        </Row>
-                    </FormSection>
+                            <Row
+                                onClick={() =>
+                                    this.openSelectedWizard('alertOptions')
+                                }
+                            >
+                                <InverseLabel title="Alert Options">
+                                    <AlertOptionsLabel />
+                                </InverseLabel>
+                                <EditButton />
+                            </Row>
+
+                            <Row
+                                onClick={() =>
+                                    this.openSelectedWizard('tapBehavior')
+                                }
+                            >
+                                <InverseLabel title="Tap Behavior">
+                                    <TapBehaviorLabel />
+                                </InverseLabel>
+                                <EditButton />
+                            </Row>
+
+                            <Row
+                                onClick={() =>
+                                    this.openSelectedWizard('advancedSettings')
+                                }
+                            >
+                                <InverseLabel title="Advanced Settings" />
+                                <EditButton />
+                            </Row>
+                        </FormSection>
+                    </div>
 
                     {currentWizard &&
                         ReactDOM.createPortal(
