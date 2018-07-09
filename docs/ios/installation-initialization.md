@@ -26,7 +26,7 @@ The simplest approach is to specify `Rover` as a dependency of your app's target
 
 ```ruby
 target 'MyAppTarget' do
-  pod 'Rover', '~> 2.0'
+  pod 'Rover', '~> 2.0.0-beta.1'
 end
 ```
 
@@ -66,9 +66,10 @@ Add the following entry to your `Cartfile`:
 
 ```ruby
 github "RoverPlatform/rover-ios" ~> 2.0.0
+github "RoverPlatform/rover-ios" ~> 2.0.0-beta.1
 ```
 
-When you run `carthage update` it will compile _all_ the Rover modules into individual frameworks and place them in your Carthage/Builds directory but you do not have to add them all to your project. You can still select the specific frameworks that are relevant to your application and add them to your project via the normal Carthage procedure.
+When you run `carthage update` it will compile _all_ the Rover modules into individual frameworks and place them in your Carthage/Build directory but you do not have to add them all to your project. You can still select the specific frameworks that are relevant to your application and add them to your project via the normal Carthage procedure.
 
 Because Carthage compiles individual frameworks you need to import the proper Rover module depending on the functionality you need. For example, to access the Rover `NotificationHandler` you need to import `RoverNotifications`. 
 

@@ -10,7 +10,7 @@
     <body>
         <nav class="primary">
             <div>
-                <a href="{{ "/" | relative_url }}">
+                <a href="{{ site.url }}">
                     {% include rover-logo.svg %}
                 </a>
                 <a href="{{ "/" | relative_url }}">
@@ -20,15 +20,15 @@
             <div>
                 <a href="{{ site.baseurl }}{% link ios/installation-initialization.md %}">
                     <span>iOS SDK</span>
-                    {% include icons/chevron-down.svg %}
+                    <!-- {% include icons/chevron-down.svg %} -->
                 </a>
                 <a href="{{ site.baseurl }}{% link android/installation-initialization.md %}">
                     Android SDK
-                    {% include icons/chevron-down.svg %}
+                    <!-- {% include icons/chevron-down.svg %} -->
                 </a>
-                <a href="{{ site.baseurl }}{% link graphql/index.md %}">
+                <!-- <a href="{{ site.baseurl }}{% link graphql/index.md %}">
                     GraphQL API
-                </a>
+                </a> -->
                 <a href="{{ site.baseurl }}{% link big-query/overview.md %}">
                     BigQuery
                 </a>
@@ -36,14 +36,9 @@
                     Bulk API
                 </a>
             </div>
-            <div>
-                <a href="{{ site.url }}">
-                    {% include icons/home.svg %}
-                </a>
-                <a class="button" href="mailto:support@rover.io">
-                    Support
-                </a>
-            </div>
+            <a class="button" href="mailto:support@rover.io">
+                Support
+            </a>
         </nav>
         <div class="columns">
             {{ content }}
