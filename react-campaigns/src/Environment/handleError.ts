@@ -11,7 +11,8 @@ export default (
 
     if (
         message.includes('auth_context') ||
-        message.includes('Unauthenticated')
+        message.includes('Unauthenticated') ||
+        message.includes('Authorised')
     ) {
         window.location.replace('/auth/sign-in')
     }
