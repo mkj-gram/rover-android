@@ -30,7 +30,9 @@ export interface GridIconPopoverDispatchProps {
     updateActivePopover: (field: string) => void
 }
 
-const Apps: React.SFC = () => {
+const Apps: React.SFC<GridIconPopoverDispatchProps> = ({
+    updateActivePopover
+}) => {
     const appContainer = (
         appName: string,
         icon: JSX.Element,
@@ -49,6 +51,8 @@ const Apps: React.SFC = () => {
                         textDecoration: 'none',
                         cursor: 'default'
                     }}
+                    target="_blank"
+                    onClick={() => updateActivePopover('')}
                 >
                     <div
                         style={{
@@ -87,7 +91,7 @@ const Apps: React.SFC = () => {
                 }}
             >
                 {appContainer('Campaigns', CampaignsIcon(), '/campaigns/')}
-                {appContainer('Studio', StudioIcon(), '/experiences/')}
+                {appContainer('Experiences', StudioIcon(), '/experiences/')}
                 {appContainer(
                     'Audience',
                     AudienceIcon({
@@ -130,7 +134,7 @@ const GridIconPopover: React.SFC<
                 width={device === 'Desktop' ? '20' : '24'}
                 viewBox="0 0 24 24"
             />
-            <Apps />
+            <Apps updateActivePopover={updateActivePopover} />
         </PopoverContainer>
     )
 }

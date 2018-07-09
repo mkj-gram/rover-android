@@ -65,7 +65,7 @@ class UserIconPopover extends React.Component<
             settingsMouseEventDirection: 'up'
         }
         this.handleSignOut = this.handleSignOut.bind(this)
-        this.cancelProfileSettingSelection = this.cancelProfileSettingSelection.bind(
+        this.closeProfileSettingSelection = this.closeProfileSettingSelection.bind(
             this
         )
     }
@@ -79,7 +79,7 @@ class UserIconPopover extends React.Component<
         window.location.replace('/auth/sign-in')
     }
 
-    cancelProfileSettingSelection() {
+    closeProfileSettingSelection() {
         const {
             closePopoverModalForm,
             device,
@@ -133,43 +133,52 @@ class UserIconPopover extends React.Component<
                         />
                     </div>
                     {device === 'Desktop' && (
-                        <div
-                            onMouseDown={() =>
-                                this.setState({
-                                    profileMouseEventDirection: 'down'
-                                })
-                            }
-                            onMouseUp={() => {
-                                this.setState({
-                                    profileMouseEventDirection: 'up'
-                                })
-                                window.location.replace('/settings/overview')
-                            }}
+                        <a
+                            href="/settings/overview"
                             style={{
-                                display: 'flex',
-                                alignItems: 'center'
+                                textDecoration: 'none',
+                                cursor: 'default'
                             }}
+                            target="_blank"
                         >
-                            <Text
-                                text="Profile"
-                                size="medium"
-                                textStyle={{
-                                    marginRight: 8,
-                                    fontWeight: 600,
-                                    color:
+                            <div
+                                onMouseDown={() =>
+                                    this.setState({
+                                        profileMouseEventDirection: 'down'
+                                    })
+                                }
+                                onMouseUp={() => {
+                                    this.setState({
+                                        profileMouseEventDirection: 'up'
+                                    })
+                                    this.closeProfileSettingSelection()
+                                }}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <Text
+                                    text="Profile"
+                                    size="medium"
+                                    textStyle={{
+                                        marginRight: 8,
+                                        fontWeight: 600,
+                                        color:
+                                            profileMouseEventDirection === 'up'
+                                                ? turquoise
+                                                : aquamarine
+                                    }}
+                                />
+                                <ExternalLinkIcon
+                                    fill={
                                         profileMouseEventDirection === 'up'
                                             ? turquoise
                                             : aquamarine
-                                }}
-                            />
-                            <ExternalLinkIcon
-                                fill={
-                                    profileMouseEventDirection === 'up'
-                                        ? turquoise
-                                        : aquamarine
-                                }
-                            />
-                        </div>
+                                    }
+                                />
+                            </div>
+                        </a>
                     )}
                 </div>
                 <div
@@ -184,50 +193,59 @@ class UserIconPopover extends React.Component<
                 >
                     <Text size="medium" text={accountName} />
                     {device === 'Desktop' && (
-                        <div
-                            onMouseDown={() =>
-                                this.setState({
-                                    settingsMouseEventDirection: 'down'
-                                })
-                            }
-                            onMouseUp={() => {
-                                this.setState({
-                                    settingsMouseEventDirection: 'up'
-                                })
-                                window.location.replace('/settings/overview')
-                            }}
+                        <a
+                            href="/settings/overview"
                             style={{
-                                display: 'flex',
-                                alignItems: 'center'
+                                textDecoration: 'none',
+                                cursor: 'default'
                             }}
+                            target="_blank"
                         >
-                            <Text
-                                text="Settings"
-                                size="medium"
-                                textStyle={{
-                                    marginRight: 8,
-                                    fontWeight: 600,
-                                    color:
+                            <div
+                                onMouseDown={() =>
+                                    this.setState({
+                                        settingsMouseEventDirection: 'down'
+                                    })
+                                }
+                                onMouseUp={() => {
+                                    this.setState({
+                                        settingsMouseEventDirection: 'up'
+                                    })
+                                    this.closeProfileSettingSelection()
+                                }}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <Text
+                                    text="Settings"
+                                    size="medium"
+                                    textStyle={{
+                                        marginRight: 8,
+                                        fontWeight: 600,
+                                        color:
+                                            settingsMouseEventDirection === 'up'
+                                                ? turquoise
+                                                : aquamarine
+                                    }}
+                                />
+                                <ExternalLinkIcon
+                                    fill={
                                         settingsMouseEventDirection === 'up'
                                             ? turquoise
                                             : aquamarine
-                                }}
-                            />
-                            <ExternalLinkIcon
-                                fill={
-                                    settingsMouseEventDirection === 'up'
-                                        ? turquoise
-                                        : aquamarine
-                                }
-                            />
-                        </div>
+                                    }
+                                />
+                            </div>
+                        </a>
                     )}
                 </div>
             </div>
         )
         const navBarProps = {
             buttonLeft: 'Done',
-            buttonLeftCallback: this.cancelProfileSettingSelection,
+            buttonLeftCallback: this.closeProfileSettingSelection,
             buttonRight: 'Sign Out',
             buttonRightCallback: this.handleSignOut,
             title: device === 'Mobile' ? 'Account' : ''
