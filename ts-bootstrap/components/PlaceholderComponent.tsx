@@ -51,6 +51,13 @@ class PlaceholderComponent extends React.Component<Props, State> {
         } = this.props
         const { hidePlaceholder } = this.state
 
+        const contentEditableStyle: React.CSSProperties = {
+            ...style,
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            zIndex: 3
+        }
         return (
             <div
                 style={{
@@ -65,7 +72,8 @@ class PlaceholderComponent extends React.Component<Props, State> {
                             top: 0,
                             left: 0,
                             ...this.props.style,
-                            color: silver
+                            color: silver,
+                            zIndex: 2
                         }}
                     >
                         {placeholderText}
@@ -78,7 +86,7 @@ class PlaceholderComponent extends React.Component<Props, State> {
                         onInputChange={onInputChange}
                         id={id}
                         onBlurChange={onBlurChange}
-                        style={this.props.style}
+                        style={contentEditableStyle}
                         handlePlaceholderChange={this.handlePlaceholderChange}
                         placeholder={true}
                         handleBlurChange={handleBlurChange}
