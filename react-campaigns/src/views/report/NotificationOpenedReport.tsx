@@ -2,6 +2,8 @@
 import * as React from 'react'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { parse } from 'qs'
+import { white } from '@rover/ts-bootstrap/dist/src'
+
 import DeviceTransitionContainer from '../utils/DeviceTransitionContainer'
 
 import { InjectedProps } from '../utils/ResponsiveContainer'
@@ -21,7 +23,8 @@ const NotificationOpenedReport: React.SFC<
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    backgroundColor: 'white'
+                    backgroundColor: white,
+                    overflowX: 'scroll'
                 }}
             >
                 <OverviewModalHeader campaignId={campaignId} device={device} />

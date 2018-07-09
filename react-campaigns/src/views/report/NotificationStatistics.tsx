@@ -28,7 +28,6 @@ const NotificationStatistics: React.SFC<
     notificationOpenedReport
 }) => {
     const {
-        totalDelivered,
         notificationCenterAttempted,
         notificationCenterDelivered,
         notificationCenterUnreachable,
@@ -36,16 +35,15 @@ const NotificationStatistics: React.SFC<
         pushAttempted,
         pushDelivered,
         pushUnreachable,
-        pushInvalid
+        pushInvalid,
+        uniqueDelivered
     } = notificationDeliveredReport
     const {
-        total,
-        unique,
+        total: totalOpens,
+        unique: uniqueOpens,
         notificationCenterTotal,
         notificationCenterUnique,
-        pushDirectTotal,
         pushDirectUnique,
-        pushInfluencedTotal,
         pushInfluencedUnique
     } = notificationOpenedReport
 
@@ -126,10 +124,10 @@ const NotificationStatistics: React.SFC<
             <NotificationStatisticsPopover
                 campaignId={campaignId}
                 device={device}
-                label="NotificationCenter"
+                label="Notification Center"
                 value={
-                    notificationCenterTotal
-                        ? notificationCenterTotal.toString()
+                    notificationCenterUnique
+                        ? notificationCenterUnique.toString()
                         : '--'
                 }
             >
@@ -181,17 +179,17 @@ const NotificationStatistics: React.SFC<
                 device={device}
                 label="Open Rate"
                 status="good"
-                value={`${((100 * total) / totalDelivered).toFixed(1)}%`}
+                value={`${((100 * uniqueOpens) / uniqueDelivered).toFixed(1)}%`}
             >
                 <StatDetail
                     detail="Delivered"
                     name="Delivered"
-                    value={totalDelivered ? totalDelivered.toString() : '--'}
+                    value={uniqueDelivered ? uniqueDelivered.toString() : '--'}
                 />
                 <StatDetail
                     detail="Opened"
                     name="Opened"
-                    value={total ? total.toString() : '--'}
+                    value={uniqueOpens ? uniqueOpens.toString() : '--'}
                 />
             </NotificationStatisticsPopover>
         </div>
