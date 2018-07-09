@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -e
+source ./docker/functions.bash
+
+setup() {
+	waiton kafka 9092
+}
+
+shell() {
+	setup analytics_dev
+	sh
+}
+
+run() {
+	setup analytics_dev
+	go run ./analytics/backend/cmd/collector/main.go
+}
+
+test() {
+	setup analytics_test
+	go test ./analytics/backend/collector/... ./analytics/backend/cmd/collector/...
+}
+
+main $@

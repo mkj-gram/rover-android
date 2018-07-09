@@ -20,7 +20,7 @@ run() {
 
 test() {
 	setup analytics_test
-	go test ./analytics/backend/...
+	go test ./analytics/backend/domain ./analytics/backend/usecase/... ./analytics/backend/influx/... ./analytics/backend/delivery/... ./analytics/backend/cmd/service/...
 }
 
 main $@

@@ -229,12 +229,28 @@ steps:
   - id: 'test-analytics-service'
     name: 'docker/compose:1.16.1'
     args:
+      - -p
+      - test-analytics
       - -f
       - ./analytics/backend/test.docker-compose.yaml
       - run
       - --rm
       - service
     waitFor:
+      - 'install-complete'
+
+  - id: 'test-analytics-collector'
+    name: 'docker/compose:1.16.1'
+    args:
+      - -p
+      - test-analytics
+      - -f
+      - ./analytics/backend/test.docker-compose.yaml
+      - run
+      - --rm
+      - collector
+    waitFor:
+      - 'test-analytics-service'
       - 'install-complete'
 
 # @rover/apis node module
@@ -278,6 +294,7 @@ steps:
         - 'test-notification'
         - 'test-events-pipeline'
         - 'test-analytics-service'
+        - 'test-analytics-collector'
         - 'test-rover-apis'
 
 # End Test Stage
@@ -525,6 +542,20 @@ steps:
     waitFor:
       - 'test-complete'
 
+  - id: 'build-analytics-collector-binary'
+    name: 'gcr.io/$PROJECT_ID/golang-rdkafka:1.10-alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -tags
+      - static_all
+      - -o
+      - docker/analytics/build/bin/collector
+      - github.com/roverplatform/rover/analytics/backend/cmd/collector
+    waitFor:
+      - 'test-complete'
+
   - id: 'build-analytics-influx-cli'
     name: 'gcr.io/$PROJECT_ID/golang:1.10-alpine'
     env:
@@ -546,6 +577,7 @@ steps:
     waitFor:
       - 'build-analytics-influx-cli'
       - 'build-analytics-service-binary'
+      - 'build-analytics-collector-binary'
 
 # GraphQL Gateway
 

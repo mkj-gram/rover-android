@@ -89,8 +89,8 @@ func main() {
 	server := grpc.Server{
 		NotificationUseCase: notificationUseCase,
 	}
-
 	go func() {
+		log.Infof("rpc listening on %s", *rpcAddr)
 		if err := server.ListenAndServe(*rpcAddr); err != nil {
 			log.Fatal(err)
 		}
@@ -102,7 +102,6 @@ func main() {
 	//
 	// Signals
 	//
-	log.Infof("rpc listening on %s", *rpcAddr)
 	select {
 	case sig := <-sigc:
 		log.WithFields(logger.Fields{"signal": fmt.Sprintf("%v", sig)}).Info("received signal")

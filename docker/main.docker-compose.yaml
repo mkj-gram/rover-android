@@ -81,6 +81,21 @@ services:
 
         
   # ROVER PROJECTS
+  analytics-collector:
+    image: roverio/golang-rdkafka:1.10-alpine
+    command: ./docker/analytics/collector/cmd run
+    volumes:
+      - ../:/go/src/github.com/roverplatform/rover
+    working_dir: /go/src/github.com/roverplatform/rover
+    depends_on:
+      - influxdb
+      - kafka
+    environment:
+      CGO_ENABLED: 1
+      LOG_LEVEL: debug
+      INFLUXDB_DSN: http://influxdb:8086/analytics_dev
+      KAFKA_DSN: kafka:9092
+
   analytics-service:
     image: golang:1.10-alpine
     command: ./docker/analytics/service/cmd run

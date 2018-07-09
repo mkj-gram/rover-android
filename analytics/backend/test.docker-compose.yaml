@@ -2,31 +2,29 @@ version: "3"
 
 services:
 
-  # kafka:
-  #   image: spotify/kafka
-  #   environment:
-  #     - AUTO_CREATE_TOPICS=true
-  #     - ADVERTISED_HOST=kafka
-  #     - NUM_PARTITIONS=3
+  kafka:
+    image: spotify/kafka
+    environment:
+      - AUTO_CREATE_TOPICS=true
+      - ADVERTISED_HOST=kafka
+      - NUM_PARTITIONS=1
 
   influxdb:
     image: influxdb:1.5.3
 
-  # collector:
-  #   image: roverio/golang-rdkafka:1.10-alpine
-  #   command: ./docker/analytics/cmd test_collector
-  #   volumes:
-  #     - ../:/go/src/github.com/roverplatform/rover
-  #   working_dir: /go/src/github.com/roverplatform/rover
-  #   depends_on:
-  #     - kafka
-  #     - influxdb
-  #   environment:
-  #     CGO_ENABLED: 1
-  #     LOG_LEVEL: debug
-  #     KAFKA_DSN: kafka:9092
-  #     INPUT_TOPICS: events.output
-  #     TEST_INFLUXDB_DSN: http://influxdb:8086
+  collector:
+    image: roverio/golang-rdkafka:1.10-alpine
+    command: ./docker/analytics/collector/cmd test
+    volumes:
+      - ../../:/go/src/github.com/roverplatform/rover
+    working_dir: /go/src/github.com/roverplatform/rover
+    depends_on:
+      - kafka
+    environment:
+      CGO_ENABLED: 1
+      LOG_LEVEL: debug
+      TEST_KAFKA_DSN: kafka:9092
+      TEST_INFLUXDB_DSN: http://influxdb:8086
 
   service:
     image: golang:1.10-alpine
