@@ -86,9 +86,9 @@ const ToolBar: React.SFC<Props> = ({
     if (media === 'Desktop') {
         return (
             <div style={style}>
-                {renderCurrentPage()}
+                {/* {renderCurrentPage()}
                 {renderLeftArrow()}
-                {renderRightArrow({ margin: 0 })}
+                {renderRightArrow({ margin: 0 })} */}
             </div>
         )
     }
@@ -103,9 +103,9 @@ const ToolBar: React.SFC<Props> = ({
                     paddingRight: 0
                 }}
             >
-                {renderLeftArrow()}
+                {/* {renderLeftArrow()}
                 {renderRightArrow({ marginLeft: 0 })}
-                {renderCurrentPage()}
+                {renderCurrentPage()} */}
             </div>
         )
     }
@@ -120,7 +120,7 @@ const ToolBar: React.SFC<Props> = ({
                     paddingRight: 24
                 }}
             >
-                <div
+                {/* <div
                     style={{
                         width: 56,
                         flex: 'none',
@@ -130,7 +130,7 @@ const ToolBar: React.SFC<Props> = ({
                 >
                     {renderLeftArrow({ margin: 0 })}
                     {renderRightArrow({ margin: 0 })}
-                </div>
+                </div> */}
 
                 <NewCampaignPopover onCreate={onCreate} media={media} />
             </div>
