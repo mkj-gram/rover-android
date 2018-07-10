@@ -1,7 +1,9 @@
 import createAccount from './createAccount'
+import createUser from './createUser'
 
 const mutations = {
-    createAccount
+    createAccount,
+    createUser
 }
 
 export default mutations

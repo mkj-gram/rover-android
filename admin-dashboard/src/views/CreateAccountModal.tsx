@@ -8,60 +8,57 @@ import {
     FormInputProps,
     Header,
     Icon,
-    Modal,
-    Input
+    Menu,
+    Modal
 } from 'semantic-ui-react'
 import { State } from '../../typings'
-import { createAccount, viewSwitch } from '../actions'
-import { getActiveView } from '../reducers'
+import { createAccount } from '../actions'
 
-interface CreateAccoutModalStateProps {
-    activeView: string
-}
 interface DispatchProps {
     createAccount: (name: string, accountname: string) => void
-    viewSwitch: (view: string) => void
-}
-interface CreateAccoutModalConstructorProps {
-    trigger: JSX.Element
 }
 
-type CreateAccoutModalProps = CreateAccoutModalConstructorProps &
-    CreateAccoutModalStateProps &
-    DispatchProps
-
-interface CreateAccoutModalState {
+interface CreateAccountModalState {
+    open: boolean
     name: string
     accountname: string
 }
 
-class CreateAccoutModal extends React.PureComponent<
-    CreateAccoutModalProps,
-    CreateAccoutModalState
+class CreateAccountModal extends React.PureComponent<
+    DispatchProps,
+    CreateAccountModalState
 > {
-    constructor(props: CreateAccoutModalProps) {
+    constructor(props: DispatchProps) {
         super(props)
         this.createAccount = this.createAccount.bind(this)
-        this.closeCreateAccoutModal = this.closeCreateAccoutModal.bind(this)
+        this.openCreateAccountModal = this.openCreateAccountModal.bind(this)
+        this.closeCreateAccountModal = this.closeCreateAccountModal.bind(this)
         this.state = {
+            open: false,
             name: '',
             accountname: ''
         }
     }
 
-    closeCreateAccoutModal() {
+    openCreateAccountModal() {
         this.setState({
+            open: true
+        })
+    }
+
+    closeCreateAccountModal() {
+        this.setState({
+            open: false,
             name: '',
             accountname: ''
         })
-        this.props.viewSwitch('accounts')
     }
 
     handleFormChange = (
         e: React.FormEvent<HTMLInputElement>,
         { field, value }: FormInputProps
     ) => {
-        this.setState({ [field]: value } as CreateAccoutModalState)
+        this.setState({ [field]: value } as CreateAccountModalState)
     }
 
     createAccount() {
@@ -71,35 +68,49 @@ class CreateAccoutModal extends React.PureComponent<
         }
         this.props.createAccount(name, accountname)
         this.setState({
+            open: false,
             name: '',
             accountname: ''
         })
     }
 
     render() {
-        const { trigger, activeView } = this.props
-        const { name, accountname } = this.state
+        const { open, name, accountname } = this.state
         const disableSubmit = name === '' || accountname === ''
         return (
             <Modal
                 size="small"
-                trigger={trigger}
-                open={activeView === 'create account'}
-                onClose={this.closeCreateAccoutModal}
+                trigger={
+                    <Menu.Item position="right" name="create account">
+                        <Button
+                            icon={true}
+                            name="create account"
+                            color="blue"
+                            onClick={this.openCreateAccountModal}
+                        >
+                            <Icon name="user circle" />
+                            Create Account
+                        </Button>
+                    </Menu.Item>
+                }
+                open={open}
+                onClose={this.closeCreateAccountModal}
             >
-                <Header icon="chess king" content="Create Account" />
+                <Header icon="user circle" content="Create Account" />
                 <Modal.Content>
                     <Form onSubmit={this.createAccount}>
                         <Form.Input
                             autoFocus={true}
                             label="Name"
                             field="name"
+                            autoComplete="off"
                             placeholder="Display name for the account"
                             onChange={this.handleFormChange}
                         />
                         <Form.Input
                             label="Account Name"
                             field="accountname"
+                            autoComplete="off"
                             placeholder="Unique account name"
                             onChange={this.handleFormChange}
                         />
@@ -113,7 +124,7 @@ class CreateAccoutModal extends React.PureComponent<
                 <Modal.Actions>
                     <Button
                         disabled={disableSubmit}
-                        color="teal"
+                        color="blue"
                         onClick={this.createAccount}
                     >
                         <Icon name="checkmark" /> Create
@@ -121,7 +132,7 @@ class CreateAccoutModal extends React.PureComponent<
                     <Button
                         basic={true}
                         color="orange"
-                        onClick={this.closeCreateAccoutModal}
+                        onClick={this.closeCreateAccountModal}
                     >
                         <Icon name="remove" /> Cancel
                     </Button>
@@ -135,17 +146,11 @@ class CreateAccoutModal extends React.PureComponent<
 const mapDispatchToProps = (
     dispatch: ThunkDispatch<State, void, AnyAction>
 ): DispatchProps => ({
-    viewSwitch: (view: string) => dispatch(viewSwitch(view)),
-
     createAccount: (name: string, accountname: string) =>
         dispatch(createAccount(name, accountname))
 })
 
-const mapStateToProps = (state: State): CreateAccoutModalStateProps => ({
-    activeView: getActiveView(state)
-})
-
 export default connect(
-    mapStateToProps,
+    null,
     mapDispatchToProps
-)(CreateAccoutModal)
+)(CreateAccountModal)

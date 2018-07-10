@@ -7,6 +7,8 @@ const activeView = (state: string = 'accounts', action: AnyAction) => {
             return 'accounts'
         case 'VIEW_CREATE_ACCOUNT':
             return 'create account'
+        case 'VIEW_CREATE_USER':
+            return 'create user'
         default:
             return state
     }

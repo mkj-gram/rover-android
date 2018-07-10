@@ -1,7 +1,6 @@
 import { User } from '@firebase/auth-types'
 import firebase from 'firebase/app'
 import 'firebase/auth'
-import * as moment from 'moment-timezone'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
@@ -9,16 +8,14 @@ import { withRouter } from 'react-router-dom'
 import { AnyAction } from 'redux'
 import { ThunkDispatch } from 'redux-thunk'
 import {
-    Button,
+    ButtonProps,
     Dropdown,
-    Grid,
+    Header,
     Image,
     Menu,
-    MenuItemProps,
-    Message,
-    Table
+    Message
 } from 'semantic-ui-react'
-import { Account, State, StringMap } from '../../typings'
+import { State, ToastState } from '../../typings'
 import { fetchAccounts, viewSwitch } from '../actions'
 import {
     getActiveView,
@@ -26,15 +23,15 @@ import {
     getIsAuthLoading,
     getUser
 } from '../reducers'
+import AccountTable from './AccountTable'
 import CreateAccountModal from './CreateAccountModal'
 
 interface DashboardStateProps {
     isAuthLoading: boolean
     isAuthenticated: boolean
     user: User
-    accounts: StringMap<Account>
     activeView: string
-    isError: StringMap<boolean | string>
+    isToast: ToastState
 }
 interface DispatchProps {
     viewSwitch: (view: string) => void
@@ -43,10 +40,6 @@ interface DispatchProps {
 type DashboardPageProps = DashboardStateProps & DispatchProps
 
 class Dashboard extends React.PureComponent<DashboardPageProps, {}> {
-    constructor(props: DashboardPageProps) {
-        super(props)
-    }
-
     componentDidUpdate(prevProps: DashboardStateProps & DispatchProps) {
         const { isAuthLoading, fetchAccounts } = this.props
         const prevIsAuthLoading = prevProps.isAuthLoading
@@ -57,8 +50,8 @@ class Dashboard extends React.PureComponent<DashboardPageProps, {}> {
     }
 
     handleItemClick = (
-        e: React.MouseEvent<HTMLAnchorElement>,
-        { name }: MenuItemProps
+        e: React.MouseEvent<HTMLButtonElement>,
+        { name }: ButtonProps
     ) => this.props.viewSwitch(name)
 
     logout = () => {
@@ -70,12 +63,11 @@ class Dashboard extends React.PureComponent<DashboardPageProps, {}> {
 
     render() {
         const {
-            accounts,
             isAuthLoading,
             isAuthenticated,
             user,
             activeView,
-            isError
+            isToast
         } = this.props
 
         return isAuthenticated && user && !isAuthLoading ? (
@@ -83,7 +75,6 @@ class Dashboard extends React.PureComponent<DashboardPageProps, {}> {
                 <Menu
                     pointing={true}
                     secondary={true}
-                    color={'teal'}
                     style={{
                         margin: '0'
                     }}
@@ -123,94 +114,27 @@ class Dashboard extends React.PureComponent<DashboardPageProps, {}> {
                 </Menu>
                 <Menu
                     tabular={true}
-                    color={'teal'}
+                    color={'blue'}
                     style={{
                         margin: '0'
                     }}
                     size="mini"
                 >
-                    <Menu.Item
-                        header={true}
-                        name="accounts"
-                        active={activeView === 'accounts'}
-                        onClick={this.handleItemClick}
-                    />
-                    <CreateAccountModal
-                        trigger={
-                            <Menu.Item
-                                position="right"
-                                name="create account"
-                                onClick={this.handleItemClick}
-                            >
-                                <Button name="create account" color="teal">
-                                    Create Account
-                                </Button>
-                            </Menu.Item>
-                        }
-                    />
+                    <Header
+                        size="huge"
+                        color="blue"
+                        style={{
+                            marginLeft: '1em',
+                            marginBottom: '0',
+                            marginTop: '5px'
+                        }}
+                    >
+                        Accounts
+                    </Header>
+                    <CreateAccountModal />
                 </Menu>
-                <Grid>
-                    <Grid.Column stretched={true}>
-                        <Table>
-                            <Table.Header>
-                                <Table.Row>
-                                    <Table.HeaderCell>ID</Table.HeaderCell>
-                                    <Table.HeaderCell>Name</Table.HeaderCell>
-                                    <Table.HeaderCell>
-                                        Account Name
-                                    </Table.HeaderCell>
-                                    <Table.HeaderCell>
-                                        Updated At
-                                    </Table.HeaderCell>
-                                    <Table.HeaderCell>
-                                        Created At
-                                    </Table.HeaderCell>
-                                </Table.Row>
-                            </Table.Header>
-                            <Table.Body>
-                                {Object.keys(accounts).map(accountId => {
-                                    return (
-                                        <Table.Row key={accountId}>
-                                            <Table.Cell>
-                                                {accounts[accountId].id}
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                {accounts[accountId].name}
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                {
-                                                    accounts[accountId]
-                                                        .accountname
-                                                }
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                {moment(
-                                                    accounts[accountId]
-                                                        .updatedAt
-                                                )
-                                                    .tz(moment.tz.guess())
-                                                    .format(
-                                                        'YYYY-MM-DD HH:mm z'
-                                                    )}
-                                            </Table.Cell>
-                                            <Table.Cell>
-                                                {moment(
-                                                    accounts[accountId]
-                                                        .createdAt
-                                                )
-                                                    .tz(moment.tz.guess())
-                                                    .format(
-                                                        'YYYY-MM-DD HH:mm z'
-                                                    )}
-                                            </Table.Cell>
-                                        </Table.Row>
-                                    )
-                                })}
-                            </Table.Body>
-                        </Table>
-                    </Grid.Column>
-                </Grid>
-                {isError.error &&
+                <AccountTable />
+                {isToast.display &&
                     ReactDOM.createPortal(
                         <div
                             style={{
@@ -224,9 +148,8 @@ class Dashboard extends React.PureComponent<DashboardPageProps, {}> {
                             }}
                         >
                             <Message
-                                header="Error"
-                                content={isError.message}
-                                color="orange"
+                                content={isToast.message}
+                                color={isToast.color}
                                 floating={true}
                             />
                         </div>,
@@ -257,9 +180,8 @@ const mapStateToProps = (state: State): DashboardStateProps => ({
     isAuthLoading: getIsAuthLoading(state),
     isAuthenticated: getIsAuthenticated(state),
     user: getUser(state),
-    accounts: state.accounts,
     activeView: getActiveView(state),
-    isError: state.isError
+    isToast: state.isToast
 })
 
 export default withRouter(connect(

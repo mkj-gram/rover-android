@@ -110,6 +110,7 @@ service Auth {
     rpc UpdateUser(UpdateUserRequest) returns (User) {};
     rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (Empty) {};
     rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse) {};
+    rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {};
 
     /*
         A user session is simple sign on using email & password based authentication to generate a new session token
@@ -283,6 +284,14 @@ message UpdateUserPasswordRequest {
     int32 user_id = 2;
 
     string password = 3;
+}
+
+message ListUsersRequest {
+    int32 account_id = 1;
+}
+
+message ListUsersResponse {
+    repeated User users = 1;
 }
 
 /*

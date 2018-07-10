@@ -15,4 +15,9 @@ export const viewSwitch: ActionCreator<
             type: 'VIEW_CREATE_ACCOUNT'
         })
     }
+    if (view === 'create user') {
+        dispatch({
+            type: 'VIEW_CREATE_USER'
+        })
+    }
 }

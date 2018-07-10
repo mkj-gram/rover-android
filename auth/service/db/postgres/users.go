@@ -122,3 +122,44 @@ func (db *DB) UpdateUserPassword(ctx context.Context, up *service.UserPasswordUp
 
 	return nil
 }
+
+func (d *DB) ListUsers(ctx context.Context, account_id int) ([]*service.User, error) {
+
+	rows, err := d.db.QueryContext(ctx, `
+		SELECT
+			id, account_id, name, email,
+			password_digest, permission_scopes,
+			created_at, updated_at
+			FROM users
+			WHERE account_id = $1
+			ORDER BY id DESC`, account_id)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "Scan")
+	}
+	defer rows.Close()
+
+	var users []*service.User
+
+	for rows.Next() {
+		var user service.User
+
+		err := rows.Scan(
+			&user.Id,
+			&user.AccountId,
+			&user.Name,
+			&user.Email,
+			&user.PasswordDigest,
+			pq.Array(&user.PermissionScopes),
+			&user.CreatedAt,
+			&user.UpdatedAt)
+
+		if err != nil {
+			return nil, errors.Wrap(err, "Scan")
+		}
+
+		users = append(users, &user)
+	}
+
+	return users, nil
+}

@@ -24,6 +24,7 @@ type Backend interface {
 	CreateUser(context.Context, *User) (*User, error)
 	UpdateUser(context.Context, *User) (*User, error)
 	UpdateUserPassword(context.Context, *UserPasswordUpdate) error
+	ListUsers(context.Context, int) ([]*User, error)
 
 	GetUserById(ctx context.Context, id int) (*User, error)
 	FindUserByEmail(ctx context.Context, email string) (*User, error)

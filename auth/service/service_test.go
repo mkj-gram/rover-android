@@ -138,14 +138,15 @@ func TestAuthsvc(t *testing.T) {
 
 	execSQL(t, db.DB(), string(readFile(t, "db/postgres/testdata/fixtures.sql")))
 
+	t.Run("ListAccounts", testAuthsvc_ListAccounts)
 	t.Run("GetAccount", testAuthsvc_GetAccount)
 	t.Run("CreateAccount", testAuthsvc_CreateAccount)
 	t.Run("CreateAccountWithTokens", testAuthsvc_CreateAccount_DefaultTokens)
 	t.Run("UpdateAccount", testAuthsvc_UpdateAccount)
 	t.Run("ListTokens", testAuthsvc_ListTokens)
 
+	t.Run("ListUsers", testAuthsvc_ListUsers)
 	t.Run("GetUserInfo", testAuthsvc_GetUserInfo)
-
 	t.Run("GetUser", testAuthsvc_GetUser)
 	t.Run("CreateUser", testAuthsvc_CreateUser)
 	t.Run("UpdateUser", testAuthsvc_UpdateUser)
@@ -545,6 +546,171 @@ func testAuthsvc_UpdateAccount(t *testing.T) {
 				t.Error("error:", diff)
 				return
 			}
+			if diff := deep.Equal(tt.want, got); diff != nil {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func testAuthsvc_ListAccounts(t *testing.T) {
+	var db, closeDB = dbConnect(t, testDSN)
+	var svc = service.Server{DB: db}
+	defer closeDB()
+
+	type args struct {
+		ctx context.Context
+		r   *auth.ListAccountsRequest
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *auth.ListAccountsResponse
+		wantErr error
+	}{
+		{
+			name: "listing accounts",
+
+			args: args{context.Background(),
+				&auth.ListAccountsRequest{},
+			},
+			want: &auth.ListAccountsResponse{
+				Accounts: []*auth.Account{
+					&auth.Account{
+						CreatedAt:   ts(t, createdAt),
+						UpdatedAt:   ts(t, createdAt),
+						Id:          1,
+						Name:        "firstAcct",
+						AccountName: "account-1",
+					},
+					&auth.Account{
+						CreatedAt:   ts(t, createdAt),
+						UpdatedAt:   ts(t, createdAt),
+						Id:          2,
+						Name:        "myAccont",
+						AccountName: "account-2",
+					},
+					&auth.Account{
+						CreatedAt:   ts(t, createdAt),
+						UpdatedAt:   ts(t, createdAt),
+						Id:          20,
+						Name:        "account20",
+						AccountName: "account-20",
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := svc.ListAccounts(tt.args.ctx, tt.args.r)
+
+			sort.Slice(got.Accounts, func(i, j int) bool {
+				return got.Accounts[i].Id < got.Accounts[j].Id
+			})
+
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
+				t.Fatal("error:", diff)
+				return
+			}
+
+			if diff := deep.Equal(tt.want, got); diff != nil {
+				t.Error(diff)
+			}
+		})
+	}
+}
+
+func testAuthsvc_ListUsers(t *testing.T) {
+	var db, closeDB = dbConnect(t, testDSN)
+	var svc = service.Server{DB: db}
+	defer closeDB()
+
+	type args struct {
+		ctx context.Context
+		r   *auth.ListUsersRequest
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *auth.ListUsersResponse
+		wantErr error
+	}{
+		{
+			name: "non existing account",
+
+			args: args{context.Background(),
+				&auth.ListUsersRequest{
+					AccountId: 999,
+				},
+			},
+
+			want: &auth.ListUsersResponse{
+				Users: nil,
+			},
+		},
+		{
+
+			name: "account with users",
+
+			args: args{context.Background(),
+				&auth.ListUsersRequest{
+					AccountId: 1,
+				},
+			},
+
+			want: &auth.ListUsersResponse{
+				Users: []*auth.User{
+					&auth.User{
+						Id:               1,
+						AccountId:        1,
+						Name:             "user1",
+						Email:            "user1@example.com",
+						PermissionScopes: []string{},
+						CreatedAt:        ts(t, createdAt),
+						UpdatedAt:        ts(t, createdAt),
+					},
+					&auth.User{
+						Id:               2,
+						AccountId:        1,
+						Name:             "user2",
+						Email:            "user2@example.com",
+						PermissionScopes: []string{},
+						CreatedAt:        ts(t, otherTime),
+						UpdatedAt:        ts(t, otherTime),
+					},
+					&auth.User{
+						Id:               3,
+						AccountId:        1,
+						Name:             "user3",
+						Email:            "user3@example.com",
+						PermissionScopes: []string{"admin"},
+						CreatedAt:        ts(t, otherTime),
+						UpdatedAt:        ts(t, otherTime),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			got, err := svc.ListUsers(tt.args.ctx, tt.args.r)
+
+			sort.Slice(got.Users, func(i, j int) bool {
+				return got.Users[i].Id < got.Users[j].Id
+			})
+
+			if diff := deep.Equal(tt.wantErr, err); diff != nil {
+				t.Fatal("error:", diff)
+				return
+			}
+
 			if diff := deep.Equal(tt.want, got); diff != nil {
 				t.Error(diff)
 			}

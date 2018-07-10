@@ -1,8 +1,10 @@
-import firebase from 'firebase'
+import firebase, { messaging } from 'firebase'
+import { SemanticCOLORS } from '../node_modules/semantic-ui-react'
 
 type State = {
-    readonly isError: ErrorState
+    readonly isToast: ToastState
     readonly accounts: StringMap<Account>
+    readonly users: StringMap<number | User>
     readonly authentication: AuthState
     readonly dashboard: DashboardState
 }
@@ -15,7 +17,7 @@ type AuthState = {
 }
 
 type DashboardState = {
-    error: ErrorState
+    error: ToastState
     activeView: string
     isFetching: boolean
 }
@@ -28,7 +30,21 @@ interface Account {
     updatedAt: string
 }
 
-type ErrorState = StringMap<boolean | string>
+interface User {
+    id: number
+    accountId: number
+    name: string
+    email: string
+    permissionScopes: [string]
+    createdAt: string
+    updatedAt: string
+}
+
+interface ToastState {
+    display: boolean
+    message: string
+    color: SemanticCOLORS
+}
 
 interface StringMap<T> {
     [x: string]: T

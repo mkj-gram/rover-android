@@ -1,8 +1,9 @@
 import { AnyAction, combineReducers } from 'redux'
-import { Account, State, StringMap } from '../../typings'
+import { Account, State, StringMap, ToastState } from '../../typings'
 import accounts, * as accountsSelector from './accounts'
 import authentication, * as authenticationSelector from './authentication'
 import dashboard, * as dashboardSelector from './dashboard'
+import { SemanticCOLORS } from '../../node_modules/semantic-ui-react'
 
 // Accounts
 export const getAccount = (state: State, id: string): Account =>
@@ -31,24 +32,34 @@ export const getActiveView = (state: State): string =>
 export const getIsFetching = (state: State): boolean =>
     dashboardSelector.getIsFetching(state.dashboard)
 
-// Error
-const isError = (
-    state: StringMap<boolean | string> = {
-        error: false,
-        message: ''
+// Toast
+const isToast = (
+    state: ToastState = {
+        display: false,
+        message: '',
+        color: 'red'
     },
     action: AnyAction
 ) => {
     if (action.type === 'DISMISS_FAILURE') {
         return {
-            error: false,
-            message: ''
+            display: false,
+            message: '',
+            color: ''
         }
     }
     if (action.type.includes('FAILURE')) {
         return {
-            error: true,
-            message: action.message
+            display: true,
+            message: action.message,
+            color: 'orange'
+        }
+    }
+    if (action.type.includes('SUCCESS_TOAST')) {
+        return {
+            display: true,
+            message: action.message,
+            color: 'green'
         }
     }
     return state
@@ -58,5 +69,5 @@ export default combineReducers({
     accounts,
     authentication,
     dashboard,
-    isError
+    isToast
 })

@@ -88,6 +88,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
     optional :user_id, :int32, 2
     optional :password, :string, 3
   end
+  add_message "rover.auth.v1.ListUsersRequest" do
+    optional :account_id, :int32, 1
+  end
+  add_message "rover.auth.v1.ListUsersResponse" do
+    repeated :users, :message, 1, "rover.auth.v1.User"
+  end
   add_message "rover.auth.v1.CreateUserSessionRequest" do
     optional :email, :string, 1
     optional :password, :string, 2
@@ -126,6 +132,8 @@ module Rover
       CreateUserRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.auth.v1.CreateUserRequest").msgclass
       UpdateUserRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.auth.v1.UpdateUserRequest").msgclass
       UpdateUserPasswordRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.auth.v1.UpdateUserPasswordRequest").msgclass
+      ListUsersRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.auth.v1.ListUsersRequest").msgclass
+      ListUsersResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.auth.v1.ListUsersResponse").msgclass
       CreateUserSessionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.auth.v1.CreateUserSessionRequest").msgclass
       AuthenticateRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.auth.v1.AuthenticateRequest").msgclass
       AuthContext = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.auth.v1.AuthContext").msgclass

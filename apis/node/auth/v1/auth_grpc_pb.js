@@ -170,6 +170,28 @@ function deserialize_rover_auth_v1_ListTokensResponse(buffer_arg) {
   return auth_v1_auth_pb.ListTokensResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_auth_v1_ListUsersRequest(arg) {
+  if (!(arg instanceof auth_v1_auth_pb.ListUsersRequest)) {
+    throw new Error('Expected argument of type rover.auth.v1.ListUsersRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_auth_v1_ListUsersRequest(buffer_arg) {
+  return auth_v1_auth_pb.ListUsersRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_auth_v1_ListUsersResponse(arg) {
+  if (!(arg instanceof auth_v1_auth_pb.ListUsersResponse)) {
+    throw new Error('Expected argument of type rover.auth.v1.ListUsersResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_auth_v1_ListUsersResponse(buffer_arg) {
+  return auth_v1_auth_pb.ListUsersResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_auth_v1_UpdateAccountRequest(arg) {
   if (!(arg instanceof auth_v1_auth_pb.UpdateAccountRequest)) {
     throw new Error('Expected argument of type rover.auth.v1.UpdateAccountRequest');
@@ -422,6 +444,17 @@ var AuthService = exports.AuthService = {
     requestDeserialize: deserialize_rover_auth_v1_GetUserInfoRequest,
     responseSerialize: serialize_rover_auth_v1_GetUserInfoResponse,
     responseDeserialize: deserialize_rover_auth_v1_GetUserInfoResponse,
+  },
+  listUsers: {
+    path: '/rover.auth.v1.Auth/ListUsers',
+    requestStream: false,
+    responseStream: false,
+    requestType: auth_v1_auth_pb.ListUsersRequest,
+    responseType: auth_v1_auth_pb.ListUsersResponse,
+    requestSerialize: serialize_rover_auth_v1_ListUsersRequest,
+    requestDeserialize: deserialize_rover_auth_v1_ListUsersRequest,
+    responseSerialize: serialize_rover_auth_v1_ListUsersResponse,
+    responseDeserialize: deserialize_rover_auth_v1_ListUsersResponse,
   },
   //
   // A user session is simple sign on using email & password based authentication to generate a new session token

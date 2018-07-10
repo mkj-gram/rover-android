@@ -1,7 +1,9 @@
 import accounts from './accounts'
+import users from './users'
 
 const queries = {
-    accounts
+    accounts,
+    users
 }
 
 export default queries

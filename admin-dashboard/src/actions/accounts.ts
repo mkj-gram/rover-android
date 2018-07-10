@@ -5,7 +5,7 @@ import { Action, ActionCreator, AnyAction, Dispatch } from 'redux'
 import { ThunkAction } from 'redux-thunk'
 import { Account, State } from '../../typings'
 import Environment from '../Environment'
-import handleError from '../Environment/handleError'
+import handleToast from '../Environment/handleToast'
 import { getUser } from '../reducers'
 
 export const fetchAccounts: ActionCreator<
@@ -31,12 +31,11 @@ export const fetchAccounts: ActionCreator<
     }
 
     const user = getUser(getState())
-
     return user.getIdToken().then(token => {
         Environment(token, request)
             .then(({ data, errors }) => {
                 if (errors) {
-                    return handleError(
+                    return handleToast(
                         'FETCH_ACCOUNTS_FAILURE',
                         dispatch,
                         errors[0].message
@@ -57,7 +56,7 @@ export const fetchAccounts: ActionCreator<
                 }
             })
             .catch(error => {
-                handleError(
+                handleToast(
                     'NETWORK_FAILURE',
                     dispatch,
                     'Network error, please try again'
@@ -97,7 +96,7 @@ export const createAccount: ActionCreator<
         .then(token => {
             Environment(token, request).then(({ data, errors }) => {
                 if (errors) {
-                    handleError(
+                    handleToast(
                         'CREATE_ACCOUNT_FAILURE',
                         dispatch,
                         errors[0].message
@@ -114,11 +113,15 @@ export const createAccount: ActionCreator<
                         accounts
                     })
                 }
-                dispatch({ type: 'VIEW_ACCOUNTS' })
+                handleToast(
+                    'CREATE_ACCOUNT_SUCCESS_TOAST',
+                    dispatch,
+                    `Created account: ${data.createAccount.name}`
+                )
             })
         })
         .catch(error => {
-            handleError(
+            handleToast(
                 'NETWORK_FAILURE',
                 dispatch,
                 'Network error, please try again'
