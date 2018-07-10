@@ -163,11 +163,35 @@ class SegmentSelector extends React.Component<
     renderSegmentChecklist() {
         const { device, editableCampaign, unselectedSegments } = this.props
         const { segmentIds } = editableCampaign
+
+        if (unselectedSegments.length === 0) {
+            return (
+                <div
+                    style={{
+                        height: 'auto',
+                        width: 385,
+                        padding: device === 'Mobile' ? '0px 24px' : '16px',
+                        display: 'flex',
+                        alignItems:
+                            device === 'Mobile' ? 'flex-start' : 'center',
+                        textAlign: 'center'
+                    }}
+                >
+                    <Text
+                        size="large"
+                        text={
+                            segmentIds.length > 0
+                                ? 'All segments added'
+                                : 'No segments found. Manage segments in the Audience App.'
+                        }
+                    />
+                </div>
+            )
+        }
         return (
             <div
                 style={{
                     flex: '1 1 auto',
-                    overflowY: device === 'Mobile' ? 'unset' : 'scroll',
                     paddingBottom: device === 'Mobile' ? 56 : 0
                 }}
             >
@@ -205,7 +229,7 @@ class SegmentSelector extends React.Component<
     }
     renderAddButton() {
         const { Fragment } = React
-        const { editableUIState } = this.props
+        const { device, editableUIState, updateActivePopover } = this.props
         const { audience } = editableUIState
         const { conditionSelected } = audience
         if (conditionSelected === 'ALL-DEVICES') {
@@ -250,6 +274,11 @@ class SegmentSelector extends React.Component<
                             active: turquoise,
                             inactive: aquamarine
                         }}
+                        onClick={
+                            device !== 'Desktop'
+                                ? () => updateActivePopover('segment-select')
+                                : undefined
+                        }
                         type="regular"
                     />
                 </div>
@@ -375,7 +404,7 @@ class SegmentSelector extends React.Component<
                     showPopover={activePopover === 'segment-select'}
                 >
                     {this.renderAddButton()}
-                    <div style={{ height: 232, overflowY: 'scroll' }}>
+                    <div style={{ height: 233, overflowY: 'scroll' }}>
                         {this.renderSegmentChecklist()}
                     </div>
                 </PopoverContainer>
@@ -411,7 +440,7 @@ class SegmentSelector extends React.Component<
                                 <Text
                                     text="Add segments"
                                     size="h2"
-                                    textStyle={{ margin: 24 }}
+                                    textStyle={{ margin: 24, marginBottom: 8 }}
                                 />
                                 {this.renderSegmentChecklist()}
                             </div>
