@@ -253,12 +253,7 @@ type AppState = {
     notificationDelivery: NotificationDeliveryState
     overview: OverviewModalState
     phonePreview: PhonePreviewState
-    settings: SettingsState
     wizardModal: WizardModal
-}
-
-type SettingsState = {
-    readonly isPhonePreviewOpen: boolean
 }
 
 type AudienceState = StringMap<number>

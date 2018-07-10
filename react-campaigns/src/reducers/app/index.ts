@@ -11,8 +11,9 @@ import notification, * as notificationSelector from './notification'
 import notificationDelivery, * as notificationDeliverySelector from './notificationDelivery'
 import overview, * as overviewSelector from './overview'
 import phonePreview, * as phonePreviewSelector from './phonePreview'
-import settings, * as settingsSelector from './settings'
 import wizardModal, * as wizardModalSelector from './wizardModal'
+
+import { getEditableCampaign } from '../index'
 
 export default combineReducers({
     activePopover,
@@ -24,7 +25,6 @@ export default combineReducers({
     notificationDelivery,
     phonePreview,
     overview,
-    settings,
     wizardModal
 })
 // Audience
@@ -97,11 +97,23 @@ export const getActivePopover = (state: AppState) =>
 export const getCurrentFormPage = (state: AppState) =>
     formSelector.getCurrentPage(state.form)
 
-export const getShouldShowPhonePreview = (state: AppState) => {
+export const getShouldShowPhonePreview = (state: State) => {
     if (window.location.pathname.includes('settings')) {
-        return settingsSelector.getShouldShowPhonePreview(state.settings)
+        const { notificationTapBehaviorType } = getEditableCampaign(state)
+
+        const currentWizard = getCurrentWizard(state.app)
+        switch (currentWizard) {
+            case 'messageAndMedia':
+            case 'alertOptions':
+                return true
+            case 'tapBehavior':
+            case '':
+                return notificationTapBehaviorType === 'OPEN_EXPERIENCE'
+            default:
+                return false
+        }
     }
-    return formSelector.getShouldShowPhonePreview(state.form)
+    return formSelector.getShouldShowPhonePreview(state.app.form)
 }
 
 export const getIsAudienceSizeUpdating = (state: AppState) =>

@@ -22,8 +22,7 @@ import {
     createEditableCampaign,
     openWizardModal,
     updateScheduledDeliverySettings,
-    updateNotificationSettings,
-    openSettingsPagePhonePreview
+    updateNotificationSettings
 } from '../../actions'
 
 import {
@@ -45,6 +44,7 @@ import AlertOptionsContainer from '../wizards/notification/AlertOptionsContainer
 import AudienceLabel from './AudienceLabel'
 import Audience from '../wizards/ScheduledDelivery/Audience'
 import AdvancedSettingsContainer from '../wizards/notification/AdvancedSettingsContainer'
+import SettingsExperiencePreview from './SettingsExperiencePreview'
 
 export interface SettingsContainerStateProps {
     editableCampaign: ScheduledCampaign | AutomatedNotificationCampaign
@@ -57,7 +57,6 @@ export interface SettingsContainerDispatchProps {
     openWizardModal: (stateType: UIStateType | formPage) => void
     updateScheduledDeliverySettings: () => void
     updateNotificationSettings: () => void
-    openSettingsPagePhonePreview: () => void
 }
 
 export type SettingsContainerProps = RouteComponentProps<Location> &
@@ -81,11 +80,7 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
     }
 
     openSelectedWizard(wizard: formPage) {
-        const {
-            editableCampaign,
-            openWizardModal,
-            openSettingsPagePhonePreview
-        } = this.props
+        const { editableCampaign, openWizardModal } = this.props
         if (
             !(
                 isScheduledCampaign(editableCampaign) &&
@@ -93,16 +88,6 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
             )
         ) {
             openWizardModal(wizard)
-
-            switch (wizard) {
-                case 'messageAndMedia':
-                case 'alertOptions':
-                case 'tapBehavior':
-                    openSettingsPagePhonePreview()
-                    break
-                default:
-                    return
-            }
         }
     }
 
@@ -349,6 +334,11 @@ class SettingsContainer extends React.Component<SettingsContainerProps, {}> {
                             </ScheduledSettingsForm>,
                             document.getElementById('mainModalLeft')
                         )}
+
+                    {device === 'Desktop' &&
+                        document.getElementById('phone-bezel') && (
+                            <SettingsExperiencePreview />
+                        )}
                 </div>
             </DeviceTransitionContainer>
         )
@@ -372,11 +362,7 @@ const mapDispatchToProps = (
         openWizardModal: stateType => dispatch(openWizardModal(stateType)),
         updateScheduledDeliverySettings: () =>
             dispatch(updateScheduledDeliverySettings()),
-        updateNotificationSettings: () =>
-            dispatch(updateNotificationSettings()),
-        openSettingsPagePhonePreview: () => {
-            dispatch(openSettingsPagePhonePreview())
-        }
+        updateNotificationSettings: () => dispatch(updateNotificationSettings())
     }
 }
 

@@ -78,8 +78,9 @@ export const getIsPhonePreviewClosing = (state: State) =>
 export const getCurrentFormPage = (state: State) =>
     appSelector.getCurrentFormPage(state.app)
 
-export const getShouldShowPhonePreview = (state: State) =>
-    appSelector.getShouldShowPhonePreview(state.app)
+export const getShouldShowPhonePreview = (state: State) => {
+    return appSelector.getShouldShowPhonePreview(state)
+}
 
 export const getIsAudienceSizeUpdating = (state: State) =>
     appSelector.getIsAudienceSizeUpdating(state.app)
