@@ -58,6 +58,9 @@ func (server *Server) GetNotificationOpenedReport(ctx context.Context, req *anal
 }
 
 func (server *Server) GetNotificationOpenedByDateReport(ctx context.Context, req *analytics.GetNotificationOpenedByDateReportRequest) (*analytics.GetNotificationOpenedByDateReportResponse, error) {
+
+	// NOTE: reports are fulfilled using [from,to)
+
 	var (
 		accountID  = int(req.GetAuthContext().GetAccountId())
 		campaignID = int(req.CampaignId)
@@ -129,7 +132,7 @@ func (server *Server) GetNotificationOpenedByDateReport(ctx context.Context, req
 			return nil, status.Error(codes.Unimplemented, "cannot support first without a starting cursor")
 		case *analytics.Cursor_Last:
 			var err error
-			cursor.Date = time.Now().In(cursor.TimeZone).Format("2006-01-02")
+			cursor.Date = time.Now().In(cursor.TimeZone).AddDate(0, 0, 1).Format("2006-01-02")
 			to, err = cursor.GetTimestamp()
 			if err != nil {
 				return nil, status.Errorf(codes.InvalidArgument, "could not get cursor start position: %v", err)
