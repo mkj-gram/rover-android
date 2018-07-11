@@ -231,7 +231,7 @@ const CampaignTypeSelector: React.SFC<
                             alignItems: 'center',
                             width: '100%',
                             height: '100%',
-                            zIndex: 2,
+                            zIndex: 3,
                             position: 'absolute',
                             background: white,
                             top: 0,

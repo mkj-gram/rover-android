@@ -90,19 +90,19 @@ class ListPage extends React.PureComponent<ListPageProps, {}> {
         const {
             fetchCampaigns,
             location,
-            campaigns,
-            fetchCampaign
+            fetchCampaign,
+            getCampaignExists
         } = this.props
         const nextSearch = nextProps.location.search
+        const { campaignId } = this.getQueryParams()
+        const searchChange = location.search !== nextSearch
 
-        if (location.search !== nextSearch) {
-            fetchCampaigns()
+        if (searchChange && campaignId && !getCampaignExists(campaignId)) {
+            fetchCampaign(parseInt(campaignId, 10))
         }
 
-        const { campaignId } = this.getQueryParams()
-
-        if (campaignId && getCampaign(campaigns, campaignId) === null) {
-            fetchCampaign(parseInt(campaignId, 10))
+        if (searchChange && !campaignId) {
+            fetchCampaigns()
         }
     }
 
