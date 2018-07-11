@@ -2,7 +2,6 @@ package usecase_test
 
 import (
 	"testing"
-
 	"time"
 
 	"github.com/golang/mock/gomock"

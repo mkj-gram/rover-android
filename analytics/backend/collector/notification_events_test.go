@@ -5,21 +5,11 @@ import (
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/golang/mock/gomock"
-	"github.com/golang/protobuf/proto"
 	"github.com/roverplatform/rover/analytics/backend/collector"
 	"github.com/roverplatform/rover/analytics/backend/usecase"
 	"github.com/roverplatform/rover/analytics/backend/usecase/mocks"
-	notification "github.com/roverplatform/rover/apis/go/notification/v1/events"
 	rtesting "github.com/roverplatform/rover/go/testing"
 )
-
-func serialize(t *testing.T, event *notification.Event) []byte {
-	out, err := proto.Marshal(event)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return out
-}
 
 func TestNotificationEventsHandler_Handle(t *testing.T) {
 	//var (

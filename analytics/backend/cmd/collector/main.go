@@ -74,13 +74,22 @@ func main() {
 		SentStore:   &influx.NotificationSentStore{Client: client},
 	}
 
+	var experienceUseCase = usecase.ExperienceInteractor{
+		ViewedStore:       &influx.ExperienceViewedStore{Client: client},
+		ScreenViewedStore: &influx.ExperienceScreenViewedStore{Client: client},
+		BlockTappedStore:  &influx.ExperienceBlockTappedStore{Client: client},
+	}
+
 	//
 	// Collector & Handlers
 	//
 	// TODO move this into the package. Main shouldn't know about topics and routing
 	var handlers = map[string]collector.Handler{
 		"notification.events": &collector.NotificationEventsHandler{Interactor: notificationUseCase},
-		"events.output":       &collector.PipelineEventsHandler{NotificationInteractor: notificationUseCase},
+		"events.output": &collector.PipelineEventsHandler{
+			NotificationInteractor: notificationUseCase,
+			ExperienceInteractor:   experienceUseCase,
+		},
 	}
 
 	server, err := collector.NewServer(*kafkadsn, handlers)

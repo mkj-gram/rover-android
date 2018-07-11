@@ -101,3 +101,40 @@ func ListVal(v ...interface{}) *Value {
 		},
 	}
 }
+
+// Getters
+func (m *Struct) GetString(attr string) (string, bool) {
+	if m == nil {
+		return "", false
+	}
+
+	v, ok := m.GetFields()[attr]
+	if !ok {
+		return "", false
+	}
+
+	value, ok := v.GetKind().(*Value_StringValue)
+	if !ok {
+		return "", false
+	}
+
+	return value.StringValue, true
+}
+
+func (m *Struct) GetNumber(attr string) (float64, bool) {
+	if m == nil {
+		return 0, false
+	}
+
+	v, ok := m.GetFields()[attr]
+	if !ok {
+		return 0, false
+	}
+
+	value, ok := v.GetKind().(*Value_NumberValue)
+	if !ok {
+		return 0, false
+	}
+
+	return value.NumberValue, true
+}

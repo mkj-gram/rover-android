@@ -1,5 +1,7 @@
 package influx
 
+// TODO combine notification_opened_store & notification_sent_store
+
 import (
 	"encoding/json"
 	"fmt"

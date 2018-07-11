@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"errors"
 	"strconv"
 	"time"
 
@@ -10,11 +11,11 @@ import (
 	"github.com/roverplatform/rover/analytics/backend/domain"
 	"github.com/roverplatform/rover/analytics/backend/usecase"
 	pipeline "github.com/roverplatform/rover/apis/go/event/v1"
-	"github.com/roverplatform/rover/apis/go/protobuf/struct"
 )
 
 type PipelineEventsHandler struct {
 	NotificationInteractor usecase.NotificationsInteractor
+	ExperienceInteractor   usecase.ExperienceInteractor
 }
 
 func (handler *PipelineEventsHandler) Handle(msg *kafka.Message) error {
@@ -32,6 +33,12 @@ func (handler *PipelineEventsHandler) Handle(msg *kafka.Message) error {
 	switch event.Name {
 	case "Notification Opened":
 		return handler.handleNotificationOpened(&event)
+	case "Experience Viewed":
+		return handler.handleExperienceViewed(&event)
+	case "Screen Viewed":
+		return handler.handleExperienceScreenViewed(&event)
+	case "Block Tapped":
+		return handler.handleExperienceBlockTapped(&event)
 	default:
 		// unknown rover event skip
 		return nil
@@ -43,31 +50,16 @@ func (handler *PipelineEventsHandler) handleNotificationOpened(event *pipeline.E
 		Note only return an error if you are unable to handle the event
 		for example when the db is down. Any validation errors should skip over by returning no error
 	*/
-	value, ok := event.GetAttributes().GetFields()["campaignID"]
-	if !ok {
-		// TODO log warning here
-		return nil
+	var campaignID int
+	if campaignIDValue, ok := event.GetAttributes().GetString("campaignID"); ok {
+		if id, err := strconv.ParseInt(campaignIDValue, 10, 64); err == nil {
+			campaignID = int(id)
+		}
 	}
 
-	campaignIDValue, ok := value.GetKind().(*structpb.Value_StringValue)
-	if !ok {
-		return nil
-	}
-
-	campaignID, err := strconv.ParseInt(campaignIDValue.StringValue, 10, 64)
-	if err != nil {
-		// TODO warn here
-		return nil
-	}
-
-	value, ok = event.GetAttributes().GetFields()["source"]
+	source, ok := event.GetAttributes().GetString("source")
 	if !ok {
 		// There was no source associated with this open we can't assume anything here just move on
-		return nil
-	}
-
-	source, ok := value.GetKind().(*structpb.Value_StringValue)
-	if !ok {
 		return nil
 	}
 
@@ -78,7 +70,7 @@ func (handler *PipelineEventsHandler) handleNotificationOpened(event *pipeline.E
 		DeviceID:   event.GetDevice().GetDeviceIdentifier(),
 	}
 
-	switch source.StringValue {
+	switch source {
 	case "pushNotification":
 		record.Source = domain.NotificationOpenSource_PUSH
 		record.SubSource = domain.NotificationOpenSubSource_DIRECT
@@ -92,7 +84,7 @@ func (handler *PipelineEventsHandler) handleNotificationOpened(event *pipeline.E
 		return nil
 	}
 
-	err = handler.NotificationInteractor.RecordOpened(record)
+	err := handler.NotificationInteractor.RecordOpened(record)
 	if err != nil {
 		if _, ok := err.(*domain.ErrInvalid); ok {
 			return nil
@@ -101,4 +93,158 @@ func (handler *PipelineEventsHandler) handleNotificationOpened(event *pipeline.E
 	}
 
 	return nil
+}
+
+func (handler *PipelineEventsHandler) handleExperienceViewed(event *pipeline.Event) error {
+	if event.GetTimestamp() == nil {
+		// TODO warn
+		return nil
+	}
+
+	fields, err := getExperienceFields(event)
+	if err != nil {
+		return nil
+	}
+
+	var record = &domain.ExperienceViewedRecord{
+		Timestamp:    time.Unix(event.GetTimestamp().Seconds, int64(event.GetTimestamp().Nanos)).UTC(),
+		AccountID:    int(event.GetAuthContext().GetAccountId()),
+		CampaignID:   fields.campaignID,
+		ExperienceID: fields.experienceID,
+		Duration:     fields.duration,
+		DeviceID:     event.GetDevice().GetDeviceIdentifier(),
+	}
+
+	err = handler.ExperienceInteractor.RecordViewed(record)
+	if err != nil {
+		if _, ok := err.(*domain.ErrInvalid); ok {
+			return nil
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (handler *PipelineEventsHandler) handleExperienceScreenViewed(event *pipeline.Event) error {
+	if event.GetTimestamp() == nil {
+		// TODO warn
+		return nil
+	}
+
+	fields, err := getExperienceFields(event)
+	if err != nil {
+		return nil
+	}
+
+	screenID, ok := event.GetAttributes().GetString("screenID")
+	if !ok {
+		return nil
+	}
+
+	var record = &domain.ExperienceScreenViewedRecord{
+		Timestamp:    time.Unix(event.GetTimestamp().Seconds, int64(event.GetTimestamp().Nanos)).UTC(),
+		AccountID:    int(event.GetAuthContext().GetAccountId()),
+		CampaignID:   fields.campaignID,
+		ExperienceID: fields.experienceID,
+		ScreenID:     screenID,
+		Duration:     fields.duration,
+		DeviceID:     event.GetDevice().GetDeviceIdentifier(),
+	}
+
+	err = handler.ExperienceInteractor.RecordScreenViewed(record)
+	if err != nil {
+		if _, ok := err.(*domain.ErrInvalid); ok {
+			return nil
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (handler *PipelineEventsHandler) handleExperienceBlockTapped(event *pipeline.Event) error {
+	if event.GetTimestamp() == nil {
+		// TODO warn
+		return nil
+	}
+
+	fields, err := getExperienceFields(event)
+	if err != nil {
+		return nil
+	}
+
+	var (
+		screenID string
+		blockID  string
+	)
+
+	screenID, ok := event.GetAttributes().GetString("screenID")
+	if !ok {
+		return nil
+	}
+
+	// BlockID parsing
+	blockID, ok = event.GetAttributes().GetString("blockID")
+	if !ok {
+		return nil
+	}
+
+	var record = &domain.ExperienceBlockTappedRecord{
+		Timestamp:    time.Unix(event.GetTimestamp().Seconds, int64(event.GetTimestamp().Nanos)).UTC(),
+		AccountID:    int(event.GetAuthContext().GetAccountId()),
+		CampaignID:   fields.campaignID,
+		ExperienceID: fields.experienceID,
+		ScreenID:     screenID,
+		BlockID:      blockID,
+		Duration:     fields.duration,
+		DeviceID:     event.GetDevice().GetDeviceIdentifier(),
+	}
+
+	err = handler.ExperienceInteractor.RecordBlockTapped(record)
+	if err != nil {
+		if _, ok := err.(*domain.ErrInvalid); ok {
+			return nil
+		}
+		return err
+	}
+
+	return nil
+}
+
+// Helpers
+type experienceEventFields struct {
+	campaignID   *int
+	experienceID string
+	duration     float64
+}
+
+func getExperienceFields(event *pipeline.Event) (*experienceEventFields, error) {
+	var (
+		campaignID   *int
+		experienceID string
+		duration     float64
+	)
+
+	if campaignIDValue, ok := event.GetAttributes().GetString("campaignID"); ok {
+		if id, err := strconv.ParseInt(campaignIDValue, 10, 64); err == nil {
+			campaignID = intPtr(int(id))
+		}
+	}
+
+	experienceID, ok := event.GetAttributes().GetString("experienceID")
+	if !ok {
+		return nil, errors.New("missing experienceID from attributes")
+	}
+
+	duration, ok = event.GetAttributes().GetNumber("duration")
+	if !ok {
+		return nil, errors.New("missing duration value from attributes")
+	}
+
+	return &experienceEventFields{
+		campaignID:   campaignID,
+		experienceID: experienceID,
+		duration:     duration,
+	}, nil
 }
