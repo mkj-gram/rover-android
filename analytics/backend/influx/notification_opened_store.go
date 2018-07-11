@@ -153,6 +153,7 @@ func (store *NotificationOpenedStore) GetReport(accountID int, campaignID int) (
 
 }
 
+// GetReportByDate retrieves a break down of notification opens per day using the range (from,to]
 func (store *NotificationOpenedStore) GetReportByDate(accountID int, campaignID int, from time.Time, to time.Time) (*domain.NotificationOpenedByDateReport, error) {
 	var (
 		zone = from.Location()
@@ -179,16 +180,24 @@ func (store *NotificationOpenedStore) GetReportByDate(accountID int, campaignID 
 		return nil, err
 	}
 
-	if len(results) == 0 || len(results[0].Series) == 0 {
-		return nil, domain.ErrNotFound
-	}
-
 	var report = &domain.NotificationOpenedByDateReport{
 		Reports: make(map[domain.Date]struct {
 			NotificationCenter int
 			PushDirect         int
 			PushInfluenced     int
 		}),
+	}
+
+	var zero struct {
+		NotificationCenter int
+		PushDirect         int
+		PushInfluenced     int
+	}
+	// NOTE: since influx will not return 0 values for the range we queried
+	// we instead fill in each missing date report with the 0 values
+	for i := from; i.Before(to); i = i.AddDate(0, 0, 1) {
+		var date = domain.Date(i.Format("2006-01-02"))
+		report.Reports[date] = zero
 	}
 
 	var addToReport = func(date domain.Date, notificationCenter int, pushDirect int, pushInfluenced int) {
@@ -204,31 +213,34 @@ func (store *NotificationOpenedStore) GetReportByDate(accountID int, campaignID 
 		}
 	}
 
-	for _, row := range results[0].Series {
-		var source = domain.NotificationOpenSource(row.Tags["source"])
+	// Add results to the report
+	if len(results) != 0 || len(results[0].Series) != 0 {
+		for _, row := range results[0].Series {
+			var source = domain.NotificationOpenSource(row.Tags["source"])
 
-		for _, values := range row.Values {
-			timestamp, err := time.Parse(time.RFC3339, values[0].(string))
-			if err != nil {
-				return nil, err
-			}
+			for _, values := range row.Values {
+				timestamp, err := time.Parse(time.RFC3339, values[0].(string))
+				if err != nil {
+					return nil, err
+				}
 
-			total, err := values[1].(json.Number).Int64()
-			if err != nil {
-				return nil, err
-			}
+				total, err := values[1].(json.Number).Int64()
+				if err != nil {
+					return nil, err
+				}
 
-			date := domain.Date(timestamp.Format("2006-01-02"))
-			switch source {
-			case domain.NotificationOpenSource_NOTIFICATION_CENTER:
-				addToReport(date, int(total), 0, 0)
-			case domain.NotificationOpenSource_PUSH:
-				var subsource = domain.NotificationOpenSubSource(row.Tags["sub_source"])
-				switch subsource {
-				case domain.NotificationOpenSubSource_DIRECT:
-					addToReport(date, 0, int(total), 0)
-				case domain.NotificationOpenSubSource_INFLUENCED:
-					addToReport(date, 0, 0, int(total))
+				date := domain.Date(timestamp.Format("2006-01-02"))
+				switch source {
+				case domain.NotificationOpenSource_NOTIFICATION_CENTER:
+					addToReport(date, int(total), 0, 0)
+				case domain.NotificationOpenSource_PUSH:
+					var subsource = domain.NotificationOpenSubSource(row.Tags["sub_source"])
+					switch subsource {
+					case domain.NotificationOpenSubSource_DIRECT:
+						addToReport(date, 0, int(total), 0)
+					case domain.NotificationOpenSubSource_INFLUENCED:
+						addToReport(date, 0, 0, int(total))
+					}
 				}
 			}
 		}

@@ -192,14 +192,36 @@ func TestNotificationOpenedStore_GetReportByDate(t *testing.T) {
 		expErr error
 	}{
 		{
-			name: "returns not found when results are empty",
+			name: "returns 0 values for entire time range",
 			request: request{
-				accountID:  0,
+				accountID:  44,
 				campaignID: 1,
 				from:       timestamp(t, "2018-06-14T00:00:00Z", ""),
-				to:         timestamp(t, "2018-06-30T00:00:00Z", ""),
+				to:         timestamp(t, "2018-06-17T00:00:00Z", ""),
 			},
-			expErr: domain.ErrNotFound,
+			exp: &domain.NotificationOpenedByDateReport{
+				Reports: map[domain.Date]struct {
+					NotificationCenter int
+					PushDirect         int
+					PushInfluenced     int
+				}{
+					"2018-06-14": {
+						PushInfluenced:     0,
+						PushDirect:         0,
+						NotificationCenter: 0,
+					},
+					"2018-06-15": {
+						PushInfluenced:     0,
+						PushDirect:         0,
+						NotificationCenter: 0,
+					},
+					"2018-06-16": {
+						PushInfluenced:     0,
+						PushDirect:         0,
+						NotificationCenter: 0,
+					},
+				},
+			},
 		},
 		{
 			name: "counts totals",
