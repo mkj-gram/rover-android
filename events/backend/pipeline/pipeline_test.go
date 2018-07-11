@@ -41,7 +41,7 @@ func TestPipeline_handle_produces_and_commits_on_success(t *testing.T) {
 			Value:          serialize(t, &event.Event{Id: "id", Name: "name"}),
 		}
 		exp = &kafka.Message{
-			TopicPartition: kafka.TopicPartition{Topic: &topic},
+			TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 			Key:            []byte("key"),
 			Timestamp:      now(),
 			Value: serialize(t, &event.Event{
@@ -249,11 +249,10 @@ func TestPipeline_process(t *testing.T) {
 				})},
 
 			exp: &kafka.Message{
-				TopicPartition: kafka.TopicPartition{Topic: &topic},
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Key:            []byte("a"),
 				Timestamp:      now(),
 				Value: serialize(t, &event.Event{
-
 					Id:   "ABC",
 					Name: "MyEvent",
 				}),

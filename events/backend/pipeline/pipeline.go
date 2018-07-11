@@ -326,7 +326,15 @@ func (p *Pipeline) process(in *kafka.Message) (out *kafka.Message, err error) {
 		return nil, errors.Wrap(err, "proto.Marshal")
 	}
 
-	out = &kafka.Message{TopicPartition: kafka.TopicPartition{Topic: &p.sink.topic}, Key: key, Value: value, Timestamp: p.timeNow()}
+	out = &kafka.Message{
+		Key:       key,
+		Value:     value,
+		Timestamp: p.timeNow(),
+		TopicPartition: kafka.TopicPartition{
+			Topic:     &p.sink.topic,
+			Partition: kafka.PartitionAny,
+		},
+	}
 
 	return out, nil
 
