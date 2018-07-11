@@ -10,6 +10,7 @@ import { InjectedProps } from '../utils/ResponsiveContainer'
 import OverviewModalHeader from '../wizards/overview/OverviewModalHeader'
 import NotificationStatistics from './NotificationStatistics'
 import NotificationStatisticsGraph from './NotificationStatisticsGraph'
+import ReportPreview from './ReportPreview'
 
 const NotificationOpenedReport: React.SFC<
     InjectedProps & RouteComponentProps<Location>
@@ -36,6 +37,10 @@ const NotificationOpenedReport: React.SFC<
                     campaignId={campaignId}
                     device={device}
                 />
+                {device === 'Desktop' &&
+                    document.getElementById('phone-bezel') && (
+                        <ReportPreview campaignId={campaignId} />
+                    )}
             </div>
         </DeviceTransitionContainer>
     )

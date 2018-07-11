@@ -1,6 +1,7 @@
 /// <reference path="../../../typings/index.d.ts"/>
 
 import { combineReducers } from 'redux'
+import { parse } from 'qs'
 
 import activePopover, * as activePopoverSelector from './activePopover'
 import audience, * as audienceSelector from './audience'
@@ -13,7 +14,7 @@ import overview, * as overviewSelector from './overview'
 import phonePreview, * as phonePreviewSelector from './phonePreview'
 import wizardModal, * as wizardModalSelector from './wizardModal'
 
-import { getEditableCampaign } from '../index'
+import { getEditableCampaign, getCampaign } from '../index'
 
 export default combineReducers({
     activePopover,
@@ -100,7 +101,6 @@ export const getCurrentFormPage = (state: AppState) =>
 export const getShouldShowPhonePreview = (state: State) => {
     if (window.location.pathname.includes('settings')) {
         const { notificationTapBehaviorType } = getEditableCampaign(state)
-
         const currentWizard = getCurrentWizard(state.app)
         switch (currentWizard) {
             case 'messageAndMedia':
@@ -112,6 +112,14 @@ export const getShouldShowPhonePreview = (state: State) => {
             default:
                 return false
         }
+    }
+
+    if (window.location.pathname.includes('report')) {
+        const { notificationTapBehaviorType } = getCampaign(
+            state,
+            parse(window.location.search.substring(1)).campaignId
+        ) as ScheduledCampaign | AutomatedNotificationCampaign
+        return notificationTapBehaviorType === 'OPEN_EXPERIENCE'
     }
     return formSelector.getShouldShowPhonePreview(state.app.form)
 }

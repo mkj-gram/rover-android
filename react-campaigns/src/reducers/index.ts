@@ -138,6 +138,10 @@ export const getCampaignFormatDate = (state: Campaign, dateField: string) =>
 
 export const getDuplicateCampaignName = (campaign: Campaign) =>
     campaignsSelector.getDuplicateCampaignName(campaign)
+
+export const getExperiencePreviewURL = (state: State, id: string) =>
+    campaignsSelector.getExperiencePreviewURL(state, id)
+
 // Editable UIState
 export const getEditableUIState = (state: State) =>
     editableUIStateSelector.getEditableUIState(state)

@@ -7,6 +7,7 @@ import {
 } from '../views/utils/getCampaignType'
 
 import { formatDisplayTime, formatDate } from '../views/utils/formatDateTime'
+import { getExperience } from './experiences'
 
 export default (
     state: StringMap<Campaign> = {},
@@ -93,3 +94,16 @@ export const getCampaignExists = (
     state: StringMap<Campaign>,
     id: string
 ): boolean => getCampaign(state, id) !== null
+
+export const getExperiencePreviewURL = (state: State, id: string): string => {
+    const { experienceId } = getCampaign(state.campaigns, id) as
+        | ScheduledCampaign
+        | AutomatedNotificationCampaign
+    if (experienceId) {
+        const experience = getExperience(state.experiences, experienceId)[0]
+        if (experience) {
+            return experience.simulatorURL
+        }
+    }
+    return ''
+}
