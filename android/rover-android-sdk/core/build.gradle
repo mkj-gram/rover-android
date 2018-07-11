@@ -1,10 +1,12 @@
+import org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'org.jetbrains.dokka-android'
 apply plugin: 'maven-publish'
-
+apply plugin: 'com.jfrog.bintray'
 apply plugin: "de.mannodermaus.android-junit5"
 
 android {
@@ -13,7 +15,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 2
+        versionCode rover_sdk_version_code
         versionName rover_sdk_version
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -113,8 +115,6 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
     args "--android", "-F", "src/**/*.kt"
 }
 
-// TODO: I hope I can make more than one dokka entry so I can run my docs for the jekyll website as
-// well as for the docsJar.
 dokka {
     outputFormat = 'html'
     outputDirectory = "$buildDir/javadoc"
@@ -137,4 +137,113 @@ task webDocsDokka (type: org.jetbrains.dokka.gradle.DokkaTask, overwrite: true) 
     }
 }
 
-apply from: 'deploy.gradle'
+ext {
+    groupId = 'io.rover' // package name of the project
+    artifactId = "core" // module name of the library
+    libVersion = rover_sdk_version
+}
+
+//just copy paste the lines below
+if (project.hasProperty("kotlin")) { //Kotlin libraries
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from android.sourceSets.main.java.srcDirs
+    }
+
+    task javadoc(type: Javadoc, dependsOn: dokka) {
+
+    }
+} else if (project.hasProperty("android")) {
+    task sourcesJar(type: Jar) {
+        classifier = 'sources'
+        from android.sourceSets.main.java.srcDirs
+    }
+
+    task javadoc(type: Javadoc) {
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    }
+} else { // Java libraries
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+    // options.encoding = 'UTF-8'
+}
+
+publishing {
+    publications {
+        production(MavenPublication) {
+            artifact("$buildDir/outputs/aar/$artifactId-release.aar")
+            groupId "io.rover"
+
+            version rover_sdk_version
+
+            //The publication doesn't know about our dependencies, so we have to manually add them to the pom
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                //Iterate over the compile dependencies (we don't want the test ones), adding a <dependency> node for each
+
+                def apiAndImplementationDeps = configurations.implementation.allDependencies + configurations.compile.allDependencies
+
+                // get all the api *and* implementation dependencies
+                apiAndImplementationDeps.each {
+                    if(it instanceof DefaultExternalModuleDependency) {
+                        println("ITERATING OVER DEPENDENCY: $it")
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                        dependencyNode.appendNode('scope', "compile")
+                    }
+                }
+
+                // notice that project scope dependencies are not handled. Instead, we must add them
+                // as external dependencies manually.
+
+            }
+
+            artifact sourcesJar {
+                classifier "sources"
+            }
+
+            artifact javadocJar {
+                classifier 'javadoc'
+            }
+        }
+    }
+}
+
+//take a look at https://github.com/bintray/gradle-bintray-plugin#buildgradle
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_API_KEY')
+
+    configurations = ['archives']
+    publish = false //[Default: false] Whether version should be auto published after an upload
+    override = false //[Default: false] Whether to override version artifacts already published
+    // Package configuration. The plugin will use the repo and name properties to check if the
+    // package already exists. In that case, there's no need to configure the other package
+    // properties (like userOrg, desc, etc).
+
+    pkg {
+        repo = 'android'
+        name = "$groupId.$artifactId"
+        licenses = ['Apache-2.0']
+        userOrg = 'rover'
+        vcsUrl = 'https://github.com/roverplatform/rover-android'
+        version {
+            name = libVersion
+        }
+    }
+
+    publications = ["production"]
+}
+
+// apply from: 'deploy.gradle'

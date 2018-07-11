@@ -25,11 +25,11 @@ you to include only the functionality relevant to your application. The SDK is
 The first step is to add the library dependencies.  We’ll start with a default
 installation, featuring all of the Rover libraries.
 
-Ensure that you have `jcenter` added to the `buildscript` → `repositories` block
-of your top-level `build.gradle`:
+Ensure that you have `jcenter` added to the `dependencies` → `repositories` block
+of your app-level `build.gradle`:
 
 ```groovy
-buildscript {
+dependencies {
     // ...
     repositories {
         // ...
@@ -43,11 +43,14 @@ top level `build.gradle`, but rather your app-level one) in the `dependencies`
 block.
 
 ```groovy
-implementation project("io.rover:core:2.0.0")
-implementation project("io.rover:notifications:2.0.0")
-implementation project("io.rover:experiences:2.0.0")
-implementation project("io.rover:location:2.0.0")
-implementation project("io.rover:debug:2.0.0")
+dependencies {
+    // ...
+    implementation "io.rover:core:2.0.0"
+    implementation "io.rover:notifications:2.0.0"
+    implementation "io.rover:experiences:2.0.0"
+    implementation "io.rover:location:2.0.0"
+    implementation "io.rover:debug:2.0.0"
+}
 ```
 
 It’s an a-la-carte selection; you can leave off modules (other than the first,

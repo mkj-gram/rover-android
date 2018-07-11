@@ -177,7 +177,7 @@ class AndroidHttpsUrlConnectionNetworkClient(
         @JvmStatic
         internal fun missingCacheException(): RuntimeException {
             return RuntimeException("An HTTPUrlConnection cache is not enabled.\n" +
-                "Please see the Rover documentation for the Data Plugin and the Google documentation: https://developer.android.com/reference/android/net/http/HttpResponseCache.html\n" +
+                "Please see the Rover documentation for Installation and Initialization of the Rover SDK: https://www.rover.io/docs/android/\n" +
                 "Consider calling Rover.installSaneGlobalHttpCache() in your Application.onCreate()")
         }
     }
