@@ -90,7 +90,8 @@ func TestWithEventTracking(t *testing.T) {
 				{
 					Timestamp: now(),
 					TopicPartition: kafka.TopicPartition{
-						Topic: &topic,
+						Topic:     &topic,
+						Partition: kafka.PartitionAny,
 					},
 					Value: serialize(t, &events.Event{
 						Type: &events.Event_NotificationAddedToNotificationCenter{
@@ -134,7 +135,8 @@ func TestWithEventTracking(t *testing.T) {
 				{
 					Timestamp: now(),
 					TopicPartition: kafka.TopicPartition{
-						Topic: &topic,
+						Topic:     &topic,
+						Partition: kafka.PartitionAny,
 					},
 					Value: serialize(t, &events.Event{
 						Type: &events.Event_PushNotificationSent{
@@ -170,7 +172,8 @@ func TestWithEventTracking(t *testing.T) {
 				{
 					Timestamp: now(),
 					TopicPartition: kafka.TopicPartition{
-						Topic: &topic,
+						Topic:     &topic,
+						Partition: kafka.PartitionAny,
 					},
 					Value: serialize(t, &events.Event{
 						Type: &events.Event_PushNotificationSent{
@@ -213,7 +216,8 @@ func TestWithEventTracking(t *testing.T) {
 				{
 					Timestamp: now(),
 					TopicPartition: kafka.TopicPartition{
-						Topic: &topic,
+						Topic:     &topic,
+						Partition: kafka.PartitionAny,
 					},
 					Value: serialize(t, &events.Event{
 						Type: &events.Event_PushNotificationSent{
@@ -230,7 +234,8 @@ func TestWithEventTracking(t *testing.T) {
 				{
 					Timestamp: now(),
 					TopicPartition: kafka.TopicPartition{
-						Topic: &topic,
+						Topic:     &topic,
+						Partition: kafka.PartitionAny,
 					},
 					Value: serialize(t, &events.Event{
 						Type: &events.Event_PushTokenUnregistered{
@@ -277,7 +282,8 @@ func TestWithEventTracking(t *testing.T) {
 				{
 					Timestamp: now(),
 					TopicPartition: kafka.TopicPartition{
-						Topic: &topic,
+						Topic:     &topic,
+						Partition: kafka.PartitionAny,
 					},
 					Value: serialize(t, &events.Event{
 						Type: &events.Event_PushNotificationSent{
@@ -294,7 +300,8 @@ func TestWithEventTracking(t *testing.T) {
 				{
 					Timestamp: now(),
 					TopicPartition: kafka.TopicPartition{
-						Topic: &topic,
+						Topic:     &topic,
+						Partition: kafka.PartitionAny,
 					},
 					Value: serialize(t, &events.Event{
 						Type: &events.Event_PushTokenUnregistered{

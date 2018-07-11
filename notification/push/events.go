@@ -151,11 +151,14 @@ func WithEventTracking(producer Producer, log logger.Logger, handler HandlerFunc
 			callback := make(chan kafka.Event, 1)
 			callbacks = append(callbacks, callback)
 
+			// NOTE we want to randomly produce to different partitions
+			// requires Key=NULL and Partition=kafka.PartitionAny
 			msg := &kafka.Message{
 				Timestamp: TimeFunc(),
 				Value:     data,
 				TopicPartition: kafka.TopicPartition{
-					Topic: &EventTopic,
+					Topic:     &EventTopic,
+					Partition: kafka.PartitionAny,
 				},
 			}
 			if err := producer.Produce(msg, callback); err != nil {
