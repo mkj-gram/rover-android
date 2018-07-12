@@ -1,6 +1,7 @@
 package io.rover.notifications
 
 import io.rover.core.data.NetworkResult
+import io.rover.core.data.domain.AttributeValue
 import io.rover.core.logging.log
 import io.rover.core.streams.*
 import io.rover.core.platform.DateFormattingInterface
@@ -226,7 +227,9 @@ class NotificationsRepository(
                 eventQueue.trackEvent(
                     Event(
                         "Notification Marked Deleted",
-                        hashMapOf()
+                        hashMapOf(
+                            Pair("NotificationID", AttributeValue.String(notification.id))
+                        )
                     ),
                     EventQueueService.ROVER_NAMESPACE
                 )
@@ -261,7 +264,9 @@ class NotificationsRepository(
                 eventQueue.trackEvent(
                     Event(
                         "Notification Marked Read",
-                        hashMapOf()
+                        hashMapOf(
+                            Pair("notificationID", AttributeValue.String(notification.id))
+                        )
                     ),
                     EventQueueService.ROVER_NAMESPACE
                 )

@@ -89,11 +89,5 @@ class InboxApplication : Application() {
             LocationAssembler(),
             DebugAssembler()
         )
-
-        Rover.sharedInstance.eventQueue.trackEvent(
-            Event(
-                "Inbox App Opened", hashMapOf()
-            )
-        )
     }
 }

@@ -64,9 +64,9 @@ class DebugPreferences(
             eventQueueService.trackEvent(
                 Event(
                     if (currentTestDeviceState())
-                        "Enabled Testing"
+                        "Testing Enabled"
                     else
-                        "Disabled Testing",
+                        "Testing Disabled",
                     hashMapOf()
                 )
             )

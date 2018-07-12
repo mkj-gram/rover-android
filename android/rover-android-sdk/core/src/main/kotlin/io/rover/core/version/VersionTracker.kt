@@ -57,16 +57,18 @@ class VersionTracker(
         val verb = if(upgrade) "updated" else "downgraded"
         log.v("App has been $verb from $previousVersionName ($previousVersionCode) to $versionName ($versionCode).")
 
-        eventQueueService.trackEvent(
-            Event(
-                "App ${verb.capitalize()}",
-                // the current app version is included as part of Context already thanks to ApplicationContextProvider.
-                hashMapOf(
-                    Pair("previousVersion", AttributeValue.String(previousVersionName)),
-                    Pair("previousBuild", AttributeValue.Integer(previousVersionCode))
+        if(upgrade) {
+            eventQueueService.trackEvent(
+                Event(
+                    "App Updated",
+                    // the current app version is included as part of Context already thanks to ApplicationContextProvider.
+                    hashMapOf(
+                        Pair("previousVersion", AttributeValue.String(previousVersionName)),
+                        Pair("previousBuild", AttributeValue.Integer(previousVersionCode))
+                    )
                 )
             )
-        )
+        }
     }
 
     private val store = localStorage.getKeyValueStorageFor(STORAGE_CONTEXT_IDENTIFIER)

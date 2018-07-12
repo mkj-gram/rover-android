@@ -376,7 +376,7 @@ open class ExperienceNavigationViewModel(
         return hashMapOf(
             Pair("experienceID", AttributeValue.String(experience.id.rawValue)),
             Pair("screenID", AttributeValue.String(screenId))
-        ) + if(experience.campaignId != null) { hashMapOf(Pair("campaignId", AttributeValue.String(experience.campaignId!!))) } else hashMapOf()
+        ) + if(experience.campaignId != null) { hashMapOf(Pair("campaignID", AttributeValue.String(experience.campaignId!!))) } else hashMapOf()
     }
 
     private fun attributeHashFragmentForCampaignId(): HashMap<String, AttributeValue.String> {

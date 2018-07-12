@@ -42,7 +42,9 @@ class LocationReportingService(
                 "Beacon Region Entered",
                 hashMapOf(
                     Pair("identifier", AttributeValue.String(beaconRegion.identifier)),
-                    Pair("uuid", AttributeValue.String(beaconRegion.uuid.toString()))
+                    Pair("uuid", AttributeValue.String(beaconRegion.uuid.toString())),
+                    Pair("major", AttributeValue.String(beaconRegion.major.toString())),
+                    Pair("minor", AttributeValue.String(beaconRegion.minor.toString()))
                 )
             )
         )
@@ -54,7 +56,9 @@ class LocationReportingService(
                 "Beacon Region Exited",
                 hashMapOf(
                     Pair("identifier", AttributeValue.String(beaconRegion.identifier)),
-                    Pair("uuid", AttributeValue.String(beaconRegion.uuid.toString()))
+                    Pair("uuid", AttributeValue.String(beaconRegion.uuid.toString())),
+                    Pair("major", AttributeValue.String(beaconRegion.major.toString())),
+                    Pair("minor", AttributeValue.String(beaconRegion.minor.toString()))
                 )
             )
         )

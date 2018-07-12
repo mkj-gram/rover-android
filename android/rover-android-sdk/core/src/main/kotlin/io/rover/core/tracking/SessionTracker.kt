@@ -69,7 +69,6 @@ class SessionTracker(
                 Event(
                     expiredSession.eventName,
                     hashMapOf(
-                        Pair("SessionID", AttributeValue.String(expiredSession.uuid.toString())),
                         Pair("duration", AttributeValue.Integer(expiredSession.durationSeconds))
                     )
                 )
@@ -83,7 +82,6 @@ class SessionTracker(
         sessionEndEventName: String,
         attributes: Attributes
     ) {
-        log.v("LEAVING SESSION $sessionKey")
         sessionStore.leaveSession(sessionKey)
 
         eventQueueService.trackEvent(

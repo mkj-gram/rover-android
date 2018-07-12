@@ -38,7 +38,7 @@ class ApplicationSessionEmitter(
                     tracker.enterSession(
                         "ApplicationSession",
                         "App Opened",
-                        "Application Viewed",
+                        "App Viewed",
                         hashMapOf())
                 }
 

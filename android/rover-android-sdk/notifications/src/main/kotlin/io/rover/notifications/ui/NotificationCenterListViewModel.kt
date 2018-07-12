@@ -107,7 +107,7 @@ class NotificationCenterListViewModel(
     protected fun trackEnterNotificationCenter() {
         sessionTracker.enterSession(
             "NotificationCenter",
-            "Notification Center Displayed",
+            "Notification Center Presented",
             "Notification Center Viewed",
             hashMapOf()
         )

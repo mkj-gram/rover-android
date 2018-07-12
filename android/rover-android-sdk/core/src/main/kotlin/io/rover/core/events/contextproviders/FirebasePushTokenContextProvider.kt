@@ -1,6 +1,7 @@
 package io.rover.core.events.contextproviders
 
 import android.os.Handler
+import io.rover.core.data.domain.AttributeValue
 import io.rover.core.logging.log
 import io.rover.core.platform.LocalStorage
 import io.rover.core.data.domain.DeviceContext
@@ -9,6 +10,7 @@ import io.rover.core.events.EventQueueService
 import io.rover.core.events.EventQueueServiceInterface
 import io.rover.core.events.PushTokenTransmissionChannel
 import io.rover.core.events.domain.Event
+import io.rover.core.platform.whenNotNull
 import java.util.Date
 import java.util.concurrent.Executors
 
@@ -40,9 +42,12 @@ class FirebasePushTokenContextProvider(
                 when {
                     this.token == null -> "Push Token Added"
                     token == null -> "Push Token Removed"
-                    else -> "Push Token Changed"
+                    else -> "Push Token Updated"
                 },
-                hashMapOf()
+                listOfNotNull(
+                    token.whenNotNull { token -> Pair("currentToken", AttributeValue.String(token)) },
+                    this.token.whenNotNull { previousToken -> Pair("previousToken", AttributeValue.String(previousToken)) }
+                ).associate { it }
             )
             this.token = token
             val eventsPlugin = eventQueue ?: throw RuntimeException("registeredWithEventQueue() not called on FirebasePushTokenContextProvider during setup.")

@@ -60,6 +60,7 @@ import io.rover.core.streams.Scheduler
 import io.rover.core.streams.forAndroidMainThread
 import io.rover.core.streams.forExecutor
 import io.rover.core.tracking.ApplicationSessionEmitter
+import io.rover.core.tracking.BluetoothStateTracker
 import io.rover.core.tracking.SessionStore
 import io.rover.core.tracking.SessionStoreInterface
 import io.rover.core.tracking.SessionTracker
@@ -272,8 +273,8 @@ class CoreAssembler @JvmOverloads constructor(
         }
 
         BluetoothAdapter.getDefaultAdapter().whenNotNull { bluetoothAdapter ->
-            container.register(Scope.Singleton, ContextProvider::class.java, "bluetooth") { _ ->
-                BluetoothContextProvider(bluetoothAdapter)
+            container.register(Scope.Singleton, BluetoothAdapter::class.java) { _ ->
+                bluetoothAdapter
             }
         }
 
@@ -370,7 +371,11 @@ class CoreAssembler @JvmOverloads constructor(
 
         resolver.resolveSingletonOrFail(ApplicationSessionEmitter::class.java).start()
 
-        resolver.resolve(ContextProvider::class.java, "bluetooth").whenNotNull { eventQueue.addContextProvider(it) }
+        resolver.resolve(BluetoothAdapter::class.java).whenNotNull { bluetoothAdapter ->
+            eventQueue.addContextProvider(BluetoothContextProvider(bluetoothAdapter))
+        }
+
+        BluetoothStateTracker(application, resolver.resolveSingletonOrFail(EventQueueServiceInterface::class.java))
 
         resolver.resolveSingletonOrFail(Router::class.java).apply {
             registerRoute(
