@@ -35,7 +35,7 @@ export interface NotificationStatisticsPopoverProps {
     children: JSX.Element[]
     device: Media
     label: string
-    status?: 'good' | 'bad' | 'ok'
+    status?: 'good' | 'bad' | 'ok' | 'N/A'
     value: string
 }
 

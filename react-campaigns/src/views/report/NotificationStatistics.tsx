@@ -47,9 +47,27 @@ const NotificationStatistics: React.SFC<
         pushInfluencedUnique
     } = notificationOpenedReport
 
-    const getSuccessRate = (): number =>
-        (100 * (notificationCenterDelivered + pushDelivered)) /
-        (notificationCenterAttempted + pushAttempted)
+    const getSuccessRate = (): string => {
+        const successRate =
+            (100 * (notificationCenterDelivered + pushDelivered)) /
+            (notificationCenterAttempted + pushAttempted)
+
+        if (isNaN(successRate)) {
+            return 'N/A'
+        }
+
+        return successRate.toFixed(2).toString() + '%'
+    }
+
+    const getOpenRate = (): string => {
+        const openRate = (100 * uniqueOpens) / uniqueDelivered
+
+        if (isNaN(openRate)) {
+            return 'N/A'
+        }
+
+        return openRate.toFixed(2).toString() + '%'
+    }
 
     return (
         <div
@@ -73,21 +91,21 @@ const NotificationStatistics: React.SFC<
                 value={
                     notificationCenterDelivered
                         ? notificationCenterDelivered.toString()
-                        : '--'
+                        : '0'
                 }
             />
             <Statistic
                 label="Push Notification"
                 style={{ marginBottom: device === 'Mobile' ? 8 : 0 }}
-                value={pushDelivered ? pushDelivered.toString() : '--'}
+                value={pushDelivered ? pushDelivered.toString() : '0'}
             />
 
             <NotificationStatisticsPopover
                 campaignId={campaignId}
                 device={device}
                 label="Success Rate"
-                status="good"
-                value={`${getSuccessRate().toFixed(2)}%`}
+                status={getSuccessRate() === 'N/A' ? 'N/A' : 'good'}
+                value={getSuccessRate()}
             >
                 <StatDetail
                     detail="Attempted description"
@@ -128,7 +146,7 @@ const NotificationStatistics: React.SFC<
                 value={
                     notificationCenterUnique
                         ? notificationCenterUnique.toString()
-                        : '--'
+                        : '0'
                 }
             >
                 <StatDetail
@@ -137,7 +155,7 @@ const NotificationStatistics: React.SFC<
                     value={
                         notificationCenterTotal
                             ? notificationCenterTotal.toString()
-                            : '--'
+                            : '0'
                     }
                 />
                 <StatDetail
@@ -146,7 +164,7 @@ const NotificationStatistics: React.SFC<
                     value={
                         notificationCenterUnique
                             ? notificationCenterUnique.toString()
-                            : '--'
+                            : '0'
                     }
                 />
             </NotificationStatisticsPopover>
@@ -160,9 +178,7 @@ const NotificationStatistics: React.SFC<
                 <StatDetail
                     detail="Direct Opens"
                     name="Direct Opens"
-                    value={
-                        pushDirectUnique ? pushDirectUnique.toString() : '--'
-                    }
+                    value={pushDirectUnique ? pushDirectUnique.toString() : '0'}
                 />
                 <StatDetail
                     detail="Influenced Opens"
@@ -170,7 +186,7 @@ const NotificationStatistics: React.SFC<
                     value={
                         pushInfluencedUnique
                             ? pushInfluencedUnique.toString()
-                            : '--'
+                            : '0'
                     }
                 />
             </NotificationStatisticsPopover>
@@ -178,18 +194,18 @@ const NotificationStatistics: React.SFC<
                 campaignId={campaignId}
                 device={device}
                 label="Open Rate"
-                status="good"
-                value={`${((100 * uniqueOpens) / uniqueDelivered).toFixed(1)}%`}
+                status={getOpenRate() === 'N/A' ? 'N/A' : 'good'}
+                value={getOpenRate()}
             >
                 <StatDetail
                     detail="Delivered"
                     name="Delivered"
-                    value={uniqueDelivered ? uniqueDelivered.toString() : '--'}
+                    value={uniqueDelivered ? uniqueDelivered.toString() : '0'}
                 />
                 <StatDetail
                     detail="Opened"
                     name="Opened"
-                    value={uniqueOpens ? uniqueOpens.toString() : '--'}
+                    value={uniqueOpens ? uniqueOpens.toString() : '0'}
                 />
             </NotificationStatisticsPopover>
         </div>

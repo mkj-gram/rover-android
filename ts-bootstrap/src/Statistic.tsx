@@ -13,7 +13,7 @@ import { semibold } from '../styles/typography'
 
 import Text from './Text'
 
-export type valueStatus = 'good' | 'bad' | 'ok'
+export type valueStatus = 'good' | 'bad' | 'ok' | 'N/A'
 
 export interface StatisticProps {
     label: string
@@ -70,6 +70,8 @@ const getValueStyle = (status: valueStatus) => {
             return red
         case 'ok':
             return yellow
+        case 'N/A':
+            return steel
         default:
             return charcoal
     }
