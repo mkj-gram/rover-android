@@ -158,6 +158,13 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rover.audience.v1.UpdateDeviceLabelPropertyResponse" do
   end
+  add_message "rover.audience.v1.UpdateDeviceAppBadgeNumberRequest" do
+    optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
+    optional :device_id, :string, 2
+    optional :app_badge_number, :message, 3, "rover.protobuf.Int32Value"
+  end
+  add_message "rover.audience.v1.UpdateDeviceAppBadgeNumberResponse" do
+  end
   add_message "rover.audience.v1.DeleteDeviceRequest" do
     optional :auth_context, :message, 1, "rover.auth.v1.AuthContext"
     optional :device_id, :string, 2
@@ -739,6 +746,8 @@ module Rover
       UpdateDeviceTestPropertyResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceTestPropertyResponse").msgclass
       UpdateDeviceLabelPropertyRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceLabelPropertyRequest").msgclass
       UpdateDeviceLabelPropertyResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceLabelPropertyResponse").msgclass
+      UpdateDeviceAppBadgeNumberRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceAppBadgeNumberRequest").msgclass
+      UpdateDeviceAppBadgeNumberResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.UpdateDeviceAppBadgeNumberResponse").msgclass
       DeleteDeviceRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeleteDeviceRequest").msgclass
       DeleteDeviceResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.DeleteDeviceResponse").msgclass
       SetDeviceProfileIdentifierRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rover.audience.v1.SetDeviceProfileIdentifierRequest").msgclass

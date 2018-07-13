@@ -56,6 +56,8 @@ module Rover
           # Test devices
           rpc :UpdateDeviceTestProperty, UpdateDeviceTestPropertyRequest, UpdateDeviceTestPropertyResponse
           rpc :UpdateDeviceLabelProperty, UpdateDeviceLabelPropertyRequest, UpdateDeviceLabelPropertyResponse
+          # Badge Number
+          rpc :UpdateDeviceAppBadgeNumber, UpdateDeviceAppBadgeNumberRequest, UpdateDeviceAppBadgeNumberResponse
           # Lists
           rpc :ListDevicesByProfileIdentifier, ListDevicesByProfileIdentifierRequest, ListDevicesByProfileIdentifierResponse
           # TODO:

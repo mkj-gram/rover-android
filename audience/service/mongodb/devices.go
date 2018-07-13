@@ -771,6 +771,37 @@ func (s *devicesStore) UpdateDeviceLabelProperty(ctx context.Context, r *audienc
 	return nil
 }
 
+func (s *devicesStore) UpdateDeviceAppBadgeNumber(ctx context.Context, r *audience.UpdateDeviceAppBadgeNumberRequest) error {
+	var (
+		now = s.timeNow()
+
+		account_id = r.GetAuthContext().GetAccountId()
+		device_id  = r.GetDeviceId()
+	)
+
+	var badgeNumber *int32
+	if r.AppBadgeNumber != nil {
+		badgeNumber = &r.AppBadgeNumber.Value
+	}
+
+	var (
+		selector = bson.M{
+			"device_id":  device_id,
+			"account_id": account_id,
+		}
+		update = bson.M{
+			"app_badge_number": badgeNumber,
+			"updated_at":       now,
+		}
+	)
+
+	if err := s.devices().Update(selector, bson.M{"$set": update}); err != nil {
+		return wrapError(err, "devices.Update")
+	}
+
+	return nil
+}
+
 func (s *devicesStore) UpdateDevicePushToken(ctx context.Context, r *audience.UpdateDevicePushTokenRequest) error {
 	var (
 		now = s.timeNow()

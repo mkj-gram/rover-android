@@ -485,6 +485,24 @@ func (mr *MockAudienceClientMockRecorder) UpdateDevice(arg0, arg1 interface{}, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDevice", reflect.TypeOf((*MockAudienceClient)(nil).UpdateDevice), varargs...)
 }
 
+// UpdateDeviceAppBadgeNumber mocks base method
+func (m *MockAudienceClient) UpdateDeviceAppBadgeNumber(arg0 context.Context, arg1 *v1.UpdateDeviceAppBadgeNumberRequest, arg2 ...grpc.CallOption) (*v1.UpdateDeviceAppBadgeNumberResponse, error) {
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "UpdateDeviceAppBadgeNumber", varargs...)
+	ret0, _ := ret[0].(*v1.UpdateDeviceAppBadgeNumberResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateDeviceAppBadgeNumber indicates an expected call of UpdateDeviceAppBadgeNumber
+func (mr *MockAudienceClientMockRecorder) UpdateDeviceAppBadgeNumber(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDeviceAppBadgeNumber", reflect.TypeOf((*MockAudienceClient)(nil).UpdateDeviceAppBadgeNumber), varargs...)
+}
+
 // UpdateDeviceCustomAttributes mocks base method
 func (m *MockAudienceClient) UpdateDeviceCustomAttributes(arg0 context.Context, arg1 *v1.UpdateDeviceCustomAttributesRequest, arg2 ...grpc.CallOption) (*v1.UpdateDeviceCustomAttributesResponse, error) {
 	varargs := []interface{}{arg0, arg1}

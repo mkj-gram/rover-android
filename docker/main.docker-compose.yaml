@@ -30,7 +30,7 @@ services:
       environment:
         - AUTO_CREATE_TOPICS=true
         - ADVERTISED_HOST=kafka
-        - NUM_PARTITIONS=3
+        - NUM_PARTITIONS=1
 
   elastic:
     image: docker.elastic.co/elasticsearch/elasticsearch:5.5.2
@@ -68,13 +68,6 @@ services:
       context: ./vendor/rabbitmq
     ports:
       - 15672
-
-  kafka:
-    image: spotify/kafka
-    environment:
-      - AUTO_CREATE_TOPICS=true
-      - ADVERTISED_HOST=kafka
-      - NUM_PARTITIONS=3
 
   influxdb:
     image: influxdb:1.5.3
@@ -123,18 +116,19 @@ services:
       GRAPHQL_HOST: "http://graphql-gateway/graphql"
 
   audience-service:
-    image: golang:1.10-alpine
+    image: roverio/golang-rdkafka:1.10-alpine
     depends_on:
       - mongo
       - elastic
       - pubsub
       - audience-segments-worker
+      - kafka
     command: ./docker/audience/cmd configure_pubsub run
     volumes:
       - ../:/go/src/github.com/roverplatform/rover
     working_dir: /go/src/github.com/roverplatform/rover
     environment:
-      CGO_ENABLED: 0
+      CGO_ENABLED: 1
       AUDIENCE_SERVICE_PUBSUB_TOPIC_NAME: "audience-service-dev-topic"
       AUDIENCE_SERVICE_MONGO_DSN: "mongodb://mongo:27017/audience_service_dev"
       AUDIENCE_SERVICE_ELASTIC_DSN: "http://elastic:9200"

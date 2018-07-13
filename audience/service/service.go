@@ -177,6 +177,23 @@ func (s *Server) UpdateDeviceLabelProperty(ctx context.Context, r *audience.Upda
 	return &audience.UpdateDeviceLabelPropertyResponse{}, nil
 }
 
+// UpdateDeviceAppBadgeNumber implements the corresponding rpc
+func (s *Server) UpdateDeviceAppBadgeNumber(ctx context.Context, r *audience.UpdateDeviceAppBadgeNumberRequest) (*audience.UpdateDeviceAppBadgeNumberResponse, error) {
+	if err := validateID(r.GetDeviceId()); err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Validation: DeviceId: %v", err)
+	}
+	db := s.db.Copy()
+	defer db.Close()
+
+	if err := db.UpdateDeviceAppBadgeNumber(ctx, r); err != nil {
+		return nil, status.Errorf(ErrorToStatus(errors.Cause(err)), "db.UpdateDeviceAppBadgeNumber: %v", err)
+	}
+
+	s.notify.deviceUpdated(ctx, r.AuthContext.AccountId, r.DeviceId)
+
+	return &audience.UpdateDeviceAppBadgeNumberResponse{}, nil
+}
+
 // DeleteDevice implements the corresponding rpc
 func (s *Server) DeleteDevice(ctx context.Context, r *audience.DeleteDeviceRequest) (*audience.DeleteDeviceResponse, error) {
 	if err := validateID(r.GetDeviceId()); err != nil {

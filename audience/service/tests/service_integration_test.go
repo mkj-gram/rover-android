@@ -97,6 +97,7 @@ func TestAudienceService(t *testing.T) {
 	t.Run("UpdateDeviceGeofenceMonitoring", testAudienceService_UpdateDeviceGeofenceMonitoring)
 	t.Run("UpdateDeviceIBeaconMonitoring", testAudienceService_UpdateDeviceIBeaconMonitoring)
 	t.Run("UpdateDeviceTestProperty", testAudienceService_UpdateDeviceTestProperty)
+	t.Run("UpdateDeviceAppBadgeNumber", testAudienceService_UpdateDeviceAppBadgeNumber)
 	t.Run("UpdateDeviceCustomAttributes", testAudienceService_UpdateDeviceCustomAttributes)
 
 	t.Run("SetDeviceProfile", testAudienceService_SetDeviceProfileIdentifier)
@@ -3475,6 +3476,156 @@ func testAudienceService_UpdateDeviceTestProperty(t *testing.T) {
 			}
 
 			var _, gotErr = client.UpdateDeviceTestProperty(ctx, tc.req)
+			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
+				t.Errorf("Diff:\n%v", difff(diff))
+			}
+
+			if tc.after != nil {
+				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
+				if diff := Diff(tc.after.exp, got, tc.after.expErr, gotErr); diff != nil {
+					t.Errorf("After:\n%v", difff(diff))
+				}
+			}
+		})
+	}
+}
+
+func testAudienceService_UpdateDeviceAppBadgeNumber(t *testing.T) {
+	var (
+		ctx = context.TODO()
+
+		updatedAt = time.Now().Truncate(time.Millisecond)
+
+		mdb = dialMongo(t, *tMongoDSN)
+		db  = mongodb.New(
+			mdb,
+			mongodb.WithObjectIDFunc(tNewObjectIdFunc(t, 0)),
+			mongodb.WithTimeFunc(func() time.Time { return updatedAt }),
+		)
+
+		svc = service.New(db, nil, logNotifier(t))
+
+		client, teardown = NewSeviceClient(t, "localhost:51000", svc)
+	)
+
+	defer teardown()
+
+	type tCase struct {
+		name string
+		req  *audience.UpdateDeviceAppBadgeNumberRequest
+
+		expErr error
+
+		before, after *expect
+	}
+
+	tcases := []tCase{
+		{
+			name: "error: device_id: unset",
+			req: &audience.UpdateDeviceAppBadgeNumberRequest{
+				AuthContext: &auth.AuthContext{AccountId: 1},
+				DeviceId:    "000000000000000000000000",
+			},
+
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDeviceAppBadgeNumber: devices.Update: not found"),
+		},
+
+		{
+			name: "error: wrong account",
+			req: &audience.UpdateDeviceAppBadgeNumberRequest{
+				AuthContext: &auth.AuthContext{AccountId: 100},
+				DeviceId:    "000000000000000000000dd4",
+			},
+
+			expErr: status.Errorf(codes.NotFound, "db.UpdateDeviceAppBadgeNumber: devices.Update: not found"),
+		},
+
+		{
+			name: "sets device badge number",
+			req: &audience.UpdateDeviceAppBadgeNumberRequest{
+				AuthContext:    &auth.AuthContext{AccountId: 5},
+				DeviceId:       "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD8",
+				AppBadgeNumber: wrappers.Int32(2),
+			},
+
+			before: &expect{
+				expErr: nil,
+				exp: &audience.Device{
+					AccountId: 5,
+
+					Id:        "000000000000000000000dd8",
+					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD8",
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.497Z")),
+				},
+			},
+
+			after: &expect{
+				expErr: nil,
+				exp: &audience.Device{
+					AccountId: 5,
+
+					AppBadgeNumber: wrappers.Int32(2),
+
+					Id:       "000000000000000000000dd8",
+					DeviceId: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD8",
+
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt: protoTs(t, updatedAt),
+				},
+			},
+		},
+
+		{
+			name: "clears device badge number",
+			req: &audience.UpdateDeviceAppBadgeNumberRequest{
+				AuthContext:    &auth.AuthContext{AccountId: 5},
+				DeviceId:       "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD8",
+				AppBadgeNumber: nil,
+			},
+
+			before: &expect{
+				expErr: nil,
+				exp: &audience.Device{
+					AccountId: 5,
+
+					AppBadgeNumber: wrappers.Int32(2),
+
+					Id:        "000000000000000000000dd8",
+					DeviceId:  "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD8",
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt: protoTs(t, updatedAt),
+				},
+			},
+
+			after: &expect{
+				expErr: nil,
+				exp: &audience.Device{
+					AccountId: 5,
+
+					AppBadgeNumber: nil,
+
+					Id:       "000000000000000000000dd8",
+					DeviceId: "DDDDDDDD-DDDD-DDDD-DDDD-DDDDDDDDDDD8",
+
+					CreatedAt: protoTs(t, parseTime(t, "2017-06-14T15:44:18.496Z")),
+					UpdatedAt: protoTs(t, updatedAt),
+				},
+			},
+		},
+	}
+
+	for _, tc := range tcases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.before != nil {
+
+				got, gotErr := db.FindDeviceById(ctx, tc.req.GetDeviceId())
+				if diff := Diff(tc.before.exp, got, tc.before.expErr, gotErr); diff != nil {
+					t.Errorf("Before:\n%v", difff(diff))
+				}
+			}
+
+			var _, gotErr = client.UpdateDeviceAppBadgeNumber(ctx, tc.req)
 			if diff := Diff(nil, nil, tc.expErr, gotErr); diff != nil {
 				t.Errorf("Diff:\n%v", difff(diff))
 			}

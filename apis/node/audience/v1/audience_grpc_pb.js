@@ -535,6 +535,28 @@ function deserialize_rover_audience_v1_TagProfileResponse(buffer_arg) {
   return audience_v1_audience_pb.TagProfileResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_rover_audience_v1_UpdateDeviceAppBadgeNumberRequest(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.UpdateDeviceAppBadgeNumberRequest)) {
+    throw new Error('Expected argument of type rover.audience.v1.UpdateDeviceAppBadgeNumberRequest');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_UpdateDeviceAppBadgeNumberRequest(buffer_arg) {
+  return audience_v1_audience_pb.UpdateDeviceAppBadgeNumberRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_rover_audience_v1_UpdateDeviceAppBadgeNumberResponse(arg) {
+  if (!(arg instanceof audience_v1_audience_pb.UpdateDeviceAppBadgeNumberResponse)) {
+    throw new Error('Expected argument of type rover.audience.v1.UpdateDeviceAppBadgeNumberResponse');
+  }
+  return new Buffer(arg.serializeBinary());
+}
+
+function deserialize_rover_audience_v1_UpdateDeviceAppBadgeNumberResponse(buffer_arg) {
+  return audience_v1_audience_pb.UpdateDeviceAppBadgeNumberResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_rover_audience_v1_UpdateDeviceCustomAttributesRequest(arg) {
   if (!(arg instanceof audience_v1_audience_pb.UpdateDeviceCustomAttributesRequest)) {
     throw new Error('Expected argument of type rover.audience.v1.UpdateDeviceCustomAttributesRequest');
@@ -1072,6 +1094,18 @@ var AudienceService = exports.AudienceService = {
     requestDeserialize: deserialize_rover_audience_v1_UpdateDeviceLabelPropertyRequest,
     responseSerialize: serialize_rover_audience_v1_UpdateDeviceLabelPropertyResponse,
     responseDeserialize: deserialize_rover_audience_v1_UpdateDeviceLabelPropertyResponse,
+  },
+  // Badge Number
+  updateDeviceAppBadgeNumber: {
+    path: '/rover.audience.v1.Audience/UpdateDeviceAppBadgeNumber',
+    requestStream: false,
+    responseStream: false,
+    requestType: audience_v1_audience_pb.UpdateDeviceAppBadgeNumberRequest,
+    responseType: audience_v1_audience_pb.UpdateDeviceAppBadgeNumberResponse,
+    requestSerialize: serialize_rover_audience_v1_UpdateDeviceAppBadgeNumberRequest,
+    requestDeserialize: deserialize_rover_audience_v1_UpdateDeviceAppBadgeNumberRequest,
+    responseSerialize: serialize_rover_audience_v1_UpdateDeviceAppBadgeNumberResponse,
+    responseDeserialize: deserialize_rover_audience_v1_UpdateDeviceAppBadgeNumberResponse,
   },
   // Lists
   listDevicesByProfileIdentifier: {

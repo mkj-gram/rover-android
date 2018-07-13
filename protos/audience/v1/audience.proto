@@ -59,6 +59,9 @@ service Audience {
   rpc UpdateDeviceTestProperty(UpdateDeviceTestPropertyRequest) returns (UpdateDeviceTestPropertyResponse);
   rpc UpdateDeviceLabelProperty(UpdateDeviceLabelPropertyRequest) returns (UpdateDeviceLabelPropertyResponse);
 
+  // Badge Number
+  rpc UpdateDeviceAppBadgeNumber(UpdateDeviceAppBadgeNumberRequest) returns (UpdateDeviceAppBadgeNumberResponse);
+
   // Lists
   rpc ListDevicesByProfileIdentifier(ListDevicesByProfileIdentifierRequest) returns (ListDevicesByProfileIdentifierResponse);
   // TODO:
@@ -321,6 +324,17 @@ message UpdateDeviceLabelPropertyRequest {
   string label = 3;
 }
 message UpdateDeviceLabelPropertyResponse {}
+
+
+// Badge Number
+message UpdateDeviceAppBadgeNumberRequest {
+  auth.v1.AuthContext auth_context  = 1;
+
+  string device_id = 2;
+
+  rover.protobuf.Int32Value app_badge_number = 3;
+}
+message UpdateDeviceAppBadgeNumberResponse { }
 
 
 message DeleteDeviceRequest {

@@ -4,6 +4,7 @@ set -e
 source ./docker/functions.bash
 
 test() {
+  waiton kafka 9092
   go test -tags integration ./audience/service/...
 }
 

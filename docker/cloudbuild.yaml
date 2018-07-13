@@ -365,6 +365,19 @@ steps:
     waitFor:
       - 'test-complete'
 
+  - id: 'build-audience-kafka-consumer'
+    name: 'gcr.io/$PROJECT_ID/golang-rdkafka:1.10-alpine'
+    env:
+      - PROJECT_ROOT=github.com/roverplatform/rover
+    args:
+      - build
+      - -tags
+      - static_all
+      - -o
+      - docker/audience/build/bin/audience-kafka-consumer
+      - github.com/roverplatform/rover/audience/service/cmd/audience-kafka-consumer
+    waitFor:
+      - 'test-complete'
 
   - id: 'build-audience-resources'
     name: 'ubuntu'
@@ -378,6 +391,7 @@ steps:
         cp -r ./gopath/bin/elastic-cli $$DEST/bin/
     waitFor:
       - 'build-audience-binaries'
+      - 'build-audience-kafka-consumer'
 
   - id: "build-audience-image"
     name: 'gcr.io/cloud-builders/docker'
