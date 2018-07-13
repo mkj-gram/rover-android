@@ -53,5 +53,3 @@ dokka {
     outputFormat = 'html'
     outputDirectory = "$buildDir/javadoc"
 }
-
-apply from: 'deploy.gradle'
