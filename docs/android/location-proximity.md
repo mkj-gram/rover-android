@@ -78,7 +78,6 @@ private fun makePermissionsAttempt() {
             // Show an explanation to the user *asynchronously* -- don't block
             // this thread waiting for the user's response! After the user
             // sees the explanation, try again to request the permission.
-
             AlertDialog.Builder(this)
                 .setMessage("My App would like to use your location for Geofences and Beacons.")
                 .setNeutralButton("Got it") { _, _ ->
@@ -91,9 +90,6 @@ private fun makePermissionsAttempt() {
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                 0
             )
-            // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-            // app-defined int constant. The callback method gets the
-            // result of the request.
         }
     } else {
         // Permission has already been granted
@@ -114,6 +110,9 @@ override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out
 }
 ```
 
+Then you can call `makePermissionsAttempt` at the appropriate point in your user
+flow.
+
 Rover will remember that the permission was granted across app restarts and will
 gracefully handle the permission being removed, but it remains prudent to
 continue checking each time from your main home screen or somewhere similarly
@@ -121,5 +120,7 @@ appropriate.
 
 <p class="read-more">
     {% include icons/book.svg %}
-    More details on how to properly handle requesting app permissions can be found in the <a href="https://developer.android.com/training/permissions/requesting">Android documentation: Request App Permissions</a>.
+    More details on how to properly handle requesting app permissions can be found
+    in the <a href="https://developer.android.com/training/permissions/requesting">
+    Android documentation: Request App Permissions</a>.
 </p>

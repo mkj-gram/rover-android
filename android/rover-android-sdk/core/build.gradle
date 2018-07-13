@@ -245,5 +245,3 @@ bintray {
 
     publications = ["production"]
 }
-
-// apply from: 'deploy.gradle'

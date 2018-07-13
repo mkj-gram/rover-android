@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                 // sees the explanation, try again to request the permission.
 
                 AlertDialog.Builder(this)
-                    .setMessage("My App would like to use your location for Geofences and Beacons.")
+                    .setMessage("Inbox App would like to use your location to discover Geofences and Beacons.")
                     .setNeutralButton("Got it") { _, _ ->
                         makePermissionsAttempt()
                     }
@@ -93,9 +93,6 @@ class MainActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     0
                 )
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
             }
         } else {
             // Permission has already been granted
