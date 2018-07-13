@@ -38,7 +38,9 @@ const trackEvents = {
         try {
             await pipeline.submitBatch(batch)
         } catch (err) {
+            console.error(err)
             // TODO if client needs to know which message failed propagate error from pipeline client
+            // NOTE we don't want to return the error back to the client as it may include sensitive information
             throw new Error(`Failed to submit events`)
         }
         

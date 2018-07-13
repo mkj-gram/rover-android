@@ -59,7 +59,7 @@ function deviceContextToProto(context) {
 		throw new Error("device.deviceIdentifier cannot be empty")
 	}
 
-	dc.setDeviceIdentifier(context.deviceIdentifier)
+	dc.setDeviceIdentifier(context.deviceIdentifier.toUpperCase())
 	dc.setProfileIdentifier(context.profileIdentifier)
 
 	dc.setAttributes(Struct.fromJavaScript(context.attributes || {}))

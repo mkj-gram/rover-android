@@ -83,7 +83,7 @@ describe('Client', function() {
 			// Use random ids to ensure we are always comparing the latest message in a kafka topic
 			const eventId			= Crypto.randomBytes(16).toString("hex")
 			const context 			= new RoverApis.auth.v1.Models.AuthContext()
-			const deviceIdentifier 	= Crypto.randomBytes(16).toString("hex") //"ea78199c-1740-11e8-b642-0ed5f89f718b" // must be stable for tests
+			const deviceIdentifier 	= Crypto.randomBytes(16).toString("hex").toUpperCase()
 
 			const input = {
 				id: eventId,
