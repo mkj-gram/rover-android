@@ -9,6 +9,7 @@ import io.rover.debug.DebugAssembler
 import io.rover.experiences.ExperiencesAssembler
 import io.rover.location.LocationAssembler
 import io.rover.notifications.NotificationsAssembler
+import io.rover.ticketmaster.TicketmasterAssembler
 import timber.log.Timber
 
 
@@ -28,7 +29,7 @@ class DebugApplication : Application() {
             CoreAssembler(
                 accountToken = getString(R.string.rover_api_token),
                 application = this,
-                urlSchemes = listOf("rv-debug"),
+                urlSchemes = listOf("rv-sean-rucker"),
                 endpoint = "$roverBaseUrl/graphql"
             ),
             NotificationsAssembler(
@@ -42,7 +43,8 @@ class DebugApplication : Application() {
             },
             ExperiencesAssembler(),
             LocationAssembler(),
-            DebugAssembler()
+            DebugAssembler(),
+            TicketmasterAssembler()
         )
     }
 }
