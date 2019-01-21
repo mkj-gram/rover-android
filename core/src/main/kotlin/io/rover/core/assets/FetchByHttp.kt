@@ -56,11 +56,13 @@ class ImageDownloader(
                             // them in the same LRU cache pool will mean that rotating through just a few
                             // large photos will cause the small payloads to be evicted even though their
                             // contribution to consumption of the cache is tiny.
-                            throw AndroidHttpsUrlConnectionNetworkClient.missingCacheException()
+                            AndroidHttpsUrlConnectionNetworkClient.emitMissingCacheWarning()
                         }
 
                         connection.apply {
                             requestMethod = "GET"
+                            connectTimeout = 60000
+                            readTimeout = 60000
                         }
 
                         val responseCode = try {
