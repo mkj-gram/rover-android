@@ -5,7 +5,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'org.jetbrains.dokka-android'
 apply plugin: 'maven-publish'
-apply plugin: "de.mannodermaus.android-junit5"
+//apply plugin: "de.mannodermaus.android-junit5"
 
 android {
     compileSdkVersion 27
@@ -67,11 +67,11 @@ dependencies {
     testImplementation 'org.skyscreamer:jsonassert:1.5.0'
 
     // JUnit 5 support.  Needed for Spek.
-    testImplementation junit5.unitTests()
+//    testImplementation junit5.unitTests()
     // (Optional) If you need "parameterized tests"
-    testImplementation junit5.parameterized()
+//    testImplementation junit5.parameterized()
     // (Optional) For running tests inside Android Studio 3.x (needed as of at least beta 7)
-    testCompileOnly junit5.unitTestsRuntime()
+//    testCompileOnly junit5.unitTestsRuntime()
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
