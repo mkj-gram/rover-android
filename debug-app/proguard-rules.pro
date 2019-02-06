@@ -24,3 +24,5 @@
 -dontwarn okhttp3.**
 -dontwarn com.uber.autodispose.**
 -dontwarn okio.**
+-keep,allowobfuscation interface io.rover.location.GeofenceServiceInterface { *; }
+
